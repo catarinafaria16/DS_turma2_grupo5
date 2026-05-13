@@ -1,6 +1,6 @@
 import type { CreateAuditoriaDto } from '../dtos/auditoria/create-auditoria.dto';
 import type { AuditoriaResponseDto } from '../dtos/auditoria/auditoria-response.dto';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export class AuditoriaService {
 

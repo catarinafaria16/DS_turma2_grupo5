@@ -1,8 +1,8 @@
-import { IntensidadeCrise } from '../../enums/IntensidadeCriseAlergia.enum';
+import { IntensidadeCriseAlergia } from '../../enums/IntensidadeCriseAlergia.enum.js';
 
 export interface CreateAlergiaDto {
     anamnese_id: number;
     descricao: string;
-    frequencia_crises: string;
-    intensidade_crises: IntensidadeCrise;
+    frequencia_crise: string;
+    intensidade_crise: IntensidadeCriseAlergia;
 }

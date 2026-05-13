@@ -1,5 +1,5 @@
-import { EstadoAlerta } from '../../enums/EstadoAlerta.enum';
-import { TipoAlerta } from '../../enums/TipoAlerta.enum';
+import { EstadoAlerta } from '../../enums/EstadoAlerta.enum.js';
+import { TipoAlerta } from '../../enums/TipoAlerta.enum.js';
 
 export interface CreateAlertaDto {
     utente_id: number;

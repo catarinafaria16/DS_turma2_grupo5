@@ -1,9 +1,10 @@
 import type { CreateUtenteDto } from '../dtos/utente/create-utente.dto';
 import type { UtenteResponseDto } from '../dtos/utente/utente-response.dto';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { AuditoriaService } from './auditoria.service.js';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export class UtenteService {
-    private auditoriaService: any; // TODO: Implementar AuditoriaService
+    private auditoriaService: AuditoriaService;
 
     constructor() {
         this.auditoriaService = new AuditoriaService();

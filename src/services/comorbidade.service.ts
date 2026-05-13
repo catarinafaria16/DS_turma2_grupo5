@@ -1,9 +1,10 @@
 import type { CreateComorbidadeDto } from '../dtos/comorbidade/create-comorbidade.dto';
 import type { ComorbidadeResponseDto } from '../dtos/comorbidade/comorbidade-response.dto';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { AuditoriaService } from './auditoria.service.js';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export class ComorbidadeService {
-    private auditoriaService: any; // TODO: Implementar AuditoriaService
+    private auditoriaService: AuditoriaService;
 
     constructor() {
         this.auditoriaService = new AuditoriaService();

@@ -6,6 +6,6 @@ export interface UtenteResponseDto {
     nr_utente: number;
     data_nascimento: Date;
     morada: string;
-    contato: string;
+    contacto: string;
     nr_faturacao: number;
 }

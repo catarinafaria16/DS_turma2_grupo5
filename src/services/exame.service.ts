@@ -1,10 +1,11 @@
 import type { CreateExameDto } from '../dtos/exame/create-exame.dto';
 import type { ExameResponseDto } from '../dtos/exame/exame-response.dto';
-import { EstadoExame } from '../enums/EstadoExame.enum';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { EstadoExame } from '../enums/EstadoExame.enum.js';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
+import { AuditoriaService } from './auditoria.service.js';
 
 export class ExameService {
-    private auditoriaService: any; // TODO: Implementar AuditoriaService
+    private auditoriaService: AuditoriaService;
 
     constructor() {
         this.auditoriaService = new AuditoriaService();

@@ -1,12 +1,13 @@
 import type { CreateAlergiaDto } from '../dtos/alergia/create-alergia.dto';
 import type { AlergiaResponseDto } from '../dtos/alergia/alergia-response.dto';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
+import { AuditoriaService } from './auditoria.service.js';
 
 export class AlergiaService {
-    private auditariaService: any; // TODO: Implementar AuditoriaService
+    private auditoriaService: AuditoriaService;
 
     constructor() {
-         this.auditariaService = new AuditoriaService();
+        this.auditoriaService = new AuditoriaService();
     }
 
     /**
@@ -46,7 +47,7 @@ export class AlergiaService {
             };
 
             // Registar auditoria
-             await this.auditariaService.registarAuditoria(
+             await this.auditoriaService.registarAuditoria(
                  utilizadorIdLogado,
                  'alergia',
                  novaAlergia.id,
