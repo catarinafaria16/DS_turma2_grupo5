@@ -7,7 +7,7 @@ export interface RegraAlertaResponseDto {
     administrador_id: number;
     categoria: CategoriaRegraAlerta;
     limiar_score: number;
-    valor_deteoracao: number;
+    valor_deterioracao: number;
     prioridade: PrioridadeRegraAlerta;
     data_criacao: Date;
 }

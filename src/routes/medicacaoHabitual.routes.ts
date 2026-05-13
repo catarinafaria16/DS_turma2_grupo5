@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { MedicacaoHabitualController } from '../controller/medicacaoHabitual.controller';
+import { MedicacaoHabitualController } from '../controller/medicacaoHabitual.controller.js';
 
 const routes = Router();
 const controller = new MedicacaoHabitualController();

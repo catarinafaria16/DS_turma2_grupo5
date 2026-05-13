@@ -1,5 +1,5 @@
-import type { CreateExameDto } from '../dtos/exame/create-exame.dto';
-import type { ExameResponseDto } from '../dtos/exame/exame-response.dto';
+import type { CreateExameDto } from '../dtos/exame/create-exame.dto.js';
+import type { ExameResponseDto } from '../dtos/exame/exame-response.dto.js';
 import { EstadoExame } from '../enums/EstadoExame.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
@@ -51,7 +51,7 @@ export class ExameService {
                 id: exameId,
                 prescricao_id: 0,
                 tipo_exame: '',
-                data_exame: new Date(),
+                data: new Date(),
                 resultado: {},
                 consentimento: false,
                 estado: EstadoExame.PENDENTE

@@ -1,5 +1,5 @@
-import type { CreateAdministradorDto } from '../dtos/administrador/create-administrador.dto';
-import type { AdministradorResponseDto } from '../dtos/administrador/administrador-response.dto';
+import type { CreateAdministradorDto } from '../dtos/administrador/create-administrador.dto.js';
+import type { AdministradorResponseDto } from '../dtos/administrador/administrador-response.dto.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 
@@ -80,7 +80,7 @@ export class AdministradorService {
             };
 
             // Registar auditoria
-             await this.auditariaService.registarAuditoria(
+             await this.auditoriaService.registarAuditoria(
                  utilizadorIdLogado,
                  'administrador',
                  administradorId,
@@ -110,7 +110,7 @@ export class AdministradorService {
             // TODO: Apagar da base de dados (soft delete é recomendado)
             
             // Registar auditoria
-             await this.auditariaService.registarAuditoria(
+             await this.auditoriaService.registarAuditoria(
                  utilizadorIdLogado,
                  'administrador',
                  administradorId,
@@ -164,7 +164,7 @@ export class AdministradorService {
             };
 
             // Registar auditoria
-             await this.auditariaService.registarAuditoria(
+             await this.auditoriaService.registarAuditoria(
                  utilizadorIdLogado,
                  'utilizador_permissoes',
                  utilizadorId,
@@ -221,7 +221,7 @@ export class AdministradorService {
             };
 
             // Registar auditoria
-             await this.auditariaService.registarAuditoria(
+             await this.auditoriaService.registarAuditoria(
                  utilizadorIdLogado,
                  'configuracao_carat',
                  1, // ID da configuração global
@@ -268,7 +268,7 @@ export class AdministradorService {
             // TODO: Aplicar operação apropriada na base de dados
 
             // Registar auditoria
-             await this.auditariaService.registarAuditoria(
+             await this.auditoriaService.registarAuditoria(
                  utilizadorIdLogado,
                  'dados_sistema',
                  1,

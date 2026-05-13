@@ -1,6 +1,6 @@
 export enum EstadoExame {
     PENDENTE = 'PENDENTE',
     REALIZADO = 'REALIZADO',
-    ANALIZADO = 'ANALIZADO',
+    ANALISADO = 'ANALISADO',
     CANCELADO = 'CANCELADO'
 }

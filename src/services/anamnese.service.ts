@@ -1,5 +1,5 @@
-import type { CreateAnamneseDto } from '../dtos/anamnese/create-anamnese.dto';
-import type { AnamneseResponseDto } from '../dtos/anamnese/anamnese-response.dto';
+import type { CreateAnamneseDto } from '../dtos/anamnese/create-anamnese.dto.js';
+import type { AnamneseResponseDto } from '../dtos/anamnese/anamnese-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 

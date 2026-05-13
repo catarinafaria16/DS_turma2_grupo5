@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { RespostaCaratService } from '../services/respostaCarat.service';
-import type { CreateRespostaCaratDto } from '../dtos/respostaCarat/create-respostaCarat.dto';
+import type { Request, Response } from 'express';
+import { RespostaCaratService } from '../services/respostaCarat.service.js';
+import type { CreateRespostaCaratDto } from '../dtos/respostaCarat/create-respostaCarat.dto.js';
 
 export class RespostaCaratController {
     private service: RespostaCaratService;

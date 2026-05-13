@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ComorbidadeController } from '../controller/comorbidade.controller';
+import { ComorbidadeController } from '../controller/comorbidade.controller.js';
 
 const routes = Router();
 const controller = new ComorbidadeController();

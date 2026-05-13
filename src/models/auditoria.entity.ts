@@ -1,4 +1,4 @@
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 type JsonValue =
     | string

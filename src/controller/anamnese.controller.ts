@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { AnamneseService } from '../services/anamnese.service';
-import type { CreateAnamneseDto } from '../dtos/anamnese/create-anamnese.dto';
+import type { Request, Response } from 'express';
+import { AnamneseService } from '../services/anamnese.service.js';
+import type { CreateAnamneseDto } from '../dtos/anamnese/create-anamnese.dto.js';
 
 export class AnamneseController {
     private service: AnamneseService;

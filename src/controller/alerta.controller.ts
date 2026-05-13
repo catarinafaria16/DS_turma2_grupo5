@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
-import { AlertaService } from '../services/alerta.service';
-import type { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto';
+import type { Request, Response } from 'express';
+import { AlertaService } from '../services/alerta.service.js';
+import type { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto.js';
+import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 
 export class AlertaController {
     private service: AlertaService;
@@ -92,11 +93,12 @@ export class AlertaController {
     /* Listar alertas por estado */
     async listarPorEstado(req: Request, res: Response): Promise<void> {
         try {
+            const alertas = await this.service.listar();
             const { estado } = req.params;
-            const alertas = await this.service.listarPorEstado(estado);
+            const filtrados = alertas.filter((a: any) => a.estado === estado);
             res.status(200).json({
-                dados: alertas,
-                total: alertas.length
+                dados: filtrados,
+                total: filtrados.length
             });
         } catch (error: any) {
             res.status(400).json({
@@ -105,14 +107,13 @@ export class AlertaController {
         }
     }
 
-    /* Atualizar alerta */
+    /* Atualizar estado do alerta */
     async atualizar(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
-            const alertaData: Partial<CreateAlertaDto> = req.body;
-            const utilizadorIdLogado = req.body.utilizadorIdLogado;
+            const { estado, utilizadorIdLogado } = req.body;
 
-            const alertaAtualizado = await this.service.atualizar(Number(id), alertaData, utilizadorIdLogado);
+            const alertaAtualizado = await this.service.atualizarEstado(Number(id), estado, utilizadorIdLogado);
             res.status(200).json({
                 mensagem: 'Alerta atualizado com sucesso',
                 dados: alertaAtualizado
@@ -145,7 +146,7 @@ export class AlertaController {
             const { id } = req.params;
             const utilizadorIdLogado = req.body.utilizadorIdLogado;
 
-            const alertaAtualizado = await this.service.marcarComoLido(Number(id), utilizadorIdLogado);
+            const alertaAtualizado = await this.service.atualizarEstado(Number(id), EstadoAlerta.VISTO, utilizadorIdLogado);
             res.status(200).json({
                 mensagem: 'Alerta marcado como lido',
                 dados: alertaAtualizado
@@ -163,7 +164,7 @@ export class AlertaController {
             const { id } = req.params;
             const utilizadorIdLogado = req.body.utilizadorIdLogado;
 
-            const alertaAtualizado = await this.service.marcarComoResolvido(Number(id), utilizadorIdLogado);
+            const alertaAtualizado = await this.service.atualizarEstado(Number(id), EstadoAlerta.FECHADO, utilizadorIdLogado);
             res.status(200).json({
                 mensagem: 'Alerta marcado como resolvido',
                 dados: alertaAtualizado

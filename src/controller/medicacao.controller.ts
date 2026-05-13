@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { MedicacaoService } from '../services/medicacao.service';
-import type { CreateMedicacaoDto } from '../dtos/medicacao/create-medicacao.dto';
+import type { Request, Response } from 'express';
+import { MedicacaoService } from '../services/medicacao.service.js';
+import type { CreateMedicacaoDto } from '../dtos/medicacao/create-medicacao.dto.js';
 
 export class MedicacaoController {
     private service: MedicacaoService;

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema CARAT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            color: #2d3748;
+        }
+
+        header {
+            background: #2b6cb0;
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        header span {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #2b6cb0, #2c7a7b);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .hero h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            opacity: 0.85;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .status-bar {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #48bb78;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #718096;
+            margin-bottom: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border-left: 4px solid #2b6cb0;
+        }
+
+        .card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .card p {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .card.green  { border-left-color: #48bb78; }
+        .card.teal   { border-left-color: #2c7a7b; }
+        .card.orange { border-left-color: #ed8936; }
+        .card.red    { border-left-color: #fc8181; }
+        .card.purple { border-left-color: #9f7aea; }
+
+        .endpoints {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .endpoint {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid #f7fafc;
+            font-size: 0.85rem;
+        }
+
+        .endpoint:last-child { border-bottom: none; }
+
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            min-width: 48px;
+            text-align: center;
+        }
+
+        .get    { background: #ebf8ff; color: #2b6cb0; }
+        .post   { background: #f0fff4; color: #276749; }
+        .put    { background: #fffaf0; color: #c05621; }
+        .delete { background: #fff5f5; color: #c53030; }
+
+        .path { color: #4a5568; font-family: monospace; }
+        .desc { color: #a0aec0; margin-left: auto; font-size: 0.78rem; }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.8rem;
+            color: #a0aec0;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>Sistema CARAT</h1>
+        <span>Controlo e Acompanhamento Respiratório e Alergológico em Tratamento</span>
+    </div>
+</header>
+
+<div class="hero">
+    <h2>API REST</h2>
+    <p>Plataforma de gestão clínica para avaliação e acompanhamento de utentes com patologias respiratórias</p>
+</div>
+
+<div class="status-bar">
+    <div class="dot"></div>
+    Servidor operacional &nbsp;|&nbsp; Base URL: <strong>/api</strong>
+</div>
+
+<div class="container">
+
+    <p class="section-title">Módulos do Sistema</p>
+    <div class="grid">
+        <div class="card">
+            <h3>Utilizadores</h3>
+            <p>Gestão de contas e perfis de acesso</p>
+        </div>
+        <div class="card green">
+            <h3>Utentes</h3>
+            <p>Registo e acompanhamento de pacientes</p>
+        </div>
+        <div class="card teal">
+            <h3>Médicos</h3>
+            <p>Profissionais e especialidades</p>
+        </div>
+        <div class="card orange">
+            <h3>Avaliação CARAT</h3>
+            <p>Questionários e scores clínicos</p>
+        </div>
+        <div class="card purple">
+            <h3>Alertas</h3>
+            <p>Notificações e regras de monitorização</p>
+        </div>
+        <div class="card red">
+            <h3>Auditoria</h3>
+            <p>Histórico de todas as operações</p>
+        </div>
+    </div>
+
+    <p class="section-title">Principais Endpoints</p>
+    <div class="endpoints">
+        <div class="endpoint">
+            <span class="badge get">GET</span>
+            <span class="path">/api/utentes</span>
+            <span class="desc">Listar todos os utentes</span>
+        </div>
+        <div class="endpoint">
+            <span class="badge post">POST</span>
+            <span class="path">/api/utentes</span>
+            <span class="desc">Criar utente</span>
+        </div>
+        <div class="endpoint">
+            <span class="badge get">GET</span>
+            <span class="path">/api/avaliacoes-carat</span>
+            <span class="desc">Listar avaliações CARAT</span>
+        </div>
+        <div class="endpoint">
+            <span class="badge post">POST</span>
+            <span class="path">/api/respostas-carat</span>
+            <span class="desc">Submeter respostas CARAT</span>
+        </div>
+        <div class="endpoint">
+            <span class="badge get">GET</span>
+            <span class="path">/api/alertas</span>
+            <span class="desc">Listar alertas ativos</span>
+        </div>
+        <div class="endpoint">
+            <span class="badge get">GET</span>
+            <span class="path">/api/auditoria</span>
+            <span class="desc">Consultar log de auditoria</span>
+        </div>
+        <div class="endpoint">
+            <span class="badge get">GET</span>
+            <span class="path">/health</span>
+            <span class="desc">Estado do servidor</span>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT
+</footer>
+
+</body>
+</html>

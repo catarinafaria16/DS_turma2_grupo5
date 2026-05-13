@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { RespostaCaratController } from '../controller/respostaCarat.controller';
+import { RespostaCaratController } from '../controller/respostaCarat.controller.js';
 
 const routes = Router();
 const controller = new RespostaCaratController();

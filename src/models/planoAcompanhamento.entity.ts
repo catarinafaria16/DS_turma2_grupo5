@@ -1,4 +1,4 @@
-import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum';
+import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum.js';
 
 export class PlanoAcompanhamento {
     id: number;

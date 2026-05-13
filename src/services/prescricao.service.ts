@@ -1,5 +1,5 @@
-import type { CreatePrescricaoDto } from '../dtos/prescricao/create-prescricao.dto';
-import type { PrescricaoResponseDto } from '../dtos/prescricao/prescricao-response.dto';
+import type { CreatePrescricaoDto } from '../dtos/prescricao/create-prescricao.dto.js';
+import type { PrescricaoResponseDto } from '../dtos/prescricao/prescricao-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 

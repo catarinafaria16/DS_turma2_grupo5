@@ -7,6 +7,4 @@ export interface CreateAlertaDto {
     regra_id: number;
     tipo: TipoAlerta;
     estado: EstadoAlerta;
-    data_criacao: Date;
-    data_atualizacao_estado: Date;
 }

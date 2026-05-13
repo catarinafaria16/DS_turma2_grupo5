@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { AvaliacaoCaratService } from '../services/avaliacaoCarat.service';
-import type { CreateAvaliacaoCaratDto } from '../dtos/avaliacaoCarat/create-avaliacaoCarat.dto';
+import type { Request, Response } from 'express';
+import { AvaliacaoCaratService } from '../services/avaliacaoCarat.service.js';
+import type { CreateAvaliacaoCaratDto } from '../dtos/avaliacaoCarat/create-avaliacaoCarat.dto.js';
 
 export class AvaliacaoCaratController {
     private service: AvaliacaoCaratService;

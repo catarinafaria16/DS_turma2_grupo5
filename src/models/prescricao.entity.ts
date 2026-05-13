@@ -1,5 +1,5 @@
-import { TipoPrescricao } from '../enums/TipoPrescricao.enum';
-import { EstadoPrescricao } from '../enums/EstadoPrescricao.enum';
+import { TipoPrescricao } from '../enums/TipoPrescricao.enum.js';
+import { EstadoPrescricao } from '../enums/EstadoPrescricao.enum.js';
 
 export class Prescricao {
     id: number;

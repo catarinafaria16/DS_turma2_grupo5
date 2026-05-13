@@ -1,4 +1,4 @@
-import { IntensidadeCriseAlergia } from '../enums/IntensidadeCriseAlergia.enum';
+import { IntensidadeCriseAlergia } from '../enums/IntensidadeCriseAlergia.enum.js';
 
 export class Alergia {
     id: number;

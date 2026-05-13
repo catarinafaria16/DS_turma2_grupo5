@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AnamneseController } from '../controller/anamnese.controller';
+import { AnamneseController } from '../controller/anamnese.controller.js';
 
 const routes = Router();
 const controller = new AnamneseController();

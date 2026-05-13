@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { MedicoService } from '../services/medico.service';
-import type { CreateMedicoDto } from '../dtos/medico/create-medico.dto';
+import type { Request, Response } from 'express';
+import { MedicoService } from '../services/medico.service.js';
+import type { CreateMedicoDto } from '../dtos/medico/create-medico.dto.js';
 
 export class MedicoController {
     private service: MedicoService;
@@ -76,6 +76,17 @@ export class MedicoController {
             res.status(204).send();
         } catch (error: any) {
             res.status(400).json({ erro: error.message || 'Erro ao apagar médico' });
+        }
+    }
+
+    /* Listar médicos por especialidade */
+    async listarPorEspecialidade(req: Request, res: Response): Promise<void> {
+        try {
+            const { especialidade } = req.params;
+            const medicos = await this.service.listarPorEspecialidade(String(especialidade));
+            res.status(200).json({ dados: medicos, total: medicos.length });
+        } catch (error: any) {
+            res.status(400).json({ erro: error.message || 'Erro ao listar médicos por especialidade' });
         }
     }
 }

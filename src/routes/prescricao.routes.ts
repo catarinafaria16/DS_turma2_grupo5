@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { PrescricaoController } from '../controller/prescricao.controller';
+import { PrescricaoController } from '../controller/prescricao.controller.js';
 
 const routes = Router();
 const controller = new PrescricaoController();

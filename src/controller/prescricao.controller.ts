@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { PrescricaoService } from '../services/prescricao.service';
-import type { CreatePrescricaoDto } from '../dtos/prescricao/create-prescricao.dto';
+import type { Request, Response } from 'express';
+import { PrescricaoService } from '../services/prescricao.service.js';
+import type { CreatePrescricaoDto } from '../dtos/prescricao/create-prescricao.dto.js';
 
 export class PrescricaoController {
     private service: PrescricaoService;

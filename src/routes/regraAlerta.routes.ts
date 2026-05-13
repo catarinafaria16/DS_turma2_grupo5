@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { RegraAlertaController } from '../controller/regraAlerta.controller';
+import { RegraAlertaController } from '../controller/regraAlerta.controller.js';
 
 const routes = Router();
 const controller = new RegraAlertaController();

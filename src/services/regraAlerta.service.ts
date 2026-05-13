@@ -1,5 +1,5 @@
-import type { CreateRegraAlertaDto } from '../dtos/regraAlerta/create-regraAlerta.dto';
-import type { RegraAlertaResponseDto } from '../dtos/regraAlerta/regraAlerta-response.dto';
+import type { CreateRegraAlertaDto } from '../dtos/regraAlerta/create-regraAlerta.dto.js';
+import type { RegraAlertaResponseDto } from '../dtos/regraAlerta/regraAlerta-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
@@ -52,7 +52,7 @@ export class RegraAlertaService {
                 administrador_id: 0,
                 categoria: 'BAIXA' as any,
                 limiar_score: 0,
-                valor_deteoracao: 0,
+                valor_deterioracao: 0,
                 prioridade: 'MEDIA' as any,
                 data_criacao: new Date()
             };

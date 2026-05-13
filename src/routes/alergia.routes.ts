@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AlergiaController } from '../controller/alergia.controller';
+import { AlergiaController } from '../controller/alergia.controller.js';
 
 const routes = Router();
 const controller = new AlergiaController();

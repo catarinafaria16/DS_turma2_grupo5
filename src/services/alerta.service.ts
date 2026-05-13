@@ -1,5 +1,5 @@
-import type { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto';
-import type { AlertaResponseDto } from '../dtos/alerta/alerta-response.dto';
+import type { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto.js';
+import type { AlertaResponseDto } from '../dtos/alerta/alerta-response.dto.js';
 import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 import { TipoAlerta } from '../enums/TipoAlerta.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
@@ -24,7 +24,9 @@ export class AlertaService {
 
             const novoAlerta: AlertaResponseDto = {
                 id: Math.random(), // TODO: Substituir por ID gerado pela BD
-                ...alertaData
+                ...alertaData,
+                data_criacao: new Date(),
+                data_atualizacao_estado: new Date()
             };
 
             await this.auditoriaService?.registarAuditoria(

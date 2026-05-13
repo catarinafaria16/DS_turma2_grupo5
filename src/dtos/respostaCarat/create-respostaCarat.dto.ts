@@ -15,7 +15,4 @@ export interface CreateRespostaCaratDto {
     r8: RespostaCarat1a9;
     r9: RespostaCarat1a9;
     r10: RespostaCarat10;
-    score_total: number;
-    interpretacao: string;
-    recomendacao_automatica: string;
 }

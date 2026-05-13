@@ -1,5 +1,5 @@
-import type { CreateUtenteDto } from '../dtos/utente/create-utente.dto';
-import type { UtenteResponseDto } from '../dtos/utente/utente-response.dto';
+import type { CreateUtenteDto } from '../dtos/utente/create-utente.dto.js';
+import type { UtenteResponseDto } from '../dtos/utente/utente-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
@@ -100,6 +100,16 @@ export class UtenteService {
             return utenteAtualizado;
         } catch (error) {
             console.error('Erro ao atualizar utente:', error);
+            throw error;
+        }
+    }
+
+    async listarPorMedico(medicoId: number): Promise<UtenteResponseDto[]> {
+        try {
+            // TODO: Buscar utentes do médico na base de dados
+            return [];
+        } catch (error) {
+            console.error('Erro ao listar utentes por médico:', error);
             throw error;
         }
     }

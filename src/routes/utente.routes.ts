@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { UtenteController } from '../controller/utente.controller';
+import { UtenteController } from '../controller/utente.controller.js';
 
 const routes = Router();
 const controller = new UtenteController();
 
+routes.get('/medico/:medicoId', controller.listarPorMedico.bind(controller));
 routes.get('/', controller.listar.bind(controller));
 routes.post('/', controller.criar.bind(controller));
 routes.get('/:id', controller.obter.bind(controller));

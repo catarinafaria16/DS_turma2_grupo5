@@ -1,6 +1,7 @@
-import type { CreateMedicoDto } from '../dtos/medico/create-medico.dto';
-import type { MedicoResponseDto } from '../dtos/medico/medico-response.dto';
+import type { CreateMedicoDto } from '../dtos/medico/create-medico.dto.js';
+import type { MedicoResponseDto } from '../dtos/medico/medico-response.dto.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
+import { AuditoriaService } from './auditoria.service.js';
 
 export class MedicoService {
     private auditoriaService: AuditoriaService;
@@ -17,8 +18,8 @@ export class MedicoService {
             if (medicoData.utilizador_id <= 0) {
                 throw new Error('ID do utilizador deve ser válido');
             }
-            if (!medicoData.crm || medicoData.crm.trim().length === 0) {
-                throw new Error('CRM é obrigatório');
+            if (!medicoData.contacto || medicoData.contacto.trim().length === 0) {
+                throw new Error('Contacto é obrigatório');
             }
             if (!medicoData.especialidade || medicoData.especialidade.trim().length === 0) {
                 throw new Error('Especialidade é obrigatória');
@@ -54,10 +55,8 @@ export class MedicoService {
             const medico: MedicoResponseDto = {
                 id: medicoId,
                 utilizador_id: 0,
-                crm: '',
                 especialidade: '',
-                telefone: '',
-                email: ''
+                contacto: ''
             };
 
             return medico;
@@ -102,6 +101,16 @@ export class MedicoService {
             return medicoAtualizado;
         } catch (error) {
             console.error('Erro ao atualizar médico:', error);
+            throw error;
+        }
+    }
+
+    async listarPorEspecialidade(especialidade: string): Promise<MedicoResponseDto[]> {
+        try {
+            // TODO: Buscar médicos pela especialidade na base de dados
+            return [];
+        } catch (error) {
+            console.error('Erro ao listar médicos por especialidade:', error);
             throw error;
         }
     }

@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { RegraAlertaService } from '../services/regraAlerta.service';
-import type { CreateRegraAlertaDto } from '../dtos/regraAlerta/create-regraAlerta.dto';
+import type { Request, Response } from 'express';
+import { RegraAlertaService } from '../services/regraAlerta.service.js';
+import type { CreateRegraAlertaDto } from '../dtos/regraAlerta/create-regraAlerta.dto.js';
 
 export class RegraAlertaController {
     private service: RegraAlertaService;

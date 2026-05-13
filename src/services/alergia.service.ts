@@ -1,5 +1,5 @@
-import type { CreateAlergiaDto } from '../dtos/alergia/create-alergia.dto';
-import type { AlergiaResponseDto } from '../dtos/alergia/alergia-response.dto';
+import type { CreateAlergiaDto } from '../dtos/alergia/create-alergia.dto.js';
+import type { AlergiaResponseDto } from '../dtos/alergia/alergia-response.dto.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 
@@ -17,8 +17,8 @@ export class AlergiaService {
     async registarAlergia(
         utenteId: number,
         descricao: string,
-        intensidade_crises: string,
-        frequencia_crises: string,
+        intensidade_crise: string,
+        frequencia_crise: string,
         utilizadorIdLogado: number
     ): Promise<AlergiaResponseDto> {
         try {
@@ -27,23 +27,23 @@ export class AlergiaService {
                 throw new Error('Descrição da alergia é obrigatória');
             }
 
-            if (!intensidade_crises || intensidade_crises.trim().length === 0) {
+            if (!intensidade_crise || intensidade_crise.trim().length === 0) {
                 throw new Error('Intensidade das crises é obrigatória');
             }
 
-            if (!frequencia_crises || frequencia_crises.trim().length === 0) {
+            if (!frequencia_crise || frequencia_crise.trim().length === 0) {
                 throw new Error('Frequência das crises é obrigatória');
             }
 
-            // TODO: Validar se intensidade_crises é um valor válido do enum IntensidadeCrise
+            // TODO: Validar se intensidade_crise é um valor válido do enum IntensidadeCrise
             // TODO: Buscar utente na BD para verificar se existe
             
             const novaAlergia: AlergiaResponseDto = {
                 id: Math.random(), // TODO: Será gerado pela BD
                 anamnese_id: 0, // TODO: Buscar anamneseId do utente
                 descricao,
-                frequencia_crises,
-                intensidade_crises: intensidade_crises as any // TODO: Type cast apropriado
+                frequencia_crise,
+                intensidade_crise: intensidade_crise as any // TODO: Type cast apropriado
             };
 
             // Registar auditoria
@@ -73,8 +73,8 @@ export class AlergiaService {
                 id: alergiaId,
                 anamnese_id: 0,
                 descricao: '',
-                frequencia_crises: '',
-                intensidade_crises: '' as any
+                frequencia_crise: '',
+                intensidade_crise: '' as any
             };
             return alergia;
         } catch (error) {
@@ -114,7 +114,7 @@ export class AlergiaService {
                 throw new Error('Descrição da alergia é obrigatória');
             }
 
-            if (!alergiaData.frequencia_crises || alergiaData.frequencia_crises.trim().length === 0) {
+            if (!alergiaData.frequencia_crise || alergiaData.frequencia_crise.trim().length === 0) {
                 throw new Error('Frequência das crises é obrigatória');
             }
 
@@ -126,12 +126,12 @@ export class AlergiaService {
                 id: alergiaId,
                 anamnese_id: alergiaData.anamnese_id,
                 descricao: alergiaData.descricao,
-                frequencia_crises: alergiaData.frequencia_crises,
-                intensidade_crises: alergiaData.intensidade_crises
+                frequencia_crise: alergiaData.frequencia_crise,
+                intensidade_crise: alergiaData.intensidade_crise
             };
 
             // Registar auditoria
-             await this.auditariaService.registarAuditoria(
+             await this.auditoriaService.registarAuditoria(
                  utilizadorIdLogado,
                  'alergia',
                  alergiaId,
@@ -161,7 +161,7 @@ export class AlergiaService {
             // TODO: Apagar da base de dados (soft delete é recomendado)
             
             // Registar auditoria
-             await this.auditariaService.registarAuditoria(
+             await this.auditoriaService.registarAuditoria(
                  utilizadorIdLogado,
                  'alergia',
                  alergiaId,
@@ -193,10 +193,10 @@ export class AlergiaService {
             // Aplicar filtros se fornecidos
             if (filtros) {
                 if (filtros.intensidade) {
-                    alergias = alergias.filter(a => a.intensidade_crises === filtros.intensidade);
+                    alergias = alergias.filter(a => a.intensidade_crise === filtros.intensidade);
                 }
                 if (filtros.frequencia) {
-                    alergias = alergias.filter(a => a.frequencia_crises === filtros.frequencia);
+                    alergias = alergias.filter(a => a.frequencia_crise === filtros.frequencia);
                 }
             }
 
@@ -250,15 +250,15 @@ export class AlergiaService {
             return {
                 totalAlergias: alergias.length,
                 alergiasPorIntensidade: {
-                    leve: alergias.filter(a => a.intensidade_crises === 'LEVE').length,
-                    moderada: alergias.filter(a => a.intensidade_crises === 'MODERADA').length,
-                    grave: alergias.filter(a => a.intensidade_crises === 'GRAVE').length
+                    leve: alergias.filter(a => a.intensidade_crise === 'LEVE').length,
+                    moderada: alergias.filter(a => a.intensidade_crise === 'MODERADA').length,
+                    grave: alergias.filter(a => a.intensidade_crise === 'GRAVE').length
                 },
                 alergiasPorFrequencia: {
-                    nunca: alergias.filter(a => a.frequencia_crises === 'Nunca').length,
-                    ateumoU2: alergias.filter(a => a.frequencia_crises === 'Até 1 ou 2 dias').length,
-                    maisDois: alergias.filter(a => a.frequencia_crises === 'Mais de 2 dias por semana').length,
-                    quaseTodos: alergias.filter(a => a.frequencia_crises === 'Quase todos os dias').length
+                    nunca: alergias.filter(a => a.frequencia_crise === 'Nunca').length,
+                    ateumoU2: alergias.filter(a => a.frequencia_crise === 'Até 1 ou 2 dias').length,
+                    maisDois: alergias.filter(a => a.frequencia_crise === 'Mais de 2 dias por semana').length,
+                    quaseTodos: alergias.filter(a => a.frequencia_crise === 'Quase todos os dias').length
                 },
                 alergias
             };

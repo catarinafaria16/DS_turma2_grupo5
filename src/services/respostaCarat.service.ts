@@ -1,5 +1,5 @@
-import type { CreateRespostaCaratDto } from '../dtos/respostaCarat/create-respostaCarat.dto';
-import type { RespostaCaratResponseDto } from '../dtos/respostaCarat/respostaCarat-response.dto';
+import type { CreateRespostaCaratDto } from '../dtos/respostaCarat/create-respostaCarat.dto.js';
+import type { RespostaCaratResponseDto } from '../dtos/respostaCarat/respostaCarat-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
@@ -21,7 +21,10 @@ export class RespostaCaratService {
 
             const novaResposta: RespostaCaratResponseDto = {
                 id: Math.random(),
-                ...respostaData
+                ...respostaData,
+                score_total: 0, // TODO: calcular a partir das respostas
+                interpretacao: '', // TODO: calcular com base no score
+                recomendacao_automatica: '' // TODO: gerar recomendação
             };
 
             await this.auditoriaService?.registarAuditoria(

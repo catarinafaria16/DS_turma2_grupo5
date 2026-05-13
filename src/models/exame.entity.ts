@@ -1,4 +1,4 @@
-import { EstadoExame } from '../enums/EstadoExame.enum';
+import { EstadoExame } from '../enums/EstadoExame.enum.js';
 
 export class Exame {
     id: number;

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AvaliacaoCaratController } from '../controller/avaliacaoCarat.controller';
+import { AvaliacaoCaratController } from '../controller/avaliacaoCarat.controller.js';
 
 const routes = Router();
 const controller = new AvaliacaoCaratController();

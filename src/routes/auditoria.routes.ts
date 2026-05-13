@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AuditoriaController } from '../controller/auditoria.controller';
+import { AuditoriaController } from '../controller/auditoria.controller.js';
 
 const routes = Router();
 const controller = new AuditoriaController();

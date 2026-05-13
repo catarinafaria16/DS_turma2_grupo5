@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { ExameService } from '../services/exame.service';
-import type { CreateExameDto } from '../dtos/exame/create-exame.dto';
+import type { Request, Response } from 'express';
+import { ExameService } from '../services/exame.service.js';
+import type { CreateExameDto } from '../dtos/exame/create-exame.dto.js';
 
 export class ExameController {
     private service: ExameService;

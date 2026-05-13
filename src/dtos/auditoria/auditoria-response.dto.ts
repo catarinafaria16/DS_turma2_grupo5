@@ -11,7 +11,7 @@ type JsonValue =
 export type JsonObject = { [key: string]: JsonValue };
 
 export interface AuditoriaResponseDto {
-    id: number;
+    log_id: number;
     utilizador_id: number;
     tabela: string;
     tabela_id: number;

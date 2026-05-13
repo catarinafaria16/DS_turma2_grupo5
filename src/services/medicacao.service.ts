@@ -1,5 +1,5 @@
-import type { CreateMedicacaoDto } from '../dtos/medicacao/create-medicacao.dto';
-import type { MedicacaoResponseDto } from '../dtos/medicacao/medicacao-response.dto';
+import type { CreateMedicacaoDto } from '../dtos/medicacao/create-medicacao.dto.js';
+import type { MedicacaoResponseDto } from '../dtos/medicacao/medicacao-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 

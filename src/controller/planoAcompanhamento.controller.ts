@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
-import { PlanoAcompanhamentoService } from '../services/planoAcompanhamento.service';
-import type { CreatePlanoAcompanhamentoDto } from '../dtos/planoAcompanhamento/create-planoAcompanhamento.dto';
-import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum';
+import type { Request, Response } from 'express';
+import { PlanoAcompanhamentoService } from '../services/planoAcompanhamento.service.js';
+import type { CreatePlanoAcompanhamentoDto } from '../dtos/planoAcompanhamento/create-planoAcompanhamento.dto.js';
+import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum.js';
 
 export class PlanoAcompanhamentoController {
     private service: PlanoAcompanhamentoService;

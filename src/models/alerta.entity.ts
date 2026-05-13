@@ -1,5 +1,5 @@
-import { TipoAlerta } from '../enums/TipoAlerta.enum';
-import { EstadoAlerta } from '../enums/EstadoAlerta.enum';
+import { TipoAlerta } from '../enums/TipoAlerta.enum.js';
+import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 
 export class Alerta {
     id: number;

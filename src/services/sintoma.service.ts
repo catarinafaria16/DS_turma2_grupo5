@@ -1,5 +1,5 @@
-import type { CreateSintomaDto } from '../dtos/sintoma/create-sintoma.dto';
-import type { SintomaResponseDto } from '../dtos/sintoma/sintoma-response.dto';
+import type { CreateSintomaDto } from '../dtos/sintoma/create-sintoma.dto.js';
+import type { SintomaResponseDto } from '../dtos/sintoma/sintoma-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 

@@ -1,5 +1,5 @@
-import type { CreateUtilizadorDto } from '../dtos/utilizador/create-utilizador.dto';
-import type { UtilizadorResponseDto } from '../dtos/utilizador/utilizador-response.dto';
+import type { CreateUtilizadorDto } from '../dtos/utilizador/create-utilizador.dto.js';
+import type { UtilizadorResponseDto } from '../dtos/utilizador/utilizador-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
@@ -56,7 +56,6 @@ export class UtilizadorService {
                 id: utilizadorId,
                 nome: '',
                 email: '',
-                password: '',
                 perfil: 'UTENTE' as any
             };
 

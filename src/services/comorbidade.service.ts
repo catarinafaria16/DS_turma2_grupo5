@@ -1,5 +1,5 @@
-import type { CreateComorbidadeDto } from '../dtos/comorbidade/create-comorbidade.dto';
-import type { ComorbidadeResponseDto } from '../dtos/comorbidade/comorbidade-response.dto';
+import type { CreateComorbidadeDto } from '../dtos/comorbidade/create-comorbidade.dto.js';
+import type { ComorbidadeResponseDto } from '../dtos/comorbidade/comorbidade-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 

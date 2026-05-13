@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { SintomaController } from '../controller/sintoma.controller';
+import { SintomaController } from '../controller/sintoma.controller.js';
 
 const routes = Router();
 const controller = new SintomaController();

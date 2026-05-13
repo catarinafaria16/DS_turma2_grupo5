@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { PlanoAcompanhamentoController } from '../controller/planoAcompanhamento.controller';
+import { PlanoAcompanhamentoController } from '../controller/planoAcompanhamento.controller.js';
 
 const routes = Router();
 const controller = new PlanoAcompanhamentoController();

@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { AdministradorService } from '../services/administrador.service';
-import type { CreateAdministradorDto } from '../dtos/administrador/create-administrador.dto';
+import type { Request, Response } from 'express';
+import { AdministradorService } from '../services/administrador.service.js';
+import type { CreateAdministradorDto } from '../dtos/administrador/create-administrador.dto.js';
 
 export class AdministradorController {
     private service: AdministradorService;

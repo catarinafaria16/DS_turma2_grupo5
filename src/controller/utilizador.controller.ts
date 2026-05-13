@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { UtilizadorService } from '../services/utilizador.service';
-import type { CreateUtilizadorDto } from '../dtos/utilizador/create-utilizador.dto';
+import type { Request, Response } from 'express';
+import { UtilizadorService } from '../services/utilizador.service.js';
+import type { CreateUtilizadorDto } from '../dtos/utilizador/create-utilizador.dto.js';
 
 export class UtilizadorController {
     private service: UtilizadorService;

@@ -1,5 +1,5 @@
-import type { CreateAuditoriaDto } from '../dtos/auditoria/create-auditoria.dto';
-import type { AuditoriaResponseDto } from '../dtos/auditoria/auditoria-response.dto';
+import type { CreateAuditoriaDto } from '../dtos/auditoria/create-auditoria.dto.js';
+import type { AuditoriaResponseDto } from '../dtos/auditoria/auditoria-response.dto.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export class AuditoriaService {
@@ -34,12 +34,12 @@ export class AuditoriaService {
 
             // RNF002: Guardar versão anterior e nova versão
             const novaAuditoria: AuditoriaResponseDto = {
-                id: Math.random(), // TODO: Será gerado pela BD
+                log_id: Math.random(), // TODO: Será gerado pela BD
                 utilizador_id: utilizadorId,
                 tabela,
                 tabela_id: tabelaId,
                 operacao,
-                valor_antigo: valorAntigo,
+                valor_anterior: valorAntigo,
                 valor_novo: valorNovo
             };
 
@@ -65,12 +65,12 @@ export class AuditoriaService {
 
             // TODO: Buscar na base de dados
             const auditoria: AuditoriaResponseDto = {
-                id: auditoriaId,
+                log_id: auditoriaId,
                 utilizador_id: 0,
                 tabela: '',
                 tabela_id: 0,
                 operacao: OperacaoAuditoria.ALTERACAO,
-                valor_antigo: null,
+                valor_anterior: null,
                 valor_novo: null
             };
             return auditoria;
@@ -227,13 +227,13 @@ export class AuditoriaService {
 
     /**
      * RNF002: Verificar alterações entre duas versões
-     * Comparar valor_antigo e valor_novo para uma auditoria
+     * Comparar valor_anterior e valor_novo para uma auditoria
      */
     async obterDiferencas(auditoriaId: number): Promise<any> {
         try {
             const auditoria = await this.obter(auditoriaId);
 
-            if (!auditoria.valor_antigo || !auditoria.valor_novo) {
+            if (!auditoria.valor_anterior || !auditoria.valor_novo) {
                 return {
                     anterior: null,
                     novo: null,
@@ -242,8 +242,8 @@ export class AuditoriaService {
             }
 
             try {
-                const anterior = JSON.parse(auditoria.valor_antigo);
-                const novo = JSON.parse(auditoria.valor_novo);
+                const anterior = JSON.parse(String(auditoria.valor_anterior));
+                const novo = JSON.parse(String(auditoria.valor_novo));
 
                 // Encontrar as diferenças
                 const diferenças: any[] = [];
@@ -279,7 +279,7 @@ export class AuditoriaService {
             } catch (parseError) {
                 // Se não conseguir fazer parse JSON, retorna valores como strings
                 return {
-                    anterior: auditoria.valor_antigo,
+                    anterior: auditoria.valor_anterior,
                     novo: auditoria.valor_novo,
                     formato: 'string'
                 };

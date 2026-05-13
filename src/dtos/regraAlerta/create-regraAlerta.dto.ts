@@ -6,7 +6,7 @@ export interface CreateRegraAlertaDto {
     administrador_id: number;
     categoria: CategoriaRegraAlerta;
     limiar_score: number;
-    valor_deteorizacao: number;
+    valor_deterioracao: number;
     prioridade: PrioridadeRegraAlerta;
     data_criacao: Date;
 }

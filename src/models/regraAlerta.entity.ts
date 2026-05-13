@@ -1,5 +1,5 @@
-import { CategoriaRegraAlerta } from '../enums/categoria-regraAlerta.enum';
-import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum';
+import { CategoriaRegraAlerta } from '../enums/CategoriaRegraAlerta.enum.js';
+import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
 
 export class RegraAlerta {
     id: number;

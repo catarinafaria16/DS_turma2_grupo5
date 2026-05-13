@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { UtenteService } from '../services/utente.service';
-import type { CreateUtenteDto } from '../dtos/utente/create-utente.dto';
+import type { Request, Response } from 'express';
+import { UtenteService } from '../services/utente.service.js';
+import type { CreateUtenteDto } from '../dtos/utente/create-utente.dto.js';
 
 export class UtenteController {
     private service: UtenteService;
@@ -76,6 +76,17 @@ export class UtenteController {
             res.status(204).send();
         } catch (error: any) {
             res.status(400).json({ erro: error.message || 'Erro ao apagar utente' });
+        }
+    }
+
+    /* Listar utentes por médico */
+    async listarPorMedico(req: Request, res: Response): Promise<void> {
+        try {
+            const { medicoId } = req.params;
+            const utentes = await this.service.listarPorMedico(Number(medicoId));
+            res.status(200).json({ dados: utentes, total: utentes.length });
+        } catch (error: any) {
+            res.status(400).json({ erro: error.message || 'Erro ao listar utentes por médico' });
         }
     }
 }
