@@ -1,5 +1,5 @@
-import { EstadoPrescricao } from '../../enums/EstadoPrescricao.enum';
-import { TipoPrescricao } from '../../enums/TipoPrescricao.enum';
+import { EstadoPrescricao } from '../../enums/EstadoPrescricao.enum.js';
+import { TipoPrescricao } from '../../enums/TipoPrescricao.enum.js';
 
 export interface PrescricaoResponseDto {
     id: number; 

@@ -1,9 +1,10 @@
 import type { CreateMedicacaoDto } from '../dtos/medicacao/create-medicacao.dto';
 import type { MedicacaoResponseDto } from '../dtos/medicacao/medicacao-response.dto';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { AuditoriaService } from './auditoria.service.js';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export class MedicacaoService {
-    private auditoriaService: any; // TODO: Implementar AuditoriaService
+    private auditoriaService: AuditoriaService;
 
     constructor() {
         this.auditoriaService = new AuditoriaService();

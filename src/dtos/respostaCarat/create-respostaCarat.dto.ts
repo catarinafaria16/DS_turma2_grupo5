@@ -1,5 +1,5 @@
-import { RespostaCarat1a9 } from '../../enums/RespostaCarat1a9.enum';
-import { RespostaCarat10 } from '../../enums/RespostaCarat10.enum';
+import { RespostaCarat1a9 } from '../../enums/RespostaCarat1a9.enum.js';
+import { RespostaCarat10 } from '../../enums/RespostaCarat10.enum.js';
 
 export interface CreateRespostaCaratDto {
     avaliacao_id: number;

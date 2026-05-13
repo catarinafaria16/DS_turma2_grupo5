@@ -1,4 +1,4 @@
-import { IntensidadeSintoma } from '../../enums/IntensidadeSintoma.enum';
+import { IntensidadeSintoma } from '../../enums/IntensidadeSintoma.enum.js';
 
 export interface SintomaResponseDto {
     id: number;

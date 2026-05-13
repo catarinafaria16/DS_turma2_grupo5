@@ -1,4 +1,4 @@
-import { Tabagismo } from '../../enums/Tabagismo.enum';
+import { Tabagismo } from '../../enums/Tabagismo.enum.js';
 
 export interface CreateAnamneseDto {
     utente_id: number;

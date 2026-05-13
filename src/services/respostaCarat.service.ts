@@ -1,9 +1,10 @@
 import type { CreateRespostaCaratDto } from '../dtos/respostaCarat/create-respostaCarat.dto';
 import type { RespostaCaratResponseDto } from '../dtos/respostaCarat/respostaCarat-response.dto';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { AuditoriaService } from './auditoria.service.js';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export class RespostaCaratService {
-    private auditoriaService: any; // TODO: Implementar AuditoriaService
+    private auditoriaService: AuditoriaService;
 
     constructor() {
         this.auditoriaService = new AuditoriaService();

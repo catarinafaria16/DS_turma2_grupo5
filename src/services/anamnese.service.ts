@@ -1,9 +1,10 @@
 import type { CreateAnamneseDto } from '../dtos/anamnese/create-anamnese.dto';
 import type { AnamneseResponseDto } from '../dtos/anamnese/anamnese-response.dto';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { AuditoriaService } from './auditoria.service.js';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export class AnamneseService {
-    private auditoriaService: any; // TODO: Implementar AuditoriaService
+    private auditoriaService: AuditoriaService;
 
     constructor() {
         this.auditoriaService = new AuditoriaService();

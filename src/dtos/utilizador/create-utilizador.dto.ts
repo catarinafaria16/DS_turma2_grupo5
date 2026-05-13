@@ -1,4 +1,4 @@
-import { PerfilUtilizador } from '../../enums/PerfilUtilizador.enum';
+import { PerfilUtilizador } from '../../enums/PerfilUtilizador.enum.js';
 
 export interface CreateUtilizadorDto {
     nome: string;

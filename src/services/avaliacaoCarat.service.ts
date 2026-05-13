@@ -1,9 +1,9 @@
 import type { CreateAvaliacaoCaratDto } from '../dtos/avaliacaoCarat/create-avaliacaoCarat.dto';
 import type { AvaliacaoCaratResponseDto } from '../dtos/avaliacaoCarat/avaliacaoCarat-response.dto';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export class AvaliacaoCaratService {
-    private auditoriaService: any; // TODO: Implementar AuditoriaService
+    private auditoriaService: AuditoriaService;
 
     constructor() {
         this.auditoriaService = new AuditoriaService();

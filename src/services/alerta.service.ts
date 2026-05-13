@@ -1,11 +1,12 @@
 import type { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto';
 import type { AlertaResponseDto } from '../dtos/alerta/alerta-response.dto';
-import { EstadoAlerta } from '../enums/EstadoAlerta.enum';
-import { TipoAlerta } from '../enums/TipoAlerta.enum';
-import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum';
+import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
+import { TipoAlerta } from '../enums/TipoAlerta.enum.js';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
+import { AuditoriaService } from './auditoria.service.js';
 
 export class AlertaService {
-    private auditoriaService: any; // TODO: Implementar AuditoriaService
+    private auditoriaService: AuditoriaService;
 
     constructor() {
         this.auditoriaService = new AuditoriaService();

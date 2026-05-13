@@ -1,4 +1,4 @@
-import { OperacaoAuditoria } from '../../enums/OperacaoAuditoria.enum';
+import { OperacaoAuditoria } from '../../enums/OperacaoAuditoria.enum.js';
 
 type JsonValue =
     | string
@@ -15,6 +15,6 @@ export interface CreateAuditoriaDto {
     tabela: string;
     tabela_id: number;
     operacao: OperacaoAuditoria;
-    valor_antigo: JsonObject | string;
+    valor_anterior: JsonObject | string;
     valor_novo: JsonObject | string;
 }

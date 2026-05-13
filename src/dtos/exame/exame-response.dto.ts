@@ -1,10 +1,10 @@
-import { EstadoExame } from '../../enums/EstadoExame.enum';
+import { EstadoExame } from '../../enums/EstadoExame.enum.js';
 
 export interface ExameResponseDto {
     id: number;
     prescricao_id: number;
     tipo_exame: string;
-    data_exame: Date;
+    data: Date;
     resultado: object; // json
     consentimento: boolean;
     estado: EstadoExame;
