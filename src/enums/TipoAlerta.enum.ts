@@ -1,0 +1,5 @@
+export enum TipoAlerta {
+    SCORE_BAIXO = 'SCORE BAIXO',
+    DETEORACAO = 'DETEORAÇÃO',
+    EXAME_NECESSARIO = 'EXAME NECESSÁRIO'
+}
