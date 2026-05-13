@@ -1,6 +1,8 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import 'reflect-metadata';
+import { AppDataSource } from './database/data-source.js';
 
 import utilizadorRoutes from './routes/utilizador.routes.js';
 import utenteRoutes from './routes/utente.routes.js';
@@ -24,7 +26,7 @@ import auditoriaRoutes from './routes/auditoria.routes.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-const PORT = process.env['PORT'] ?? 3000;
+const PORT = process.env['PORT'] ?? 3001;
 
 app.use(express.static(join(__dirname, '..', 'public')));
 app.use(express.json());
@@ -57,8 +59,16 @@ app.use((_req, res) => {
     res.status(404).json({ erro: 'Rota não encontrada' });
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor a correr na porta ${PORT}`);
-});
+AppDataSource.initialize()
+    .then(() => {
+        console.log('Database connected successfully');
+        app.listen(PORT, () => {
+            console.log(`Servidor a correr na porta ${PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.error('Error during database initialization:', error);
+        process.exit(1);
+    });
 
 export default app;

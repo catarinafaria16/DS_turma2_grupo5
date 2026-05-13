@@ -1,42 +1,34 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
+    "rootDir": "./src",
+    "outDir": "./dist",
 
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "ES2020",
+    "lib": ["ES2020"],
     "types": ["node"],
-    // For nodejs:
-    // "lib": ["esnext"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
 
-    // Other Outputs
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
 
-    // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
 
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
     "strict": true,
+
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
+    "moduleDetection": "force"
   }
 }
