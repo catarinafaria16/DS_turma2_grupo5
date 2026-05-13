@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { PrescricaoController } from '../controller/prescricao.controller';
+import { AlergiaController } from '../controller/alergia.controller';
 
 const routes = Router();
-const controller = new PrescricaoController();
+const controller = new AlergiaController();
 
-routes.get('/utente/:utenteId', controller.listarPorUtente.bind(controller));
-routes.get('/medico/:medicoId', controller.listarPorMedico.bind(controller));
+routes.get('/anamnese/:anamneseId', controller.listarPorAnamnese.bind(controller));
 routes.get('/', controller.listar.bind(controller));
 routes.post('/', controller.criar.bind(controller));
 routes.get('/:id', controller.obter.bind(controller));

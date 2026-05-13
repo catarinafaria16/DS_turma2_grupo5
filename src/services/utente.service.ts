@@ -55,7 +55,7 @@ export class UtenteService {
                 nr_utente: 0,
                 data_nascimento: new Date(),
                 morada: '',
-                contato: '',
+                contacto: '',
                 nr_faturacao: 0
             };
 
