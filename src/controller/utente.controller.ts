@@ -79,6 +79,17 @@ export class UtenteController {
         }
     }
 
+    /* RF031: Histórico clínico completo do utente */
+    async historicoClinico(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            const historico = await this.service.historicoClinico(Number(id));
+            res.status(200).json({ dados: historico });
+        } catch (error: any) {
+            res.status(400).json({ erro: error.message || 'Erro ao obter histórico clínico' });
+        }
+    }
+
     /* Listar utentes por médico */
     async listarPorMedico(req: Request, res: Response): Promise<void> {
         try {

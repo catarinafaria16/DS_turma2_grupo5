@@ -20,6 +20,7 @@ import sintomaRoutes from './routes/sintoma.routes.js';
 import alergiaRoutes from './routes/alergia.routes.js';
 import comorbidadeRoutes from './routes/comorbidade.routes.js';
 import auditoriaRoutes from './routes/auditoria.routes.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -48,6 +49,7 @@ app.use('/api/sintomas', sintomaRoutes);
 app.use('/api/alergias', alergiaRoutes);
 app.use('/api/comorbidades', comorbidadeRoutes);
 app.use('/api/auditoria', auditoriaRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
