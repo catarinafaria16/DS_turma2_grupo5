@@ -116,15 +116,15 @@ export class AnamneseService {
     async apagar(anamneseId: number, utilizadorIdLogado: number): Promise<void> {
         try {
             const anamneseAnterior = await this.obter(anamneseId);
-
-            // TODO: Apagar da base de dados ou usar soft delete
+            const anamneseEliminada = { ...anamneseAnterior, deleted_at: new Date() };
+            // TODO: UPDATE anamnese SET deleted_at = NOW() WHERE id = anamneseId
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'anamnese',
                 anamneseId,
                 OperacaoAuditoria.ELIMINACAO,
                 JSON.stringify(anamneseAnterior),
-                null
+                JSON.stringify(anamneseEliminada)
             );
         } catch (error) {
             console.error('Erro ao apagar anamnese:', error);

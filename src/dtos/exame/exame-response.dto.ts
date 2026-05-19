@@ -8,4 +8,5 @@ export interface ExameResponseDto {
     resultado: object; // json
     consentimento: boolean;
     estado: EstadoExame;
+    deleted_at?: Date;
 }

@@ -117,13 +117,15 @@ export class SintomaService {
     async apagar(sintomaId: number, utilizadorIdLogado: number): Promise<void> {
         try {
             const sintomaAnterior = await this.obter(sintomaId);
+            const sintomaEliminado = { ...sintomaAnterior, deleted_at: new Date() };
+            // TODO: UPDATE sintoma SET deleted_at = NOW() WHERE id = sintomaId
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'sintoma',
                 sintomaId,
                 OperacaoAuditoria.ELIMINACAO,
                 JSON.stringify(sintomaAnterior),
-                null
+                JSON.stringify(sintomaEliminado)
             );
         } catch (error) {
             console.error('Erro ao apagar sintoma:', error);

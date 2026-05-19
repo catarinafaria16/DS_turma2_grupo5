@@ -10,4 +10,5 @@ export interface RegraAlertaResponseDto {
     valor_deterioracao: number;
     prioridade: PrioridadeRegraAlerta;
     data_criacao: Date;
+    deleted_at?: Date;
 }

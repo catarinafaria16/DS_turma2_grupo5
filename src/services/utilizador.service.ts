@@ -27,7 +27,9 @@ export class UtilizadorService {
 
             const novoUtilizador: UtilizadorResponseDto = {
                 id: Math.random(),
-                ...utilizadorData
+                nome: utilizadorData.nome,
+                email: utilizadorData.email,
+                perfil: utilizadorData.perfil
             };
 
             await this.auditoriaService?.registarAuditoria(
@@ -84,7 +86,9 @@ export class UtilizadorService {
             const utilizadorAnterior = await this.obter(utilizadorId);
             const utilizadorAtualizado: UtilizadorResponseDto = {
                 ...utilizadorAnterior,
-                ...utilizadorData
+                nome: utilizadorData.nome,
+                email: utilizadorData.email,
+                perfil: utilizadorData.perfil
             };
 
             await this.auditoriaService?.registarAuditoria(
@@ -106,13 +110,15 @@ export class UtilizadorService {
     async apagar(utilizadorId: number, utilizadorIdLogado: number): Promise<void> {
         try {
             const utilizadorAnterior = await this.obter(utilizadorId);
+            const utilizadorEliminado = { ...utilizadorAnterior, deleted_at: new Date() };
+            // TODO: UPDATE utilizador SET deleted_at = NOW() WHERE id = utilizadorId
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'utilizador',
                 utilizadorId,
                 OperacaoAuditoria.ELIMINACAO,
                 JSON.stringify(utilizadorAnterior),
-                null
+                JSON.stringify(utilizadorEliminado)
             );
         } catch (error) {
             console.error('Erro ao apagar utilizador:', error);

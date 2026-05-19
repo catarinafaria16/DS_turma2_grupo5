@@ -8,4 +8,5 @@ export interface UtenteResponseDto {
     morada: string;
     contacto: string;
     nr_faturacao: number;
+    deleted_at?: Date;
 }

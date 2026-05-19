@@ -122,15 +122,15 @@ export class MedicacaoService {
     async apagar(medicacaoId: number, utilizadorIdLogado: number): Promise<void> {
         try {
             const medicacaoAnterior = await this.obter(medicacaoId);
-
-            // TODO: Apagar da base de dados ou usar soft delete
+            const medicacaoEliminada = { ...medicacaoAnterior, deleted_at: new Date() };
+            // TODO: UPDATE medicacao SET deleted_at = NOW() WHERE id = medicacaoId
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'medicacao',
                 medicacaoId,
                 OperacaoAuditoria.ELIMINACAO,
                 JSON.stringify(medicacaoAnterior),
-                null
+                JSON.stringify(medicacaoEliminada)
             );
         } catch (error) {
             console.error('Erro ao apagar medicação:', error);

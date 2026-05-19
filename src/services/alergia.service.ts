@@ -155,20 +155,17 @@ export class AlergiaService {
         utilizadorIdLogado: number
     ): Promise<void> {
         try {
-            // TODO: Buscar versão anterior para auditoria
             const alergiaAnterior = await this.obter(alergiaId);
-
-            // TODO: Apagar da base de dados (soft delete é recomendado)
-            
-            // Registar auditoria
-             await this.auditoriaService.registarAuditoria(
-                 utilizadorIdLogado,
-                 'alergia',
-                 alergiaId,
-                 OperacaoAuditoria.ELIMINACAO,
-                 JSON.stringify(alergiaAnterior),
-                 null
-             );
+            const alergiaEliminada = { ...alergiaAnterior, deleted_at: new Date() };
+            // TODO: UPDATE alergia SET deleted_at = NOW() WHERE id = alergiaId
+            await this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado,
+                'alergia',
+                alergiaId,
+                OperacaoAuditoria.ELIMINACAO,
+                JSON.stringify(alergiaAnterior),
+                JSON.stringify(alergiaEliminada)
+            );
         } catch (error) {
             console.error('Erro ao apagar alergia:', error);
             throw error;

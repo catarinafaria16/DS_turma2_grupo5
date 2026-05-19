@@ -7,4 +7,5 @@ export interface SintomaResponseDto {
     intensidade: IntensidadeSintoma;
     duracao: string;
     data_registo: Date;
+    deleted_at?: Date;
 }

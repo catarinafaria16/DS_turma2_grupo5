@@ -147,13 +147,15 @@ export class UtenteService {
     async apagar(utenteId: number, utilizadorIdLogado: number): Promise<void> {
         try {
             const utenteAnterior = await this.obter(utenteId);
+            const utenteEliminado = { ...utenteAnterior, deleted_at: new Date() };
+            // TODO: UPDATE utente SET deleted_at = NOW() WHERE id = utenteId
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'utente',
                 utenteId,
                 OperacaoAuditoria.ELIMINACAO,
                 JSON.stringify(utenteAnterior),
-                null
+                JSON.stringify(utenteEliminado)
             );
         } catch (error) {
             console.error('Erro ao apagar utente:', error);

@@ -4,205 +4,130 @@ import type { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto.js';
 import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 
 export class AlertaController {
-    private service: AlertaService;
+    private service = new AlertaService();
 
-    constructor() {
-        this.service = new AlertaService();
-    }
-
-    /* Criar novo alerta */
-    async criar(req: Request, res: Response): Promise<void> {
+    async criar(req: Request, res: Response) {
         try {
             const alertaData: CreateAlertaDto = req.body;
             const utilizadorIdLogado = req.body.utilizadorIdLogado;
-
             const novoAlerta = await this.service.criar(alertaData, utilizadorIdLogado);
-            res.status(201).json({
-                mensagem: 'Alerta criado com sucesso',
-                dados: novoAlerta
-            });
+            return res.status(201).json({ mensagem: 'Alerta criado com sucesso', dados: novoAlerta });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao criar alerta'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao criar alerta' });
         }
     }
 
-    /* Listar todos os alertas */
-    async listar(req: Request, res: Response): Promise<void> {
+    async listar(_req: Request, res: Response) {
         try {
             const alertas = await this.service.listar();
-            res.status(200).json({
-                dados: alertas,
-                total: alertas.length
-            });
+            return res.status(200).json({ dados: alertas, total: alertas.length });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao listar alertas'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao listar alertas' });
         }
     }
 
-    /* Obter alerta por ID */
-    async obter(req: Request, res: Response): Promise<void> {
+    async obter(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const alerta = await this.service.obter(Number(id));
-            res.status(200).json({
-                dados: alerta
-            });
+            return res.status(200).json({ dados: alerta });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao obter alerta'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao obter alerta' });
         }
     }
 
-    /* Listar alertas por utente */
-    async listarPorUtente(req: Request, res: Response): Promise<void> {
+    async listarPorUtente(req: Request, res: Response) {
         try {
             const { utenteId } = req.params;
             const alertas = await this.service.listarPorUtente(Number(utenteId));
-            res.status(200).json({
-                dados: alertas,
-                total: alertas.length
-            });
+            return res.status(200).json({ dados: alertas, total: alertas.length });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao listar alertas do utente'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao listar alertas do utente' });
         }
     }
 
-    /* Listar alertas por médico */
-    async listarPorMedico(req: Request, res: Response): Promise<void> {
+    async listarPorMedico(req: Request, res: Response) {
         try {
             const { medicoId } = req.params;
             const alertas = await this.service.listarPorMedico(Number(medicoId));
-            res.status(200).json({
-                dados: alertas,
-                total: alertas.length
-            });
+            return res.status(200).json({ dados: alertas, total: alertas.length });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao listar alertas do médico'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao listar alertas do médico' });
         }
     }
 
-    /* Listar alertas por estado */
-    async listarPorEstado(req: Request, res: Response): Promise<void> {
+    async listarPorEstado(req: Request, res: Response) {
         try {
             const alertas = await this.service.listar();
             const { estado } = req.params;
             const filtrados = alertas.filter((a: any) => a.estado === estado);
-            res.status(200).json({
-                dados: filtrados,
-                total: filtrados.length
-            });
+            return res.status(200).json({ dados: filtrados, total: filtrados.length });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao listar alertas por estado'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao listar alertas por estado' });
         }
     }
 
-    /* Atualizar estado do alerta */
-    async atualizar(req: Request, res: Response): Promise<void> {
+    async atualizar(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const { estado, utilizadorIdLogado } = req.body;
-
             const alertaAtualizado = await this.service.atualizarEstado(Number(id), estado, utilizadorIdLogado);
-            res.status(200).json({
-                mensagem: 'Alerta atualizado com sucesso',
-                dados: alertaAtualizado
-            });
+            return res.status(200).json({ mensagem: 'Alerta atualizado com sucesso', dados: alertaAtualizado });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao atualizar alerta'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao atualizar alerta' });
         }
     }
 
-    /* Apagar alerta */
-    async apagar(req: Request, res: Response): Promise<void> {
+    async apagar(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const utilizadorIdLogado = req.body.utilizadorIdLogado;
-
             await this.service.apagar(Number(id), utilizadorIdLogado);
-            res.status(204).send();
+            return res.status(204).send();
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao apagar alerta'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao apagar alerta' });
         }
     }
 
-    /* Marcar alerta como lido */
-    async marcarComoLido(req: Request, res: Response): Promise<void> {
+    async marcarComoLido(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const utilizadorIdLogado = req.body.utilizadorIdLogado;
-
             const alertaAtualizado = await this.service.atualizarEstado(Number(id), EstadoAlerta.VISTO, utilizadorIdLogado);
-            res.status(200).json({
-                mensagem: 'Alerta marcado como lido',
-                dados: alertaAtualizado
-            });
+            return res.status(200).json({ mensagem: 'Alerta marcado como lido', dados: alertaAtualizado });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao marcar alerta como lido'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao marcar alerta como lido' });
         }
     }
 
-    /* Marcar alerta como resolvido */
-    async marcarComoResolvido(req: Request, res: Response): Promise<void> {
+    async marcarComoResolvido(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const utilizadorIdLogado = req.body.utilizadorIdLogado;
-
             const alertaAtualizado = await this.service.atualizarEstado(Number(id), EstadoAlerta.FECHADO, utilizadorIdLogado);
-            res.status(200).json({
-                mensagem: 'Alerta marcado como resolvido',
-                dados: alertaAtualizado
-            });
+            return res.status(200).json({ mensagem: 'Alerta marcado como resolvido', dados: alertaAtualizado });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao marcar alerta como resolvido'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao marcar alerta como resolvido' });
         }
     }
 
-    /* RF018: Adicionar nota/ação ao alerta */
-    async adicionarNota(req: Request, res: Response): Promise<void> {
+    async adicionarNota(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const { nota, utilizadorIdLogado } = req.body;
-
             const alertaAtualizado = await this.service.adicionarNota(Number(id), nota, utilizadorIdLogado);
-            res.status(200).json({
-                mensagem: 'Nota adicionada ao alerta',
-                dados: alertaAtualizado
-            });
+            return res.status(200).json({ mensagem: 'Nota adicionada ao alerta', dados: alertaAtualizado });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao adicionar nota ao alerta'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao adicionar nota ao alerta' });
         }
     }
 
-    /* RF047: Resumo agregado de alertas */
-    async resumo(_req: Request, res: Response): Promise<void> {
+    async resumo(_req: Request, res: Response) {
         try {
             const dados = await this.service.obterResumo();
-            res.status(200).json({ dados });
+            return res.status(200).json({ dados });
         } catch (error: any) {
-            res.status(400).json({
-                erro: error.message || 'Erro ao obter resumo de alertas'
-            });
+            return res.status(400).json({ erro: error.message || 'Erro ao obter resumo de alertas' });
         }
     }
 }

@@ -3,4 +3,5 @@ export interface MedicoResponseDto {
     utilizador_id: number;
     especialidade: string;
     contacto: string;
+    deleted_at?: Date;
 }

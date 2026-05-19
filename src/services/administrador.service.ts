@@ -104,20 +104,17 @@ export class AdministradorService {
         utilizadorIdLogado: number
     ): Promise<void> {
         try {
-            // TODO: Buscar versão anterior para auditoria
             const adminAnterior = await this.obter(administradorId);
-
-            // TODO: Apagar da base de dados (soft delete é recomendado)
-            
-            // Registar auditoria
-             await this.auditoriaService.registarAuditoria(
-                 utilizadorIdLogado,
-                 'administrador',
-                 administradorId,
-                 OperacaoAuditoria.ELIMINACAO,
-                 JSON.stringify(adminAnterior),
-                 null
-             );
+            const adminEliminado = { ...adminAnterior, deleted_at: new Date() };
+            // TODO: UPDATE administrador SET deleted_at = NOW() WHERE id = administradorId
+            await this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado,
+                'administrador',
+                administradorId,
+                OperacaoAuditoria.ELIMINACAO,
+                JSON.stringify(adminAnterior),
+                JSON.stringify(adminEliminado)
+            );
         } catch (error) {
             console.error('Erro ao apagar administrador:', error);
             throw error;

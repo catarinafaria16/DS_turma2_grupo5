@@ -6,4 +6,5 @@ export interface MedicacaoHabitualResponseDto {
     dose: string;
     duracao: string;
     periodicidade: string;
+    deleted_at?: Date;
 }

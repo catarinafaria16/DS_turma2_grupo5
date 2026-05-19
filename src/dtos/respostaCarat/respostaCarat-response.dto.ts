@@ -19,4 +19,5 @@ export interface RespostaCaratResponseDto {
     score_total: number;
     interpretacao: string;
     recomendacao_automatica: string;
+    deleted_at?: Date;
 }

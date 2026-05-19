@@ -2,7 +2,7 @@ import { EstadoPrescricao } from '../../enums/EstadoPrescricao.enum.js';
 import { TipoPrescricao } from '../../enums/TipoPrescricao.enum.js';
 
 export interface PrescricaoResponseDto {
-    id: number; 
+    id: number;
     medico_id: number;
     utente_id: number;
     tipo: TipoPrescricao;
@@ -10,4 +10,5 @@ export interface PrescricaoResponseDto {
     data_validade: Date;
     estado: EstadoPrescricao;
     assinatura: string;
+    deleted_at?: Date;
 }

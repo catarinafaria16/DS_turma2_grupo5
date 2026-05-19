@@ -6,4 +6,5 @@ export interface AlergiaResponseDto {
     descricao: string;
     frequencia_crise: string;
     intensidade_crise: IntensidadeCriseAlergia;
+    deleted_at?: Date;
 }

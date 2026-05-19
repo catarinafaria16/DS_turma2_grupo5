@@ -5,4 +5,5 @@ export interface UtilizadorResponseDto {
     nome: string;
     email: string;
     perfil: PerfilUtilizador;
+    deleted_at?: Date;
 }

@@ -131,13 +131,15 @@ export class PrescricaoService {
     async apagar(prescricaoId: number, utilizadorIdLogado: number): Promise<void> {
         try {
             const prescricaoAnterior = await this.obter(prescricaoId);
+            const prescricaoEliminada = { ...prescricaoAnterior, deleted_at: new Date() };
+            // TODO: UPDATE prescricao SET deleted_at = NOW() WHERE id = prescricaoId
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'prescricao',
                 prescricaoId,
                 OperacaoAuditoria.ELIMINACAO,
                 JSON.stringify(prescricaoAnterior),
-                null
+                JSON.stringify(prescricaoEliminada)
             );
         } catch (error) {
             console.error('Erro ao apagar prescrição:', error);

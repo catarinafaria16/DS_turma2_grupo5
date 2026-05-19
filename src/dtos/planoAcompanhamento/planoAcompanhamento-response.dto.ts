@@ -9,4 +9,5 @@ export interface PlanoAcompanhamentoResponseDto {
     data_fim: Date;
     estado: EstadoPlanoAcompanhamento;
     recomendacao_medica: string;
+    deleted_at?: Date;
 }

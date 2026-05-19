@@ -116,13 +116,15 @@ export class RegraAlertaService {
     async apagar(regraId: number, utilizadorIdLogado: number): Promise<void> {
         try {
             const regraAnterior = await this.obter(regraId);
+            const regraEliminada = { ...regraAnterior, deleted_at: new Date() };
+            // TODO: UPDATE regra_alerta SET deleted_at = NOW() WHERE id = regraId
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'regra_alerta',
                 regraId,
                 OperacaoAuditoria.ELIMINACAO,
                 JSON.stringify(regraAnterior),
-                null
+                JSON.stringify(regraEliminada)
             );
         } catch (error) {
             console.error('Erro ao apagar regra de alerta:', error);
