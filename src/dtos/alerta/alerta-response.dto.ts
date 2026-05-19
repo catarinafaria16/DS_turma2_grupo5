@@ -1,5 +1,6 @@
 import { EstadoAlerta } from '../../enums/EstadoAlerta.enum.js';
 import { TipoAlerta } from '../../enums/TipoAlerta.enum.js';
+import type { PrioridadeRegraAlerta } from '../../enums/PrioridadeRegraAlerta.enum.js';
 
 export interface AlertaResponseDto {
     id: number;
@@ -8,6 +9,8 @@ export interface AlertaResponseDto {
     regra_id: number;
     tipo: TipoAlerta;
     estado: EstadoAlerta;
+    prioridade: PrioridadeRegraAlerta;
+    notas?: string;
     data_criacao: Date;
     data_atualizacao_estado: Date;
 }

@@ -114,6 +114,36 @@ export class UtenteService {
         }
     }
 
+    // RF031: Histórico clínico completo do utente (avaliações, alertas, medicação, exames, sintomas)
+    async historicoClinico(utenteId: number): Promise<{
+        utente_id: number;
+        avaliacoes_carat: unknown[];
+        alertas: unknown[];
+        medicacoes: unknown[];
+        exames: unknown[];
+        sintomas: unknown[];
+        anamnese: unknown;
+    }> {
+        try {
+            if (utenteId <= 0) {
+                throw new Error('ID de utente inválido');
+            }
+            // TODO: agregar dados de todos os módulos clínicos do utente na BD
+            return {
+                utente_id: utenteId,
+                avaliacoes_carat: [],
+                alertas: [],
+                medicacoes: [],
+                exames: [],
+                sintomas: [],
+                anamnese: null
+            };
+        } catch (error) {
+            console.error('Erro ao obter histórico clínico:', error);
+            throw error;
+        }
+    }
+
     async apagar(utenteId: number, utilizadorIdLogado: number): Promise<void> {
         try {
             const utenteAnterior = await this.obter(utenteId);

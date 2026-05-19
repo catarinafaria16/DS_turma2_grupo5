@@ -175,4 +175,34 @@ export class AlertaController {
             });
         }
     }
+
+    /* RF018: Adicionar nota/ação ao alerta */
+    async adicionarNota(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            const { nota, utilizadorIdLogado } = req.body;
+
+            const alertaAtualizado = await this.service.adicionarNota(Number(id), nota, utilizadorIdLogado);
+            res.status(200).json({
+                mensagem: 'Nota adicionada ao alerta',
+                dados: alertaAtualizado
+            });
+        } catch (error: any) {
+            res.status(400).json({
+                erro: error.message || 'Erro ao adicionar nota ao alerta'
+            });
+        }
+    }
+
+    /* RF047: Resumo agregado de alertas */
+    async resumo(_req: Request, res: Response): Promise<void> {
+        try {
+            const dados = await this.service.obterResumo();
+            res.status(200).json({ dados });
+        } catch (error: any) {
+            res.status(400).json({
+                erro: error.message || 'Erro ao obter resumo de alertas'
+            });
+        }
+    }
 }
