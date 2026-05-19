@@ -67,14 +67,4 @@ export class RespostaCaratController {
         }
     }
 
-    async apagar(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const utilizadorIdLogado = req.body.utilizadorIdLogado;
-            await this.service.apagar(Number(id), utilizadorIdLogado);
-            return res.status(204).send();
-        } catch (error: any) {
-            return res.status(400).json({ erro: error.message || 'Erro ao apagar resposta CARAT' });
-        }
-    }
 }

@@ -1,33 +1,31 @@
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 import { TipoPrescricao } from '../enums/TipoPrescricao.enum.js';
 import { EstadoPrescricao } from '../enums/EstadoPrescricao.enum.js';
 
+@Entity()
 export class Prescricao {
-    id: number;
-    medico_id: number;
-    utente_id: number;
-    tipo: TipoPrescricao;
-    data_emissao: Date;
-    data_validade: Date;
-    estado: EstadoPrescricao;
-    assinatura: string;
 
-    constructor(
-        id: number,
-        medico_id: number,
-        utente_id: number,
-        tipo: TipoPrescricao,
-        data_emissao: Date,
-        data_validade: Date,
-        estado: EstadoPrescricao,
-        assinatura: string
-    ) {
-        this.id = id;
-        this.medico_id = medico_id;
-        this.utente_id = utente_id;
-        this.tipo = tipo;
-        this.data_emissao = data_emissao;
-        this.data_validade = data_validade;
-        this.estado = estado;
-        this.assinatura = assinatura;
-    }
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    medico_id!: number;
+
+    @Column()
+    utente_id!: number;
+
+    @Column({ type: 'simple-enum', enum: TipoPrescricao })
+    tipo!: TipoPrescricao;
+
+    @CreateDateColumn()
+    data_emissao!: Date;
+
+    @Column({ type: 'date' })
+    data_validade!: Date;
+
+    @Column({ type: 'simple-enum', enum: EstadoPrescricao })
+    estado!: EstadoPrescricao;
+
+    @Column()
+    assinatura!: string;
 }

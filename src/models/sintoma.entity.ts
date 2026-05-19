@@ -1,26 +1,24 @@
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 import { IntensidadeSintoma } from '../enums/IntensidadeSintoma.enum.js';
 
+@Entity()
 export class Sintoma {
-    id: number;
-    utente_id: number;
-    descricao: string;
-    intensidade: IntensidadeSintoma;
-    duracao: string;
-    data_registo: Date;
 
-    constructor(
-        id: number,
-        utente_id: number,
-        descricao: string,
-        intensidade: IntensidadeSintoma,
-        duracao: string,
-        data_registo: Date
-    ) {
-        this.id = id;
-        this.utente_id = utente_id;
-        this.descricao = descricao;
-        this.intensidade = intensidade;
-        this.duracao = duracao;
-        this.data_registo = data_registo;
-    }
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    utente_id!: number;
+
+    @Column()
+    descricao!: string;
+
+    @Column({ type: 'simple-enum', enum: IntensidadeSintoma })
+    intensidade!: IntensidadeSintoma;
+
+    @Column()
+    duracao!: string;
+
+    @CreateDateColumn()
+    data_registo!: Date;
 }

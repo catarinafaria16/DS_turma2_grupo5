@@ -1,23 +1,24 @@
+import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn } from 'typeorm';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
+@Entity()
 export class Utilizador {
-    id: number;
-    nome: string;
-    email: string;
-    password: string;
-    perfil: PerfilUtilizador;
 
-    constructor(
-        id: number,
-        nome: string,
-        email: string,
-        password: string,
-        perfil: PerfilUtilizador
-    ) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.password = password;
-        this.perfil = perfil;
-    }
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    nome!: string;
+
+    @Column({ unique: true })
+    email!: string;
+
+    @Column()
+    password!: string;
+
+    @Column({ type: 'simple-enum', enum: PerfilUtilizador })
+    perfil!: PerfilUtilizador;
+
+    @DeleteDateColumn({ nullable: true })
+    deleted_at?: Date;
 }

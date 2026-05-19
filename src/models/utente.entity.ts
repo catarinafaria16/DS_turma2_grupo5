@@ -1,30 +1,32 @@
-export class Utente {
-    id: number;
-    utilizador_id: number;
-    medico_id: number;
-    nr_utente: number;
-    data_nascimento: Date;
-    morada: string;
-    contacto: string;
-    nr_faturacao: number;
+import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn } from 'typeorm';
 
-    constructor(
-        id: number,
-        utilizador_id: number,
-        medico_id: number,
-        nr_utente: number,
-        data_nascimento: Date,
-        morada: string,
-        contacto: string,
-        nr_faturacao: number
-    ) {
-        this.id = id;
-        this.utilizador_id = utilizador_id;
-        this.medico_id = medico_id;
-        this.nr_utente = nr_utente;
-        this.data_nascimento = data_nascimento;
-        this.morada = morada;
-        this.contacto = contacto;
-        this.nr_faturacao = nr_faturacao;
-    }
+@Entity()
+export class Utente {
+
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    utilizador_id!: number;
+
+    @Column()
+    medico_id!: number;
+
+    @Column({ unique: true })
+    nr_utente!: number;
+
+    @Column({ type: 'date' })
+    data_nascimento!: Date;
+
+    @Column()
+    morada!: string;
+
+    @Column()
+    contacto!: string;
+
+    @Column()
+    nr_faturacao!: number;
+
+    @DeleteDateColumn({ nullable: true })
+    deleted_at?: Date;
 }

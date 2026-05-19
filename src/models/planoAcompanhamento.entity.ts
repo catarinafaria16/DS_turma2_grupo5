@@ -1,32 +1,30 @@
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum.js';
 
+@Entity()
 export class PlanoAcompanhamento {
-    id: number;
-    medico_id: number;
-    utente_id: number;
-    frequencia_avaliacao: string;
-    data_inicio: Date;
-    data_fim: Date;
-    estado: EstadoPlanoAcompanhamento;
-    recomendacao_medica: string;
 
-    constructor(
-        id: number,
-        medico_id: number,
-        utente_id: number,
-        frequencia_avaliacao: string,
-        data_inicio: Date,
-        data_fim: Date,
-        estado: EstadoPlanoAcompanhamento,
-        recomendacao_medica: string
-    ) {
-        this.id = id;
-        this.medico_id = medico_id;
-        this.utente_id = utente_id;
-        this.frequencia_avaliacao = frequencia_avaliacao;
-        this.data_inicio = data_inicio;
-        this.data_fim = data_fim;
-        this.estado = estado;
-        this.recomendacao_medica = recomendacao_medica;
-    }
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    medico_id!: number;
+
+    @Column()
+    utente_id!: number;
+
+    @Column()
+    frequencia_avaliacao!: string;
+
+    @Column({ type: 'date' })
+    data_inicio!: Date;
+
+    @Column({ type: 'date' })
+    data_fim!: Date;
+
+    @Column({ type: 'simple-enum', enum: EstadoPlanoAcompanhamento })
+    estado!: EstadoPlanoAcompanhamento;
+
+    @Column({ type: 'text' })
+    recomendacao_medica!: string;
 }

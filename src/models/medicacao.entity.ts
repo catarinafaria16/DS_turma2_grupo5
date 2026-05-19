@@ -1,27 +1,26 @@
-export class Medicacao {
-    id: number;
-    prescricao_id: number;
-    nome: string;
-    dose: string;
-    duracao: string;
-    periodicidade: string;
-    validade: Date;
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-    constructor(
-        id: number,
-        prescricao_id: number,
-        nome: string,
-        dose: string,
-        duracao: string,
-        periodicidade: string,
-        validade: Date
-    ) {
-        this.id = id;
-        this.prescricao_id = prescricao_id;
-        this.nome = nome;
-        this.dose = dose;
-        this.duracao = duracao;
-        this.periodicidade = periodicidade;
-        this.validade = validade;
-    }
+@Entity()
+export class Medicacao {
+
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    prescricao_id!: number;
+
+    @Column()
+    nome!: string;
+
+    @Column()
+    dose!: string;
+
+    @Column()
+    duracao!: string;
+
+    @Column()
+    periodicidade!: string;
+
+    @Column({ type: 'date' })
+    validade!: Date;
 }

@@ -1,24 +1,23 @@
-export class MedicacaoHabitual {
-    id: number;
-    anamnese_id: number;
-    nome: string;
-    dose: string;
-    duracao: string;
-    periodicidade: string;
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-    constructor(
-        id: number,
-        anamnese_id: number,
-        nome: string,
-        dose: string,
-        duracao: string,
-        periodicidade: string
-    ) {
-        this.id = id;
-        this.anamnese_id = anamnese_id;
-        this.nome = nome;
-        this.dose = dose;
-        this.duracao = duracao;
-        this.periodicidade = periodicidade;
-    }
+@Entity()
+export class MedicacaoHabitual {
+
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    anamnese_id!: number;
+
+    @Column()
+    nome!: string;
+
+    @Column()
+    dose!: string;
+
+    @Column()
+    duracao!: string;
+
+    @Column()
+    periodicidade!: string;
 }

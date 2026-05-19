@@ -1,29 +1,27 @@
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { EstadoExame } from '../enums/EstadoExame.enum.js';
 
+@Entity()
 export class Exame {
-    id: number;
-    prescricao_id: number;
-    tipo_exame: string;
-    data: Date;
-    resultado: object;
-    consentimento: boolean;
-    estado: EstadoExame;
 
-    constructor(
-        id: number,
-        prescricao_id: number,
-        tipo_exame: string,
-        data: Date,
-        resultado: object,
-        consentimento: boolean,
-        estado: EstadoExame
-    ) {
-        this.id = id;
-        this.prescricao_id = prescricao_id;
-        this.tipo_exame = tipo_exame;
-        this.data = data;
-        this.resultado = resultado;
-        this.consentimento = consentimento;
-        this.estado = estado;
-    }
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    prescricao_id!: number;
+
+    @Column()
+    tipo_exame!: string;
+
+    @Column({ type: 'timestamp' })
+    data!: Date;
+
+    @Column({ type: 'simple-json' })
+    resultado!: object;
+
+    @Column()
+    consentimento!: boolean;
+
+    @Column({ type: 'simple-enum', enum: EstadoExame })
+    estado!: EstadoExame;
 }

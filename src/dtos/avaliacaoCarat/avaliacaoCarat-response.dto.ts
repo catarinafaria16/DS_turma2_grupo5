@@ -33,5 +33,4 @@ export interface AvaliacaoCaratResponseDto {
     r9: JsonObject;
     r10: JsonObject;
     versao: number;
-    deleted_at?: Date;
 }

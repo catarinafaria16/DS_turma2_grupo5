@@ -1,20 +1,20 @@
-import { EspecialidadeMedico } from '../enums/EspecialidadeMedico.enum.js';
+import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn } from 'typeorm';
 
+@Entity()
 export class Medico {
-    id: number;
-    utilizador_id: number;
-    especialidade: EspecialidadeMedico;
-    contacto: string;
 
-    constructor(
-        id: number,
-        utilizador_id: number,
-        especialidade: EspecialidadeMedico,
-        contacto: string
-    ) {
-        this.id = id;
-        this.utilizador_id = utilizador_id;
-        this.especialidade = especialidade;
-        this.contacto = contacto;
-    }
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    utilizador_id!: number;
+
+    @Column()
+    especialidade!: string;
+
+    @Column()
+    contacto!: string;
+
+    @DeleteDateColumn({ nullable: true })
+    deleted_at?: Date;
 }

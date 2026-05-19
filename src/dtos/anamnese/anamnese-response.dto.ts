@@ -5,5 +5,4 @@ export interface AnamneseResponseDto {
     utente_id: number;
     historico_familiar: string;
     tabagismo: Tabagismo;
-    deleted_at?: Date;
 }

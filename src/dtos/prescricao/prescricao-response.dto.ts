@@ -10,5 +10,4 @@ export interface PrescricaoResponseDto {
     data_validade: Date;
     estado: EstadoPrescricao;
     assinatura: string;
-    deleted_at?: Date;
 }

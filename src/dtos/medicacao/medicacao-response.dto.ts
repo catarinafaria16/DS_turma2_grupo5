@@ -7,5 +7,4 @@ export interface MedicacaoResponseDto {
     duracao: string;
     periodicidade: string;
     validade: Date;
-    deleted_at?: Date;
 }

@@ -1,20 +1,18 @@
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { Tabagismo } from '../enums/Tabagismo.enum.js';
 
+@Entity()
 export class Anamnese {
-    id: number;
-    utente_id: number;
-    historico_familiar: string;
-    tabagismo: Tabagismo;
 
-    constructor(
-        id: number,
-        utente_id: number,
-        historico_familiar: string,
-        tabagismo: Tabagismo
-    ) {
-        this.id = id;
-        this.utente_id = utente_id;
-        this.historico_familiar = historico_familiar;
-        this.tabagismo = tabagismo;
-    }
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    utente_id!: number;
+
+    @Column({ type: 'text' })
+    historico_familiar!: string;
+
+    @Column({ type: 'simple-enum', enum: Tabagismo })
+    tabagismo!: Tabagismo;
 }

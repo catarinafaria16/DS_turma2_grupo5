@@ -1,9 +1,14 @@
-export class Administrador {
-    id: number;
-    utilizador_id: number;
+import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn } from 'typeorm';
 
-    constructor(id: number, utilizador_id: number) {
-        this.id = id;
-        this.utilizador_id = utilizador_id;
-    }
+@Entity()
+export class Administrador {
+
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    utilizador_id!: number;
+
+    @DeleteDateColumn({ nullable: true })
+    deleted_at?: Date;
 }

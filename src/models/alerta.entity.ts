@@ -1,33 +1,38 @@
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 import { TipoAlerta } from '../enums/TipoAlerta.enum.js';
 import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
+import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
 
+@Entity()
 export class Alerta {
-    id: number;
-    utente_id: number;
-    medico_id: number;
-    regra_id: number;
-    tipo: TipoAlerta;
-    estado: EstadoAlerta;
-    data_criacao: Date;
-    data_atualizacao_estado: Date;
 
-    constructor(
-        id: number,
-        utente_id: number,
-        medico_id: number,
-        regra_id: number,
-        tipo: TipoAlerta,
-        estado: EstadoAlerta,
-        data_criacao: Date,
-        data_atualizacao_estado: Date
-    ) {
-        this.id = id;
-        this.utente_id = utente_id;
-        this.medico_id = medico_id;
-        this.regra_id = regra_id;
-        this.tipo = tipo;
-        this.estado = estado;
-        this.data_criacao = data_criacao;
-        this.data_atualizacao_estado = data_atualizacao_estado;
-    }
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    utente_id!: number;
+
+    @Column()
+    medico_id!: number;
+
+    @Column()
+    regra_id!: number;
+
+    @Column({ type: 'simple-enum', enum: TipoAlerta })
+    tipo!: TipoAlerta;
+
+    @Column({ type: 'simple-enum', enum: EstadoAlerta })
+    estado!: EstadoAlerta;
+
+    @Column({ type: 'simple-enum', enum: PrioridadeRegraAlerta })
+    prioridade!: PrioridadeRegraAlerta;
+
+    @Column({ type: 'text', nullable: true })
+    notas?: string;
+
+    @CreateDateColumn()
+    data_criacao!: Date;
+
+    @Column({ type: 'timestamp' })
+    data_atualizacao_estado!: Date;
 }

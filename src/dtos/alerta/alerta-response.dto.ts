@@ -13,5 +13,4 @@ export interface AlertaResponseDto {
     notas?: string;
     data_criacao: Date;
     data_atualizacao_estado: Date;
-    deleted_at?: Date;
 }
