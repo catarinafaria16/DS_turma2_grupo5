@@ -1,4 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { appConfig } from '../config/app.config.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 export interface UtilizadorAutenticado {
@@ -15,7 +17,6 @@ declare global {
     }
 }
 
-
 export function autenticar(req: Request, res: Response, next: NextFunction): void {
     const authHeader = req.headers['authorization'];
 
@@ -27,10 +28,7 @@ export function autenticar(req: Request, res: Response, next: NextFunction): voi
     const token = authHeader.substring(7);
 
     try {
-        
-        const payload = JSON.parse(
-            Buffer.from(token, 'base64').toString('utf-8')
-        ) as UtilizadorAutenticado;
+        const payload = jwt.verify(token, appConfig.auth.jwtSecret) as UtilizadorAutenticado;
 
         if (!payload.id || !payload.perfil) {
             throw new Error('Payload inválido');
@@ -38,11 +36,14 @@ export function autenticar(req: Request, res: Response, next: NextFunction): voi
 
         req.utilizador = payload;
         next();
-    } catch {
-        res.status(401).json({ erro: 'Token inválido ou expirado' });
+    } catch (err) {
+        if (err instanceof jwt.TokenExpiredError) {
+            res.status(401).json({ erro: 'Token expirado' });
+            return;
+        }
+        res.status(401).json({ erro: 'Token inválido' });
     }
 }
-
 
 export function requirePerfil(...perfis: PerfilUtilizador[]) {
     return (req: Request, res: Response, next: NextFunction): void => {

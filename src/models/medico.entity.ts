@@ -1,13 +1,15 @@
+import { EspecialidadeMedico } from '../enums/EspecialidadeMedico.enum.js';
+
 export class Medico {
     id: number;
     utilizador_id: number;
-    especialidade: string;
+    especialidade: EspecialidadeMedico;
     contacto: string;
 
     constructor(
         id: number,
         utilizador_id: number,
-        especialidade: string,
+        especialidade: EspecialidadeMedico,
         contacto: string
     ) {
         this.id = id;

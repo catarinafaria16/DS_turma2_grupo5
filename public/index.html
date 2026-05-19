@@ -1,264 +1,398 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema CARAT</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema CARAT</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f0f4f8;
-            color: #2d3748;
-        }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #2d3748; }
 
-        header {
-            background: #2b6cb0;
-            color: white;
-            padding: 1.5rem 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
+    header {
+      background: #2b6cb0; color: white;
+      padding: 1.25rem 2rem;
+      display: flex; align-items: center; gap: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    header h1 { font-size: 1.4rem; font-weight: 600; }
+    header span { font-size: 0.85rem; opacity: 0.8; }
 
-        header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
+    .tabs {
+      background: white; border-bottom: 1px solid #e2e8f0;
+      display: flex; padding: 0 2rem;
+    }
+    .tab {
+      padding: 0.85rem 1.25rem; font-size: 0.875rem; cursor: pointer;
+      border-bottom: 3px solid transparent; color: #718096; font-weight: 500;
+    }
+    .tab:hover { color: #2b6cb0; }
+    .tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; }
 
-        header span {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
+    .container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
 
-        .hero {
-            background: linear-gradient(135deg, #2b6cb0, #2c7a7b);
-            color: white;
-            text-align: center;
-            padding: 3rem 2rem;
-        }
+    .card {
+      background: white; border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      padding: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #2b6cb0; }
 
-        .hero h2 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
+    form { display: flex; flex-direction: column; gap: 8px; max-width: 460px; }
+    input, select {
+      padding: 8px 10px; font-size: 14px;
+      border: 1px solid #cbd5e0; border-radius: 5px; background: white;
+    }
+    input:focus, select:focus {
+      outline: none; border-color: #2b6cb0;
+      box-shadow: 0 0 0 2px rgba(43,108,176,0.15);
+    }
+    .row { display: flex; gap: 8px; }
+    .row input, .row select { flex: 1; }
 
-        .hero p {
-            font-size: 1rem;
-            opacity: 0.85;
-            max-width: 500px;
-            margin: 0 auto;
-        }
+    button {
+      padding: 9px 18px; background: #2b6cb0; color: white;
+      border: none; border-radius: 5px; cursor: pointer;
+      font-size: 14px; font-weight: 500; align-self: flex-start;
+    }
+    button:hover { background: #2c5282; }
 
-        .status-bar {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 0.75rem 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            color: #718096;
-        }
+    .erro    { color: #e53e3e; font-size: 0.85rem; margin-top: 4px; }
+    .sucesso { color: #276749; font-size: 0.85rem; margin-top: 4px; }
 
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #48bb78;
-        }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.875rem; }
+    th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #edf2f7; }
+    th { background: #f7fafc; color: #4a5568; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f7fafc; }
 
-        .container {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-        }
+    .badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 999px;
+    }
+    .badge-blue   { background: #ebf8ff; color: #2b6cb0; }
+    .badge-green  { background: #f0fff4; color: #276749; }
+    .badge-orange { background: #fffaf0; color: #c05621; }
+    .badge-red    { background: #fff5f5; color: #c53030; }
 
-        .section-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #718096;
-            margin-bottom: 1rem;
-        }
+    .vazio { color: #a0aec0; font-size: 0.875rem; padding: 1rem 0; }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.25rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            border-left: 4px solid #2b6cb0;
-        }
-
-        .card h3 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .card p {
-            font-size: 0.8rem;
-            color: #718096;
-        }
-
-        .card.green  { border-left-color: #48bb78; }
-        .card.teal   { border-left-color: #2c7a7b; }
-        .card.orange { border-left-color: #ed8936; }
-        .card.red    { border-left-color: #fc8181; }
-        .card.purple { border-left-color: #9f7aea; }
-
-        .endpoints {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-
-        .endpoint {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1.25rem;
-            border-bottom: 1px solid #f7fafc;
-            font-size: 0.85rem;
-        }
-
-        .endpoint:last-child { border-bottom: none; }
-
-        .badge {
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            min-width: 48px;
-            text-align: center;
-        }
-
-        .get    { background: #ebf8ff; color: #2b6cb0; }
-        .post   { background: #f0fff4; color: #276749; }
-        .put    { background: #fffaf0; color: #c05621; }
-        .delete { background: #fff5f5; color: #c53030; }
-
-        .path { color: #4a5568; font-family: monospace; }
-        .desc { color: #a0aec0; margin-left: auto; font-size: 0.78rem; }
-
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            font-size: 0.8rem;
-            color: #a0aec0;
-            border-top: 1px solid #e2e8f0;
-            background: white;
-        }
-    </style>
+    footer {
+      text-align: center; padding: 1.5rem; font-size: 0.8rem;
+      color: #a0aec0; border-top: 1px solid #e2e8f0;
+      background: white; margin-top: 2rem;
+    }
+  </style>
 </head>
 <body>
+  <div id="root"></div>
 
-<header>
-    <div>
-        <h1>Sistema CARAT</h1>
-        <span>Controlo e Acompanhamento Respiratório e Alergológico em Tratamento</span>
-    </div>
-</header>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
 
-<div class="hero">
-    <h2>API REST</h2>
-    <p>Plataforma de gestão clínica para avaliação e acompanhamento de utentes com patologias respiratórias</p>
-</div>
+    /* ───── Utentes ───── */
+    function SecaoUtentes() {
+      const [utentes, setUtentes] = useState([]);
+      const [form, setForm] = useState({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' });
+      const [erro, setErro] = useState('');
+      const [sucesso, setSucesso] = useState('');
 
-<div class="status-bar">
-    <div class="dot"></div>
-    Servidor operacional &nbsp;|&nbsp; Base URL: <strong>/api</strong>
-</div>
+      async function buscar() {
+        try {
+          const r = await fetch('/api/utentes');
+          if (r.ok) { const d = await r.json(); setUtentes(d.dados ?? []); }
+        } catch {}
+      }
+      useEffect(() => { buscar(); }, []);
 
-<div class="container">
+      function set(field) { return e => setForm(f => ({ ...f, [field]: e.target.value })); }
 
-    <p class="section-title">Módulos do Sistema</p>
-    <div class="grid">
-        <div class="card">
-            <h3>Utilizadores</h3>
-            <p>Gestão de contas e perfis de acesso</p>
-        </div>
-        <div class="card green">
-            <h3>Utentes</h3>
-            <p>Registo e acompanhamento de pacientes</p>
-        </div>
-        <div class="card teal">
-            <h3>Médicos</h3>
-            <p>Profissionais e especialidades</p>
-        </div>
-        <div class="card orange">
-            <h3>Avaliação CARAT</h3>
-            <p>Questionários e scores clínicos</p>
-        </div>
-        <div class="card purple">
-            <h3>Alertas</h3>
-            <p>Notificações e regras de monitorização</p>
-        </div>
-        <div class="card red">
-            <h3>Auditoria</h3>
-            <p>Histórico de todas as operações</p>
-        </div>
-    </div>
+      async function handleSubmit(e) {
+        e.preventDefault(); setErro(''); setSucesso('');
+        const r = await fetch('/api/utentes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            utilizador_id: Number(form.utilizador_id),
+            medico_id:     Number(form.medico_id),
+            nr_utente:     Number(form.nr_utente),
+            data_nascimento: form.data_nascimento,
+            morada:        form.morada,
+            contacto:      form.contacto,
+            nr_faturacao:  Number(form.nr_faturacao),
+          }),
+        });
+        const d = await r.json();
+        if (r.ok) {
+          setForm({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' });
+          setSucesso('Utente criado com sucesso.');
+          buscar();
+        } else {
+          setErro(d.erro || 'Erro ao criar utente.');
+        }
+      }
 
-    <p class="section-title">Principais Endpoints</p>
-    <div class="endpoints">
-        <div class="endpoint">
-            <span class="badge get">GET</span>
-            <span class="path">/api/utentes</span>
-            <span class="desc">Listar todos os utentes</span>
-        </div>
-        <div class="endpoint">
-            <span class="badge post">POST</span>
-            <span class="path">/api/utentes</span>
-            <span class="desc">Criar utente</span>
-        </div>
-        <div class="endpoint">
-            <span class="badge get">GET</span>
-            <span class="path">/api/avaliacoes-carat</span>
-            <span class="desc">Listar avaliações CARAT</span>
-        </div>
-        <div class="endpoint">
-            <span class="badge post">POST</span>
-            <span class="path">/api/respostas-carat</span>
-            <span class="desc">Submeter respostas CARAT</span>
-        </div>
-        <div class="endpoint">
-            <span class="badge get">GET</span>
-            <span class="path">/api/alertas</span>
-            <span class="desc">Listar alertas ativos</span>
-        </div>
-        <div class="endpoint">
-            <span class="badge get">GET</span>
-            <span class="path">/api/auditoria</span>
-            <span class="desc">Consultar log de auditoria</span>
-        </div>
-        <div class="endpoint">
-            <span class="badge get">GET</span>
-            <span class="path">/health</span>
-            <span class="desc">Estado do servidor</span>
-        </div>
-    </div>
+      return (
+        <>
+          <div className="card">
+            <h2>Novo Utente</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="row">
+                <input type="number" value={form.utilizador_id} onChange={set('utilizador_id')} placeholder="ID utilizador" required />
+                <input type="number" value={form.medico_id}     onChange={set('medico_id')}     placeholder="ID médico" required />
+              </div>
+              <div className="row">
+                <input type="number" value={form.nr_utente}    onChange={set('nr_utente')}    placeholder="Nº utente" required />
+                <input type="number" value={form.nr_faturacao} onChange={set('nr_faturacao')} placeholder="Nº faturação" required />
+              </div>
+              <input type="date" value={form.data_nascimento} onChange={set('data_nascimento')} required />
+              <input value={form.morada}   onChange={set('morada')}   placeholder="Morada" required />
+              <input value={form.contacto} onChange={set('contacto')} placeholder="Contacto" required />
+              <button type="submit">Registar utente</button>
+              {erro    && <p className="erro">{erro}</p>}
+              {sucesso && <p className="sucesso">{sucesso}</p>}
+            </form>
+          </div>
 
-</div>
+          <div className="card">
+            <h2>Utentes Registados</h2>
+            {utentes.length === 0 ? <p className="vazio">Nenhum utente registado.</p> : (
+              <table>
+                <thead><tr><th>#</th><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Médico ID</th></tr></thead>
+                <tbody>
+                  {utentes.map(u => (
+                    <tr key={u.id}>
+                      <td>{u.id}</td>
+                      <td>{u.nr_utente}</td>
+                      <td>{u.morada}</td>
+                      <td>{u.contacto}</td>
+                      <td>{u.data_nascimento ? new Date(u.data_nascimento).toLocaleDateString('pt-PT') : '—'}</td>
+                      <td><span className="badge badge-blue">{u.medico_id}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </>
+      );
+    }
 
-<footer>
-    DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT
-</footer>
+    /* ───── Prescrições ───── */
+    function SecaoPrescricoes() {
+      const [prescricoes, setPrescricoes] = useState([]);
+      const [form, setForm] = useState({ medico_id: '', utente_id: '', tipo: 'MEDICAÇÃO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' });
+      const [erro, setErro] = useState('');
+      const [sucesso, setSucesso] = useState('');
 
+      async function buscar() {
+        try {
+          const r = await fetch('/api/prescricoes');
+          if (r.ok) { const d = await r.json(); setPrescricoes(d.dados ?? []); }
+        } catch {}
+      }
+      useEffect(() => { buscar(); }, []);
+
+      function set(field) { return e => setForm(f => ({ ...f, [field]: e.target.value })); }
+
+      async function handleSubmit(e) {
+        e.preventDefault(); setErro(''); setSucesso('');
+        const r = await fetch('/api/prescricoes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            medico_id:    Number(form.medico_id),
+            utente_id:    Number(form.utente_id),
+            tipo:         form.tipo,
+            data_emissao: form.data_emissao,
+            data_validade: form.data_validade,
+            estado:       form.estado,
+            assinatura:   form.assinatura,
+          }),
+        });
+        const d = await r.json();
+        if (r.ok) {
+          setForm({ medico_id: '', utente_id: '', tipo: 'MEDICAÇÃO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' });
+          setSucesso('Prescrição criada com sucesso.');
+          buscar();
+        } else {
+          setErro(d.erro || 'Erro ao criar prescrição.');
+        }
+      }
+
+      const estadoBadge = { 'ATIVA': 'badge-green', 'DISPENSADA': 'badge-orange', 'CANCELADA': 'badge-red' };
+
+      return (
+        <>
+          <div className="card">
+            <h2>Nova Prescrição</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="row">
+                <input type="number" value={form.medico_id}  onChange={set('medico_id')}  placeholder="ID médico" required />
+                <input type="number" value={form.utente_id}  onChange={set('utente_id')}  placeholder="ID utente" required />
+              </div>
+              <div className="row">
+                <select value={form.tipo}   onChange={set('tipo')}>
+                  <option value="MEDICAÇÃO">Medicação</option>
+                  <option value="EXAME">Exame</option>
+                </select>
+                <select value={form.estado} onChange={set('estado')}>
+                  <option value="ATIVA">Ativa</option>
+                  <option value="DISPENSADA">Dispensada</option>
+                  <option value="CANCELADA">Cancelada</option>
+                </select>
+              </div>
+              <div className="row">
+                <input type="date" value={form.data_emissao}  onChange={set('data_emissao')}  required />
+                <input type="date" value={form.data_validade} onChange={set('data_validade')} required />
+              </div>
+              <input value={form.assinatura} onChange={set('assinatura')} placeholder="Assinatura do médico" required />
+              <button type="submit">Criar prescrição</button>
+              {erro    && <p className="erro">{erro}</p>}
+              {sucesso && <p className="sucesso">{sucesso}</p>}
+            </form>
+          </div>
+
+          <div className="card">
+            <h2>Prescrições Registadas</h2>
+            {prescricoes.length === 0 ? <p className="vazio">Nenhuma prescrição registada.</p> : (
+              <table>
+                <thead><tr><th>#</th><th>Tipo</th><th>Estado</th><th>Emissão</th><th>Validade</th><th>Utente</th><th>Médico</th></tr></thead>
+                <tbody>
+                  {prescricoes.map(p => (
+                    <tr key={p.id}>
+                      <td>{p.id}</td>
+                      <td>{p.tipo}</td>
+                      <td><span className={`badge ${estadoBadge[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
+                      <td>{p.data_emissao  ? new Date(p.data_emissao).toLocaleDateString('pt-PT')  : '—'}</td>
+                      <td>{p.data_validade ? new Date(p.data_validade).toLocaleDateString('pt-PT') : '—'}</td>
+                      <td><span className="badge badge-green">{p.utente_id}</span></td>
+                      <td><span className="badge badge-blue">{p.medico_id}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </>
+      );
+    }
+
+    /* ───── Médicos ───── */
+    function SecaoMedicos() {
+      const [medicos, setMedicos] = useState([]);
+      const [form, setForm] = useState({ utilizador_id: '', especialidade: 'PNEUMOLOGIA', contacto: '' });
+      const [erro, setErro] = useState('');
+      const [sucesso, setSucesso] = useState('');
+
+      async function buscar() {
+        try {
+          const r = await fetch('/api/medicos');
+          if (r.ok) { const d = await r.json(); setMedicos(d.dados ?? []); }
+        } catch {}
+      }
+      useEffect(() => { buscar(); }, []);
+
+      function set(field) { return e => setForm(f => ({ ...f, [field]: e.target.value })); }
+
+      async function handleSubmit(e) {
+        e.preventDefault(); setErro(''); setSucesso('');
+        const r = await fetch('/api/medicos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            utilizador_id: Number(form.utilizador_id),
+            especialidade: form.especialidade,
+            contacto:      form.contacto,
+          }),
+        });
+        const d = await r.json();
+        if (r.ok) {
+          setForm({ utilizador_id: '', especialidade: '', contacto: '' });
+          setSucesso('Médico registado com sucesso.');
+          buscar();
+        } else {
+          setErro(d.erro || 'Erro ao registar médico.');
+        }
+      }
+
+      return (
+        <>
+          <div className="card">
+            <h2>Novo Médico</h2>
+            <form onSubmit={handleSubmit}>
+              <input type="number" value={form.utilizador_id} onChange={set('utilizador_id')} placeholder="ID utilizador" required />
+              <select value={form.especialidade} onChange={set('especialidade')} required>
+                <option value="">-- Especialidade --</option>
+                <option value="PNEUMOLOGIA">Pneumologia</option>
+                <option value="ALERGOLOGIA">Alergologia</option>
+                <option value="IMUNOALERGOLOGIA">Imunoalergologia</option>
+                <option value="MEDICINA INTERNA">Medicina Interna</option>
+                <option value="MEDICINA GERAL E FAMILIAR">Medicina Geral e Familiar</option>
+                <option value="OTORRINOLARINGOLOGIA">Otorrinolaringologia</option>
+                <option value="PEDIATRIA">Pediatria</option>
+              </select>
+              <input value={form.contacto}      onChange={set('contacto')}      placeholder="Contacto" required />
+              <button type="submit">Registar médico</button>
+              {erro    && <p className="erro">{erro}</p>}
+              {sucesso && <p className="sucesso">{sucesso}</p>}
+            </form>
+          </div>
+
+          <div className="card">
+            <h2>Médicos Registados</h2>
+            {medicos.length === 0 ? <p className="vazio">Nenhum médico registado.</p> : (
+              <table>
+                <thead><tr><th>#</th><th>Especialidade</th><th>Contacto</th><th>Utilizador ID</th></tr></thead>
+                <tbody>
+                  {medicos.map(m => (
+                    <tr key={m.id}>
+                      <td>{m.id}</td>
+                      <td>{m.especialidade}</td>
+                      <td>{m.contacto}</td>
+                      <td><span className="badge badge-blue">{m.utilizador_id}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </>
+      );
+    }
+
+    /* ───── App ───── */
+    const TABS = ['Utentes', 'Prescrições', 'Médicos'];
+
+    function App() {
+      const [tab, setTab] = useState('Utentes');
+      return (
+        <>
+          <header>
+            <div>
+              <h1>Sistema CARAT</h1>
+              <span>Controlo e Acompanhamento Respiratório e Alergológico em Tratamento</span>
+            </div>
+          </header>
+          <nav className="tabs">
+            {TABS.map(t => (
+              <div key={t} className={`tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>{t}</div>
+            ))}
+          </nav>
+          <div className="container">
+            {tab === 'Utentes'     && <SecaoUtentes />}
+            {tab === 'Prescrições' && <SecaoPrescricoes />}
+            {tab === 'Médicos'     && <SecaoMedicos />}
+          </div>
+          <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT</footer>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
 </body>
 </html>
