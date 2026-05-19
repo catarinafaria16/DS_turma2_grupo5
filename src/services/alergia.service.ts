@@ -147,31 +147,7 @@ export class AlergiaService {
         }
     }
 
-    /**
-     * Apagar alergia
-     */
-    async apagar(
-        alergiaId: number,
-        utilizadorIdLogado: number
-    ): Promise<void> {
-        try {
-            const alergiaAnterior = await this.obter(alergiaId);
-            const alergiaEliminada = { ...alergiaAnterior, deleted_at: new Date() };
-            // TODO: UPDATE alergia SET deleted_at = NOW() WHERE id = alergiaId
-            await this.auditoriaService.registarAuditoria(
-                utilizadorIdLogado,
-                'alergia',
-                alergiaId,
-                OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(alergiaAnterior),
-                JSON.stringify(alergiaEliminada)
-            );
-        } catch (error) {
-            console.error('Erro ao apagar alergia:', error);
-            throw error;
-        }
-    }
-
+   
     /**
      * Listar alergias de um utente com filtros avançados
      * Útil para o dashboard e consultas clínicas

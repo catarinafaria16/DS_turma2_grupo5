@@ -116,23 +116,4 @@ export class ExameService {
             throw error;
         }
     }
-
-    async apagar(exameId: number, utilizadorIdLogado: number): Promise<void> {
-        try {
-            const exameAnterior = await this.obter(exameId);
-            const exameEliminado = { ...exameAnterior, deleted_at: new Date() };
-            // TODO: UPDATE exame SET deleted_at = NOW() WHERE id = exameId
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'exame',
-                exameId,
-                OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(exameAnterior),
-                JSON.stringify(exameEliminado)
-            );
-        } catch (error) {
-            console.error('Erro ao apagar exame:', error);
-            throw error;
-        }
-    }
 }

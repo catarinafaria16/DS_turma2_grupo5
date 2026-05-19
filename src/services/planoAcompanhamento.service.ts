@@ -163,23 +163,4 @@ export class PlanoAcompanhamentoService {
             throw error;
         }
     }
-
-    async apagar(planoId: number, utilizadorIdLogado: number): Promise<void> {
-        try {
-            const planoAnterior = await this.obter(planoId);
-            const planoEliminado = { ...planoAnterior, deleted_at: new Date() };
-            // TODO: UPDATE plano_acompanhamento SET deleted_at = NOW() WHERE id = planoId
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'plano_acompanhamento',
-                planoId,
-                OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(planoAnterior),
-                JSON.stringify(planoEliminado)
-            );
-        } catch (error) {
-            console.error('Erro ao apagar plano de acompanhamento:', error);
-            throw error;
-        }
-    }
 }

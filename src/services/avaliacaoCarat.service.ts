@@ -118,22 +118,4 @@ export class AvaliacaoCaratService {
         }
     }
 
-    async apagar(avaliacaoId: number, utilizadorIdLogado: number): Promise<void> {
-        try {
-            const avaliacaoAnterior = await this.obter(avaliacaoId);
-            const avaliacaoEliminada = { ...avaliacaoAnterior, deleted_at: new Date() };
-            // TODO: UPDATE avaliacao_carat SET deleted_at = NOW() WHERE id = avaliacaoId
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'avaliacao_carat',
-                avaliacaoId,
-                OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(avaliacaoAnterior),
-                JSON.stringify(avaliacaoEliminada)
-            );
-        } catch (error) {
-            console.error('Erro ao apagar avaliação CARAT:', error);
-            throw error;
-        }
-    }
 }

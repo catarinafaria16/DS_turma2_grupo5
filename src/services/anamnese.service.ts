@@ -113,22 +113,5 @@ export class AnamneseService {
         }
     }
 
-    async apagar(anamneseId: number, utilizadorIdLogado: number): Promise<void> {
-        try {
-            const anamneseAnterior = await this.obter(anamneseId);
-            const anamneseEliminada = { ...anamneseAnterior, deleted_at: new Date() };
-            // TODO: UPDATE anamnese SET deleted_at = NOW() WHERE id = anamneseId
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'anamnese',
-                anamneseId,
-                OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(anamneseAnterior),
-                JSON.stringify(anamneseEliminada)
-            );
-        } catch (error) {
-            console.error('Erro ao apagar anamnese:', error);
-            throw error;
-        }
-    }
+   
 }

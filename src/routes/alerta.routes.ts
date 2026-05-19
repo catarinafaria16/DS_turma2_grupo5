@@ -15,6 +15,6 @@ routes.put('/:id', controller.atualizar.bind(controller));
 routes.patch('/:id/lido', controller.marcarComoLido.bind(controller));
 routes.patch('/:id/resolvido', controller.marcarComoResolvido.bind(controller));
 routes.patch('/:id/nota', controller.adicionarNota.bind(controller));    // RF018
-routes.delete('/:id', controller.apagar.bind(controller));
+
 
 export default routes;

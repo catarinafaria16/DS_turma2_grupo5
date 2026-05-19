@@ -224,23 +224,4 @@ export class RespostaCaratService {
             throw error;
         }
     }
-
-    async apagar(respostaId: number, utilizadorIdLogado: number): Promise<void> {
-        try {
-            const respostaAnterior = await this.obter(respostaId);
-            const respostaEliminada = { ...respostaAnterior, deleted_at: new Date() };
-            // TODO: UPDATE resposta_carat SET deleted_at = NOW() WHERE id = respostaId
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'resposta_carat',
-                respostaId,
-                OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(respostaAnterior),
-                JSON.stringify(respostaEliminada)
-            );
-        } catch (error) {
-            console.error('Erro ao apagar resposta CARAT:', error);
-            throw error;
-        }
-    }
 }

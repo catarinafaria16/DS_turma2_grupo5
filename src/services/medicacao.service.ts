@@ -118,23 +118,4 @@ export class MedicacaoService {
             throw error;
         }
     }
-
-    async apagar(medicacaoId: number, utilizadorIdLogado: number): Promise<void> {
-        try {
-            const medicacaoAnterior = await this.obter(medicacaoId);
-            const medicacaoEliminada = { ...medicacaoAnterior, deleted_at: new Date() };
-            // TODO: UPDATE medicacao SET deleted_at = NOW() WHERE id = medicacaoId
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'medicacao',
-                medicacaoId,
-                OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(medicacaoAnterior),
-                JSON.stringify(medicacaoEliminada)
-            );
-        } catch (error) {
-            console.error('Erro ao apagar medicação:', error);
-            throw error;
-        }
-    }
 }

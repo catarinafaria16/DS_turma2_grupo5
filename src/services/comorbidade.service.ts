@@ -114,23 +114,4 @@ export class ComorbidadeService {
             throw error;
         }
     }
-
-    async apagar(comorbidadeId: number, utilizadorIdLogado: number): Promise<void> {
-        try {
-            const comorbidadeAnterior = await this.obter(comorbidadeId);
-            const comorbidadeEliminada = { ...comorbidadeAnterior, deleted_at: new Date() };
-            // TODO: UPDATE comorbidade SET deleted_at = NOW() WHERE id = comorbidadeId
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'comorbidade',
-                comorbidadeId,
-                OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(comorbidadeAnterior),
-                JSON.stringify(comorbidadeEliminada)
-            );
-        } catch (error) {
-            console.error('Erro ao apagar comorbidade:', error);
-            throw error;
-        }
-    }
 }
