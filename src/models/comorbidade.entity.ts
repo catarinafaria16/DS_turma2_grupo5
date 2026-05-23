@@ -6,9 +6,9 @@ export class Comorbidade {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     anamnese_id!: number;
 
-    @Column()
+    @Column('text')
     descricao!: string;
 }

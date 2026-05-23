@@ -7,13 +7,13 @@ export class PlanoAcompanhamento {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     medico_id!: number;
 
-    @Column()
+    @Column('int')
     utente_id!: number;
 
-    @Column()
+    @Column('text')
     frequencia_avaliacao!: string;
 
     @Column({ type: 'date' })

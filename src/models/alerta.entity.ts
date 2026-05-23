@@ -9,13 +9,13 @@ export class Alerta {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     utente_id!: number;
 
-    @Column()
+    @Column('int')
     medico_id!: number;
 
-    @Column()
+    @Column('int')
     regra_id!: number;
 
     @Column({ type: 'simple-enum', enum: TipoAlerta })
@@ -33,6 +33,6 @@ export class Alerta {
     @CreateDateColumn()
     data_criacao!: Date;
 
-    @Column({ type: 'timestamp' })
+    @Column({ type: 'datetime' })
     data_atualizacao_estado!: Date;
 }

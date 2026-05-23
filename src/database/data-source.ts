@@ -20,9 +20,9 @@ import { Utilizador } from '../models/utilizador.entity.js';
 
 export const AppDataSource = new DataSource({
     type: 'sqlite',
-    database: 'database.sqlite',
+    database: 'database.db',
     synchronize: true,
-    logging: false,
+    logging: true,
     entities: [
         Administrador,
         Alergia,

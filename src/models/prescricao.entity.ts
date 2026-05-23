@@ -8,10 +8,10 @@ export class Prescricao {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     medico_id!: number;
 
-    @Column()
+    @Column('int')
     utente_id!: number;
 
     @Column({ type: 'simple-enum', enum: TipoPrescricao })
@@ -26,6 +26,6 @@ export class Prescricao {
     @Column({ type: 'simple-enum', enum: EstadoPrescricao })
     estado!: EstadoPrescricao;
 
-    @Column()
+    @Column('text')
     assinatura!: string;
 }

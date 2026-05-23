@@ -6,9 +6,8 @@ export class AlergiaController {
 
     async criar(req: Request, res: Response) {
         try {
-            const { utenteId, descricao, intensidade_crises, frequencia_crises } = req.body;
             const utilizadorIdLogado = req.body.utilizadorIdLogado;
-            const novaAlergia = await this.service.registarAlergia(utenteId, descricao, intensidade_crises, frequencia_crises, utilizadorIdLogado);
+            const novaAlergia = await this.service.criar(req.body, utilizadorIdLogado);
             return res.status(201).json({ mensagem: 'Alergia criada com sucesso', dados: novaAlergia });
         } catch (error: any) {
             return res.status(400).json({ erro: error.message || 'Erro ao criar alergia' });
@@ -17,7 +16,7 @@ export class AlergiaController {
 
     async listar(_req: Request, res: Response) {
         try {
-            const alergias = await this.service.listarAlergias(0);
+            const alergias = await this.service.listar();
             return res.status(200).json({ dados: alergias, total: alergias.length });
         } catch (error: any) {
             return res.status(400).json({ erro: error.message || 'Erro ao listar alergias' });

@@ -6,18 +6,18 @@ export class MedicacaoHabitual {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     anamnese_id!: number;
 
-    @Column()
+    @Column('text')
     nome!: string;
 
-    @Column()
+    @Column('text')
     dose!: string;
 
-    @Column()
+    @Column('text')
     duracao!: string;
 
-    @Column()
+    @Column('text')
     periodicidade!: string;
 }

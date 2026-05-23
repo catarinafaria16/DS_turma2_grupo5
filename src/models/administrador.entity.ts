@@ -6,7 +6,7 @@ export class Administrador {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     utilizador_id!: number;
 
     @DeleteDateColumn({ nullable: true })

@@ -7,13 +7,13 @@ export class Utilizador {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('text')
     nome!: string;
 
-    @Column({ unique: true })
+    @Column({ unique: true, type: 'text' })
     email!: string;
 
-    @Column()
+    @Column('text')
     password!: string;
 
     @Column({ type: 'simple-enum', enum: PerfilUtilizador })

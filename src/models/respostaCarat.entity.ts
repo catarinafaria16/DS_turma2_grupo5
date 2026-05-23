@@ -8,13 +8,13 @@ export class RespostaCarat {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     avaliacao_id!: number;
 
-    @Column()
+    @Column('int')
     utente_id!: number;
 
-    @Column({ type: 'timestamp' })
+    @Column({ type: 'datetime' })
     data_avaliacao!: Date;
 
     @Column({ type: 'simple-enum', enum: RespostaCarat1a9 })
@@ -47,10 +47,10 @@ export class RespostaCarat {
     @Column({ type: 'simple-enum', enum: RespostaCarat10 })
     r10!: RespostaCarat10;
 
-    @Column()
+    @Column('int')
     score_total!: number;
 
-    @Column()
+    @Column('text')
     interpretacao!: string;
 
     @Column({ type: 'text' })

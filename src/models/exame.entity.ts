@@ -7,19 +7,19 @@ export class Exame {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     prescricao_id!: number;
 
-    @Column()
+    @Column('text')
     tipo_exame!: string;
 
-    @Column({ type: 'timestamp' })
+    @Column({ type: 'datetime' })
     data!: Date;
 
     @Column({ type: 'simple-json' })
     resultado!: object;
 
-    @Column()
+    @Column('boolean')
     consentimento!: boolean;
 
     @Column({ type: 'simple-enum', enum: EstadoExame })

@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { Anamnese } from '../models/anamnese.entity.js';
 import type { CreateAnamneseDto } from '../dtos/anamnese/create-anamnese.dto.js';
 import type { AnamneseResponseDto } from '../dtos/anamnese/anamnese-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
@@ -10,30 +12,21 @@ export class AnamneseService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    async criar(
-        anamneseData: CreateAnamneseDto,
-        utilizadorIdLogado: number
-    ): Promise<AnamneseResponseDto> {
+    private get repo() { return AppDataSource.getRepository(Anamnese); }
+
+    async criar(anamneseData: CreateAnamneseDto, utilizadorIdLogado: number): Promise<AnamneseResponseDto> {
         try {
-            if (anamneseData.utente_id <= 0) {
-                throw new Error('ID do utente deve ser válido');
-            }
+            if (anamneseData.utente_id <= 0) throw new Error('ID do utente deve ser válido');
 
-            const novaAnamnese: AnamneseResponseDto = {
-                id: Math.random(), // TODO: Será gerado pela BD
-                ...anamneseData
-            };
+            const anamnese = this.repo.create(anamneseData);
+            const saved = await this.repo.save(anamnese);
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'anamnese',
-                novaAnamnese.id,
-                OperacaoAuditoria.CRIACAO,
-                null,
-                JSON.stringify(novaAnamnese)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'anamnese', saved.id,
+                OperacaoAuditoria.CRIACAO, null, JSON.stringify(saved)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return novaAnamnese;
+            return saved as unknown as AnamneseResponseDto;
         } catch (error) {
             console.error('Erro ao criar anamnese:', error);
             throw error;
@@ -42,18 +35,10 @@ export class AnamneseService {
 
     async obter(anamneseId: number): Promise<AnamneseResponseDto> {
         try {
-            if (anamneseId <= 0) {
-                throw new Error('ID de anamnese inválido');
-            }
-
-            const anamnese: AnamneseResponseDto = {
-                id: anamneseId,
-                utente_id: 0,
-                historico_familiar: '',
-                tabagismo: 'NAO_FUMADOR' as any // TODO: Substituir pelo valor real da BD
-            };
-
-            return anamnese;
+            if (anamneseId <= 0) throw new Error('ID de anamnese inválido');
+            const anamnese = await this.repo.findOne({ where: { id: anamneseId } });
+            if (!anamnese) throw new Error('Anamnese não encontrada');
+            return anamnese as unknown as AnamneseResponseDto;
         } catch (error) {
             console.error('Erro ao obter anamnese:', error);
             throw error;
@@ -62,8 +47,8 @@ export class AnamneseService {
 
     async listar(): Promise<AnamneseResponseDto[]> {
         try {
-            // TODO: Buscar todas as anamneses na base de dados
-            return [];
+            const result = await this.repo.find();
+            return result as unknown as AnamneseResponseDto[];
         } catch (error) {
             console.error('Erro ao listar anamneses:', error);
             throw error;
@@ -72,46 +57,29 @@ export class AnamneseService {
 
     async listarPorUtente(utenteId: number): Promise<AnamneseResponseDto[]> {
         try {
-            if (utenteId <= 0) {
-                throw new Error('ID do utente inválido');
-            }
-
-            // TODO: Buscar anamneses por utente na base de dados
-            return [];
+            if (utenteId <= 0) throw new Error('ID do utente inválido');
+            const result = await this.repo.find({ where: { utente_id: utenteId } });
+            return result as unknown as AnamneseResponseDto[];
         } catch (error) {
             console.error('Erro ao listar anamneses por utente:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        anamneseId: number,
-        anamneseData: CreateAnamneseDto,
-        utilizadorIdLogado: number
-    ): Promise<AnamneseResponseDto> {
+    async atualizar(anamneseId: number, anamneseData: CreateAnamneseDto, utilizadorIdLogado: number): Promise<AnamneseResponseDto> {
         try {
-            const anamneseAnterior = await this.obter(anamneseId);
+            const anterior = await this.obter(anamneseId);
+            const atualizada = await this.repo.save({ ...anterior, ...anamneseData, id: anamneseId });
 
-            const anamneseAtualizada: AnamneseResponseDto = {
-                ...anamneseAnterior,
-                ...anamneseData
-            };
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'anamnese', anamneseId,
+                OperacaoAuditoria.ALTERACAO, JSON.stringify(anterior), JSON.stringify(atualizada)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'anamnese',
-                anamneseId,
-                OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(anamneseAnterior),
-                JSON.stringify(anamneseAtualizada)
-            );
-
-            return anamneseAtualizada;
+            return atualizada as unknown as AnamneseResponseDto;
         } catch (error) {
             console.error('Erro ao atualizar anamnese:', error);
             throw error;
         }
     }
-
-   
 }

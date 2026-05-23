@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { AvaliacaoCarat } from '../models/avaliacaoCarat.entity.js';
 import type { CreateAvaliacaoCaratDto } from '../dtos/avaliacaoCarat/create-avaliacaoCarat.dto.js';
 import type { AvaliacaoCaratResponseDto } from '../dtos/avaliacaoCarat/avaliacaoCarat-response.dto.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
@@ -10,30 +12,21 @@ export class AvaliacaoCaratService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    async criar(
-        avaliacaoData: CreateAvaliacaoCaratDto,
-        utilizadorIdLogado: number
-    ): Promise<AvaliacaoCaratResponseDto> {
+    private get repo() { return AppDataSource.getRepository(AvaliacaoCarat); }
+
+    async criar(avaliacaoData: CreateAvaliacaoCaratDto, utilizadorIdLogado: number): Promise<AvaliacaoCaratResponseDto> {
         try {
-            if (avaliacaoData.versao <= 0) {
-                throw new Error('Versão da avaliação deve ser maior que zero');
-            }
+            if (avaliacaoData.versao <= 0) throw new Error('Versão da avaliação deve ser maior que zero');
 
-            const novaAvaliacao: AvaliacaoCaratResponseDto = {
-                id: Math.random(), // TODO: Será gerado pela BD
-                ...avaliacaoData
-            };
+            const avaliacao = this.repo.create(avaliacaoData);
+            const saved = await this.repo.save(avaliacao);
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'avaliacao_carat',
-                novaAvaliacao.id,
-                OperacaoAuditoria.CRIACAO,
-                null,
-                JSON.stringify(novaAvaliacao)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'avaliacao_carat', saved.id,
+                OperacaoAuditoria.CRIACAO, null, JSON.stringify(saved)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return novaAvaliacao;
+            return saved as unknown as AvaliacaoCaratResponseDto;
         } catch (error) {
             console.error('Erro ao criar avaliação CARAT:', error);
             throw error;
@@ -42,37 +35,10 @@ export class AvaliacaoCaratService {
 
     async obter(avaliacaoId: number): Promise<AvaliacaoCaratResponseDto> {
         try {
-            if (avaliacaoId <= 0) {
-                throw new Error('ID de avaliação inválido');
-            }
-
-            const avaliacao: AvaliacaoCaratResponseDto = {
-                id: avaliacaoId,
-                data_criacao: new Date(),
-                q1: '',
-                q2: '',
-                q3: '',
-                q4: '',
-                q5: '',
-                q6: '',
-                q7: '',
-                q8: '',
-                q9: '',
-                q10: '',
-                r1: {},
-                r2: {},
-                r3: {},
-                r4: {},
-                r5: {},
-                r6: {},
-                r7: {},
-                r8: {},
-                r9: {},
-                r10: {},
-                versao: 1
-            };
-
-            return avaliacao;
+            if (avaliacaoId <= 0) throw new Error('ID de avaliação inválido');
+            const avaliacao = await this.repo.findOne({ where: { id: avaliacaoId } });
+            if (!avaliacao) throw new Error('Avaliação CARAT não encontrada');
+            return avaliacao as unknown as AvaliacaoCaratResponseDto;
         } catch (error) {
             console.error('Erro ao obter avaliação CARAT:', error);
             throw error;
@@ -81,41 +47,28 @@ export class AvaliacaoCaratService {
 
     async listar(): Promise<AvaliacaoCaratResponseDto[]> {
         try {
-            // TODO: Buscar todas as avaliações CARAT na base de dados
-            return [];
+            const result = await this.repo.find();
+            return result as unknown as AvaliacaoCaratResponseDto[];
         } catch (error) {
             console.error('Erro ao listar avaliações CARAT:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        avaliacaoId: number,
-        avaliacaoData: CreateAvaliacaoCaratDto,
-        utilizadorIdLogado: number
-    ): Promise<AvaliacaoCaratResponseDto> {
+    async atualizar(avaliacaoId: number, avaliacaoData: CreateAvaliacaoCaratDto, utilizadorIdLogado: number): Promise<AvaliacaoCaratResponseDto> {
         try {
-            const avaliacaoAnterior = await this.obter(avaliacaoId);
+            const anterior = await this.obter(avaliacaoId);
+            const atualizada = await this.repo.save({ ...anterior, ...avaliacaoData, id: avaliacaoId });
 
-            const avaliacaoAtualizada: AvaliacaoCaratResponseDto = {
-                ...avaliacaoAnterior,
-                ...avaliacaoData
-            };
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'avaliacao_carat', avaliacaoId,
+                OperacaoAuditoria.ALTERACAO, JSON.stringify(anterior), JSON.stringify(atualizada)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'avaliacao_carat',
-                avaliacaoId,
-                OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(avaliacaoAnterior),
-                JSON.stringify(avaliacaoAtualizada)
-            );
-
-            return avaliacaoAtualizada;
+            return atualizada as unknown as AvaliacaoCaratResponseDto;
         } catch (error) {
             console.error('Erro ao atualizar avaliação CARAT:', error);
             throw error;
         }
     }
-
 }

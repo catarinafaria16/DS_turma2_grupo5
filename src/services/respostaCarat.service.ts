@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { RespostaCarat } from '../models/respostaCarat.entity.js';
 import type { CreateRespostaCaratDto } from '../dtos/respostaCarat/create-respostaCarat.dto.js';
 import type { RespostaCaratResponseDto } from '../dtos/respostaCarat/respostaCarat-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
@@ -9,6 +11,8 @@ export class RespostaCaratService {
     constructor() {
         this.auditoriaService = new AuditoriaService();
     }
+
+    private get repo() { return AppDataSource.getRepository(RespostaCarat); }
 
     // RF013: Validar que todas as questões foram respondidas
     private todasPerguntasRespondidas(data: CreateRespostaCaratDto): boolean {
@@ -34,7 +38,7 @@ export class RespostaCaratService {
         return 'Doença mal controlada';
     }
 
-    // RF011: Recomendações com base no score (autocuidado, sinais de alarme, próxima avaliação)
+    // RF011: Recomendações com base no score
     private gerarRecomendacao(score: number): string {
         if (score >= 21) {
             return (
@@ -71,10 +75,7 @@ export class RespostaCaratService {
         );
     }
 
-    async criar(
-        respostaData: CreateRespostaCaratDto,
-        utilizadorIdLogado: number
-    ): Promise<RespostaCaratResponseDto> {
+    async criar(respostaData: CreateRespostaCaratDto, utilizadorIdLogado: number): Promise<RespostaCaratResponseDto> {
         try {
             if (respostaData.avaliacao_id <= 0 || respostaData.utente_id <= 0) {
                 throw new Error('IDs de avaliação e utente devem ser válidos');
@@ -90,27 +91,23 @@ export class RespostaCaratService {
             const interpretacao = this.interpretarScore(score_total);
             const recomendacao_automatica = this.gerarRecomendacao(score_total);
 
-            const novaResposta: RespostaCaratResponseDto = {
-                id: Math.random(),
+            const resposta = this.repo.create({
                 ...respostaData,
                 score_total,
                 interpretacao,
                 recomendacao_automatica
-            };
+            });
+            const saved = await this.repo.save(resposta);
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'resposta_carat',
-                novaResposta.id,
-                OperacaoAuditoria.CRIACAO,
-                null,
-                JSON.stringify(novaResposta)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'resposta_carat', saved.id,
+                OperacaoAuditoria.CRIACAO, null, JSON.stringify(saved)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
             // RF022: Avaliar regras de alerta automaticamente após nova avaliação
-            await this.avaliarRegrasAlerta(novaResposta);
+            await this.avaliarRegrasAlerta(saved as unknown as RespostaCaratResponseDto);
 
-            return novaResposta;
+            return saved as unknown as RespostaCaratResponseDto;
         } catch (error) {
             console.error('Erro ao criar resposta CARAT:', error);
             throw error;
@@ -119,31 +116,10 @@ export class RespostaCaratService {
 
     async obter(respostaId: number): Promise<RespostaCaratResponseDto> {
         try {
-            if (respostaId <= 0) {
-                throw new Error('ID de resposta inválido');
-            }
-
-            const resposta: RespostaCaratResponseDto = {
-                id: respostaId,
-                avaliacao_id: 0,
-                utente_id: 0,
-                data_avaliacao: new Date(),
-                r1: 0,
-                r2: 0,
-                r3: 0,
-                r4: 0,
-                r5: 0,
-                r6: 0,
-                r7: 0,
-                r8: 0,
-                r9: 0,
-                r10: 0,
-                score_total: 0,
-                interpretacao: '',
-                recomendacao_automatica: ''
-            };
-
-            return resposta;
+            if (respostaId <= 0) throw new Error('ID de resposta inválido');
+            const resposta = await this.repo.findOne({ where: { id: respostaId } });
+            if (!resposta) throw new Error('Resposta CARAT não encontrada');
+            return resposta as unknown as RespostaCaratResponseDto;
         } catch (error) {
             console.error('Erro ao obter resposta CARAT:', error);
             throw error;
@@ -152,7 +128,8 @@ export class RespostaCaratService {
 
     async listar(): Promise<RespostaCaratResponseDto[]> {
         try {
-            return [];
+            const result = await this.repo.find();
+            return result as unknown as RespostaCaratResponseDto[];
         } catch (error) {
             console.error('Erro ao listar respostas CARAT:', error);
             throw error;
@@ -161,10 +138,9 @@ export class RespostaCaratService {
 
     async listarPorAvaliacao(avaliacaoId: number): Promise<RespostaCaratResponseDto[]> {
         try {
-            if (avaliacaoId <= 0) {
-                throw new Error('ID de avaliação inválido');
-            }
-            return [];
+            if (avaliacaoId <= 0) throw new Error('ID de avaliação inválido');
+            const result = await this.repo.find({ where: { avaliacao_id: avaliacaoId } });
+            return result as unknown as RespostaCaratResponseDto[];
         } catch (error) {
             console.error('Erro ao listar respostas por avaliação:', error);
             throw error;
@@ -173,52 +149,44 @@ export class RespostaCaratService {
 
     async listarPorUtente(utenteId: number): Promise<RespostaCaratResponseDto[]> {
         try {
-            if (utenteId <= 0) {
-                throw new Error('ID do utente inválido');
-            }
-            return [];
+            if (utenteId <= 0) throw new Error('ID do utente inválido');
+            const result = await this.repo.find({ where: { utente_id: utenteId }, order: { data_avaliacao: 'DESC' } });
+            return result as unknown as RespostaCaratResponseDto[];
         } catch (error) {
             console.error('Erro ao listar respostas por utente:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        respostaId: number,
-        respostaData: CreateRespostaCaratDto,
-        utilizadorIdLogado: number
-    ): Promise<RespostaCaratResponseDto> {
+    async atualizar(respostaId: number, respostaData: CreateRespostaCaratDto, utilizadorIdLogado: number): Promise<RespostaCaratResponseDto> {
         try {
             // RF013: Validar que todas as questões estão presentes na atualização
             if (!this.todasPerguntasRespondidas(respostaData)) {
                 throw new Error('Todas as questões do questionário CARAT são obrigatórias');
             }
 
-            const respostaAnterior = await this.obter(respostaId);
+            const anterior = await this.obter(respostaId);
 
             // RF009-RF011: Recalcular score após atualização
             const score_total = this.calcularScore(respostaData);
             const interpretacao = this.interpretarScore(score_total);
             const recomendacao_automatica = this.gerarRecomendacao(score_total);
 
-            const respostaAtualizada: RespostaCaratResponseDto = {
-                ...respostaAnterior,
+            const atualizada = await this.repo.save({
+                ...anterior,
                 ...respostaData,
+                id: respostaId,
                 score_total,
                 interpretacao,
                 recomendacao_automatica
-            };
+            });
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'resposta_carat',
-                respostaId,
-                OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(respostaAnterior),
-                JSON.stringify(respostaAtualizada)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'resposta_carat', respostaId,
+                OperacaoAuditoria.ALTERACAO, JSON.stringify(anterior), JSON.stringify(atualizada)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return respostaAtualizada;
+            return atualizada as unknown as RespostaCaratResponseDto;
         } catch (error) {
             console.error('Erro ao atualizar resposta CARAT:', error);
             throw error;

@@ -6,25 +6,25 @@ export class Utente {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     utilizador_id!: number;
 
-    @Column()
+    @Column('int')
     medico_id!: number;
 
-    @Column({ unique: true })
+    @Column({ unique: true, type: 'int' })
     nr_utente!: number;
 
     @Column({ type: 'date' })
     data_nascimento!: Date;
 
-    @Column()
+    @Column('text')
     morada!: string;
 
-    @Column()
+    @Column('text')
     contacto!: string;
 
-    @Column()
+    @Column('int')
     nr_faturacao!: number;
 
     @DeleteDateColumn({ nullable: true })

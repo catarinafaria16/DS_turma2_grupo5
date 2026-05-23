@@ -7,13 +7,13 @@ export class Alergia {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     anamnese_id!: number;
 
-    @Column()
+    @Column('text')
     descricao!: string;
 
-    @Column()
+    @Column('text')
     frequencia_crise!: string;
 
     @Column({ type: 'simple-enum', enum: IntensidadeCriseAlergia })

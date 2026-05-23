@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { Utilizador } from '../models/utilizador.entity.js';
 import type { CreateUtilizadorDto } from '../dtos/utilizador/create-utilizador.dto.js';
 import type { UtilizadorResponseDto } from '../dtos/utilizador/utilizador-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
@@ -10,10 +12,9 @@ export class UtilizadorService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    async criar(
-        utilizadorData: CreateUtilizadorDto,
-        utilizadorIdLogado: number
-    ): Promise<UtilizadorResponseDto> {
+    private get repo() { return AppDataSource.getRepository(Utilizador); }
+
+    async criar(utilizadorData: CreateUtilizadorDto, utilizadorIdLogado: number): Promise<UtilizadorResponseDto> {
         try {
             if (!utilizadorData.nome || utilizadorData.nome.trim().length === 0) {
                 throw new Error('Nome do utilizador é obrigatório');
@@ -25,23 +26,19 @@ export class UtilizadorService {
                 throw new Error('Password do utilizador deve ter pelo menos 6 caracteres');
             }
 
-            const novoUtilizador: UtilizadorResponseDto = {
-                id: Math.random(),
-                nome: utilizadorData.nome,
-                email: utilizadorData.email,
-                perfil: utilizadorData.perfil
-            };
+            const utilizador = this.repo.create(utilizadorData);
+            const saved = await this.repo.save(utilizador);
 
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'utilizador',
-                novoUtilizador.id,
+                saved.id,
                 OperacaoAuditoria.CRIACAO,
                 null,
-                JSON.stringify(novoUtilizador)
+                JSON.stringify(saved)
             );
 
-            return novoUtilizador;
+            return saved;
         } catch (error) {
             console.error('Erro ao criar utilizador:', error);
             throw error;
@@ -50,17 +47,9 @@ export class UtilizadorService {
 
     async obter(utilizadorId: number): Promise<UtilizadorResponseDto> {
         try {
-            if (utilizadorId <= 0) {
-                throw new Error('ID de utilizador inválido');
-            }
-
-            const utilizador: UtilizadorResponseDto = {
-                id: utilizadorId,
-                nome: '',
-                email: '',
-                perfil: 'UTENTE' as any
-            };
-
+            if (utilizadorId <= 0) throw new Error('ID de utilizador inválido');
+            const utilizador = await this.repo.findOne({ where: { id: utilizadorId } });
+            if (!utilizador) throw new Error('Utilizador não encontrado');
             return utilizador;
         } catch (error) {
             console.error('Erro ao obter utilizador:', error);
@@ -70,37 +59,28 @@ export class UtilizadorService {
 
     async listar(): Promise<UtilizadorResponseDto[]> {
         try {
-            return [];
+            return await this.repo.find();
         } catch (error) {
             console.error('Erro ao listar utilizadores:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        utilizadorId: number,
-        utilizadorData: CreateUtilizadorDto,
-        utilizadorIdLogado: number
-    ): Promise<UtilizadorResponseDto> {
+    async atualizar(utilizadorId: number, utilizadorData: CreateUtilizadorDto, utilizadorIdLogado: number): Promise<UtilizadorResponseDto> {
         try {
-            const utilizadorAnterior = await this.obter(utilizadorId);
-            const utilizadorAtualizado: UtilizadorResponseDto = {
-                ...utilizadorAnterior,
-                nome: utilizadorData.nome,
-                email: utilizadorData.email,
-                perfil: utilizadorData.perfil
-            };
+            const anterior = await this.obter(utilizadorId);
+            const atualizado = await this.repo.save({ ...anterior, ...utilizadorData, id: utilizadorId });
 
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'utilizador',
                 utilizadorId,
                 OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(utilizadorAnterior),
-                JSON.stringify(utilizadorAtualizado)
+                JSON.stringify(anterior),
+                JSON.stringify(atualizado)
             );
 
-            return utilizadorAtualizado;
+            return atualizado;
         } catch (error) {
             console.error('Erro ao atualizar utilizador:', error);
             throw error;
@@ -109,16 +89,16 @@ export class UtilizadorService {
 
     async apagar(utilizadorId: number, utilizadorIdLogado: number): Promise<void> {
         try {
-            const utilizadorAnterior = await this.obter(utilizadorId);
-            const utilizadorEliminado = { ...utilizadorAnterior, deleted_at: new Date() };
-            // TODO: UPDATE utilizador SET deleted_at = NOW() WHERE id = utilizadorId
+            const anterior = await this.obter(utilizadorId);
+            await this.repo.softDelete(utilizadorId);
+
             await this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'utilizador',
                 utilizadorId,
                 OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(utilizadorAnterior),
-                JSON.stringify(utilizadorEliminado)
+                JSON.stringify(anterior),
+                null
             );
         } catch (error) {
             console.error('Erro ao apagar utilizador:', error);

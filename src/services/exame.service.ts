@@ -1,6 +1,7 @@
+import { AppDataSource } from '../database/data-source.js';
+import { Exame } from '../models/exame.entity.js';
 import type { CreateExameDto } from '../dtos/exame/create-exame.dto.js';
 import type { ExameResponseDto } from '../dtos/exame/exame-response.dto.js';
-import { EstadoExame } from '../enums/EstadoExame.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 
@@ -11,30 +12,21 @@ export class ExameService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    async criar(
-        exameData: CreateExameDto,
-        utilizadorIdLogado: number
-    ): Promise<ExameResponseDto> {
+    private get repo() { return AppDataSource.getRepository(Exame); }
+
+    async criar(exameData: CreateExameDto, utilizadorIdLogado: number): Promise<ExameResponseDto> {
         try {
-            if (exameData.prescricao_id <= 0) {
-                throw new Error('ID de prescrição deve ser válido');
-            }
+            if (exameData.prescricao_id <= 0) throw new Error('ID de prescrição deve ser válido');
 
-            const novoExame: ExameResponseDto = {
-                id: Math.random(), // TODO: Será gerado pela BD
-                ...exameData
-            };
+            const exame = this.repo.create(exameData);
+            const saved = await this.repo.save(exame);
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'exame',
-                novoExame.id,
-                OperacaoAuditoria.CRIACAO,
-                null,
-                JSON.stringify(novoExame)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'exame', saved.id,
+                OperacaoAuditoria.CRIACAO, null, JSON.stringify(saved)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return novoExame;
+            return saved as unknown as ExameResponseDto;
         } catch (error) {
             console.error('Erro ao criar exame:', error);
             throw error;
@@ -43,21 +35,10 @@ export class ExameService {
 
     async obter(exameId: number): Promise<ExameResponseDto> {
         try {
-            if (exameId <= 0) {
-                throw new Error('ID de exame inválido');
-            }
-
-            const exame: ExameResponseDto = {
-                id: exameId,
-                prescricao_id: 0,
-                tipo_exame: '',
-                data: new Date(),
-                resultado: {},
-                consentimento: false,
-                estado: EstadoExame.PENDENTE
-            };
-
-            return exame;
+            if (exameId <= 0) throw new Error('ID de exame inválido');
+            const exame = await this.repo.findOne({ where: { id: exameId } });
+            if (!exame) throw new Error('Exame não encontrado');
+            return exame as unknown as ExameResponseDto;
         } catch (error) {
             console.error('Erro ao obter exame:', error);
             throw error;
@@ -66,8 +47,8 @@ export class ExameService {
 
     async listar(): Promise<ExameResponseDto[]> {
         try {
-            // TODO: Buscar todos os exames na base de dados
-            return [];
+            const result = await this.repo.find();
+            return result as unknown as ExameResponseDto[];
         } catch (error) {
             console.error('Erro ao listar exames:', error);
             throw error;
@@ -76,41 +57,26 @@ export class ExameService {
 
     async listarPorPrescricao(prescricaoId: number): Promise<ExameResponseDto[]> {
         try {
-            if (prescricaoId <= 0) {
-                throw new Error('ID de prescrição inválido');
-            }
-
-            // TODO: Buscar exames por prescrição na base de dados
-            return [];
+            if (prescricaoId <= 0) throw new Error('ID de prescrição inválido');
+            const result = await this.repo.find({ where: { prescricao_id: prescricaoId } });
+            return result as unknown as ExameResponseDto[];
         } catch (error) {
             console.error('Erro ao listar exames por prescrição:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        exameId: number,
-        exameData: CreateExameDto,
-        utilizadorIdLogado: number
-    ): Promise<ExameResponseDto> {
+    async atualizar(exameId: number, exameData: CreateExameDto, utilizadorIdLogado: number): Promise<ExameResponseDto> {
         try {
-            const exameAnterior = await this.obter(exameId);
+            const anterior = await this.obter(exameId);
+            const atualizado = await this.repo.save({ ...anterior, ...exameData, id: exameId });
 
-            const exameAtualizado: ExameResponseDto = {
-                ...exameAnterior,
-                ...exameData
-            };
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'exame', exameId,
+                OperacaoAuditoria.ALTERACAO, JSON.stringify(anterior), JSON.stringify(atualizado)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'exame',
-                exameId,
-                OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(exameAnterior),
-                JSON.stringify(exameAtualizado)
-            );
-
-            return exameAtualizado;
+            return atualizado as unknown as ExameResponseDto;
         } catch (error) {
             console.error('Erro ao atualizar exame:', error);
             throw error;

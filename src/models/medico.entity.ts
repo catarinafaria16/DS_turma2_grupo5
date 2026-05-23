@@ -6,13 +6,13 @@ export class Medico {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     utilizador_id!: number;
 
-    @Column()
+    @Column('text')
     especialidade!: string;
 
-    @Column()
+    @Column('text')
     contacto!: string;
 
     @DeleteDateColumn({ nullable: true })

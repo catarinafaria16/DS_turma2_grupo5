@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { Medico } from '../models/medico.entity.js';
 import type { CreateMedicoDto } from '../dtos/medico/create-medico.dto.js';
 import type { MedicoResponseDto } from '../dtos/medico/medico-response.dto.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
@@ -10,10 +12,9 @@ export class MedicoService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    async criar(
-        medicoData: CreateMedicoDto,
-        utilizadorIdLogado: number
-    ): Promise<MedicoResponseDto> {
+    private get repo() { return AppDataSource.getRepository(Medico); }
+
+    async criar(medicoData: CreateMedicoDto, utilizadorIdLogado: number): Promise<MedicoResponseDto> {
         try {
             if (medicoData.utilizador_id <= 0) {
                 throw new Error('ID do utilizador deve ser válido');
@@ -25,21 +26,19 @@ export class MedicoService {
                 throw new Error('Especialidade é obrigatória');
             }
 
-            const novoMedico: MedicoResponseDto = {
-                id: Math.random(), // TODO: Será gerado pela BD
-                ...medicoData
-            };
+            const medico = this.repo.create(medicoData);
+            const saved = await this.repo.save(medico);
 
-            await this.auditoriaService?.registarAuditoria(
+            this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'medico',
-                novoMedico.id,
+                saved.id,
                 OperacaoAuditoria.CRIACAO,
                 null,
-                JSON.stringify(novoMedico)
-            );
+                JSON.stringify(saved)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return novoMedico;
+            return saved;
         } catch (error) {
             console.error('Erro ao criar médico:', error);
             throw error;
@@ -48,17 +47,9 @@ export class MedicoService {
 
     async obter(medicoId: number): Promise<MedicoResponseDto> {
         try {
-            if (medicoId <= 0) {
-                throw new Error('ID de médico inválido');
-            }
-
-            const medico: MedicoResponseDto = {
-                id: medicoId,
-                utilizador_id: 0,
-                especialidade: '',
-                contacto: ''
-            };
-
+            if (medicoId <= 0) throw new Error('ID de médico inválido');
+            const medico = await this.repo.findOne({ where: { id: medicoId } });
+            if (!medico) throw new Error('Médico não encontrado');
             return medico;
         } catch (error) {
             console.error('Erro ao obter médico:', error);
@@ -68,37 +59,28 @@ export class MedicoService {
 
     async listar(): Promise<MedicoResponseDto[]> {
         try {
-            // TODO: Buscar todos os médicos na base de dados
-            return [];
+            return await this.repo.find();
         } catch (error) {
             console.error('Erro ao listar médicos:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        medicoId: number,
-        medicoData: CreateMedicoDto,
-        utilizadorIdLogado: number
-    ): Promise<MedicoResponseDto> {
+    async atualizar(medicoId: number, medicoData: CreateMedicoDto, utilizadorIdLogado: number): Promise<MedicoResponseDto> {
         try {
-            const medicoAnterior = await this.obter(medicoId);
+            const anterior = await this.obter(medicoId);
+            const atualizado = await this.repo.save({ ...anterior, ...medicoData, id: medicoId });
 
-            const medicoAtualizado: MedicoResponseDto = {
-                ...medicoAnterior,
-                ...medicoData
-            };
-
-            await this.auditoriaService?.registarAuditoria(
+            this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'medico',
                 medicoId,
                 OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(medicoAnterior),
-                JSON.stringify(medicoAtualizado)
-            );
+                JSON.stringify(anterior),
+                JSON.stringify(atualizado)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return medicoAtualizado;
+            return atualizado;
         } catch (error) {
             console.error('Erro ao atualizar médico:', error);
             throw error;
@@ -107,8 +89,7 @@ export class MedicoService {
 
     async listarPorEspecialidade(especialidade: string): Promise<MedicoResponseDto[]> {
         try {
-            // TODO: Buscar médicos pela especialidade na base de dados
-            return [];
+            return await this.repo.find({ where: { especialidade } });
         } catch (error) {
             console.error('Erro ao listar médicos por especialidade:', error);
             throw error;
@@ -117,17 +98,17 @@ export class MedicoService {
 
     async apagar(medicoId: number, utilizadorIdLogado: number): Promise<void> {
         try {
-            const medicoAnterior = await this.obter(medicoId);
-            const medicoEliminado = { ...medicoAnterior, deleted_at: new Date() };
-            // TODO: UPDATE medico SET deleted_at = NOW() WHERE id = medicoId
-            await this.auditoriaService?.registarAuditoria(
+            const anterior = await this.obter(medicoId);
+            await this.repo.softDelete(medicoId);
+
+            this.auditoriaService?.registarAuditoria(
                 utilizadorIdLogado,
                 'medico',
                 medicoId,
                 OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(medicoAnterior),
-                JSON.stringify(medicoEliminado)
-            );
+                JSON.stringify(anterior),
+                null
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
         } catch (error) {
             console.error('Erro ao apagar médico:', error);
             throw error;

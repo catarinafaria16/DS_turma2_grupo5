@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { Sintoma } from '../models/sintoma.entity.js';
 import type { CreateSintomaDto } from '../dtos/sintoma/create-sintoma.dto.js';
 import type { SintomaResponseDto } from '../dtos/sintoma/sintoma-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
@@ -10,33 +12,24 @@ export class SintomaService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    async criar(
-        sintomaData: CreateSintomaDto,
-        utilizadorIdLogado: number
-    ): Promise<SintomaResponseDto> {
+    private get repo() { return AppDataSource.getRepository(Sintoma); }
+
+    async criar(sintomaData: CreateSintomaDto, utilizadorIdLogado: number): Promise<SintomaResponseDto> {
         try {
-            if (sintomaData.utente_id <= 0) {
-                throw new Error('ID do utente deve ser válido');
-            }
+            if (sintomaData.utente_id <= 0) throw new Error('ID do utente deve ser válido');
             if (!sintomaData.descricao || sintomaData.descricao.trim().length === 0) {
                 throw new Error('Descrição do sintoma é obrigatória');
             }
 
-            const novoSintoma: SintomaResponseDto = {
-                id: Math.random(),
-                ...sintomaData
-            };
+            const sintoma = this.repo.create(sintomaData);
+            const saved = await this.repo.save(sintoma);
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'sintoma',
-                novoSintoma.id,
-                OperacaoAuditoria.CRIACAO,
-                null,
-                JSON.stringify(novoSintoma)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'sintoma', saved.id,
+                OperacaoAuditoria.CRIACAO, null, JSON.stringify(saved)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return novoSintoma;
+            return saved as unknown as SintomaResponseDto;
         } catch (error) {
             console.error('Erro ao criar sintoma:', error);
             throw error;
@@ -45,20 +38,10 @@ export class SintomaService {
 
     async obter(sintomaId: number): Promise<SintomaResponseDto> {
         try {
-            if (sintomaId <= 0) {
-                throw new Error('ID de sintoma inválido');
-            }
-
-            const sintoma: SintomaResponseDto = {
-                id: sintomaId,
-                utente_id: 0,
-                descricao: '',
-                intensidade: 'LEVE' as any,
-                duracao: '',
-                data_registo: new Date()
-            };
-
-            return sintoma;
+            if (sintomaId <= 0) throw new Error('ID de sintoma inválido');
+            const sintoma = await this.repo.findOne({ where: { id: sintomaId } });
+            if (!sintoma) throw new Error('Sintoma não encontrado');
+            return sintoma as unknown as SintomaResponseDto;
         } catch (error) {
             console.error('Erro ao obter sintoma:', error);
             throw error;
@@ -67,7 +50,8 @@ export class SintomaService {
 
     async listar(): Promise<SintomaResponseDto[]> {
         try {
-            return [];
+            const result = await this.repo.find();
+            return result as unknown as SintomaResponseDto[];
         } catch (error) {
             console.error('Erro ao listar sintomas:', error);
             throw error;
@@ -76,38 +60,26 @@ export class SintomaService {
 
     async listarPorUtente(utenteId: number): Promise<SintomaResponseDto[]> {
         try {
-            if (utenteId <= 0) {
-                throw new Error('ID do utente inválido');
-            }
-            return [];
+            if (utenteId <= 0) throw new Error('ID do utente inválido');
+            const result = await this.repo.find({ where: { utente_id: utenteId }, order: { data_registo: 'DESC' } });
+            return result as unknown as SintomaResponseDto[];
         } catch (error) {
             console.error('Erro ao listar sintomas por utente:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        sintomaId: number,
-        sintomaData: CreateSintomaDto,
-        utilizadorIdLogado: number
-    ): Promise<SintomaResponseDto> {
+    async atualizar(sintomaId: number, sintomaData: CreateSintomaDto, utilizadorIdLogado: number): Promise<SintomaResponseDto> {
         try {
-            const sintomaAnterior = await this.obter(sintomaId);
-            const sintomaAtualizado: SintomaResponseDto = {
-                ...sintomaAnterior,
-                ...sintomaData
-            };
+            const anterior = await this.obter(sintomaId);
+            const atualizado = await this.repo.save({ ...anterior, ...sintomaData, id: sintomaId });
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'sintoma',
-                sintomaId,
-                OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(sintomaAnterior),
-                JSON.stringify(sintomaAtualizado)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'sintoma', sintomaId,
+                OperacaoAuditoria.ALTERACAO, JSON.stringify(anterior), JSON.stringify(atualizado)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return sintomaAtualizado;
+            return atualizado as unknown as SintomaResponseDto;
         } catch (error) {
             console.error('Erro ao atualizar sintoma:', error);
             throw error;

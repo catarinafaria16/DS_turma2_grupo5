@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { Administrador } from '../models/administrador.entity.js';
 import type { CreateAdministradorDto } from '../dtos/administrador/create-administrador.dto.js';
 import type { AdministradorResponseDto } from '../dtos/administrador/administrador-response.dto.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
@@ -10,50 +12,34 @@ export class AdministradorService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    /**
-     * Criar novo administrador
-     * RF006: Gerir os perfis e as permissões dos utilizadores
-     */
-    async criar(
-        adminData: CreateAdministradorDto,
-        utilizadorIdLogado: number
-    ): Promise<AdministradorResponseDto> {
-        try {
-            // TODO: Validar se utilizadorId existe e se já tem perfil de admin
-            // TODO: Inserir na base de dados
-            
-            const novoAdmin: AdministradorResponseDto = {
-                id: Math.random(), // TODO: Será gerado pela BD
-                utilizador_id: adminData.utilizador_id
-            };
+    private get repo() { return AppDataSource.getRepository(Administrador); }
 
-            // Registar auditoria
-             await this.auditoriaService.registarAuditoria(
-                 utilizadorIdLogado,
-                 'administrador',
-                 novoAdmin.id,
-                 OperacaoAuditoria.CRIACAO,
-                 null,
-                 JSON.stringify(novoAdmin)
+    async criar(adminData: CreateAdministradorDto, utilizadorIdLogado: number): Promise<AdministradorResponseDto> {
+        try {
+            const admin = this.repo.create(adminData);
+            const saved = await this.repo.save(admin);
+
+            await this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado,
+                'administrador',
+                saved.id,
+                OperacaoAuditoria.CRIACAO,
+                null,
+                JSON.stringify(saved)
             );
 
-            return novoAdmin;
+            return saved;
         } catch (error) {
             console.error('Erro ao criar administrador:', error);
             throw error;
         }
     }
 
-    /**
-     * Obter administrador por ID
-     */
     async obter(administradorId: number): Promise<AdministradorResponseDto> {
         try {
-            // TODO: Buscar na base de dados
-            const admin: AdministradorResponseDto = {
-                id: administradorId,
-                utilizador_id: 0 // TODO: Buscar da BD
-            };
+            if (administradorId <= 0) throw new Error('ID de administrador inválido');
+            const admin = await this.repo.findOne({ where: { id: administradorId } });
+            if (!admin) throw new Error('Administrador não encontrado');
             return admin;
         } catch (error) {
             console.error('Erro ao obter administrador:', error);
@@ -61,59 +47,48 @@ export class AdministradorService {
         }
     }
 
-    /**
-     * Atualizar administrador
-     */
-    async atualizar(
-        administradorId: number,
-        adminData: CreateAdministradorDto,
-        utilizadorIdLogado: number
-    ): Promise<AdministradorResponseDto> {
+    async listar(): Promise<AdministradorResponseDto[]> {
         try {
-            // TODO: Buscar versão anterior para auditoria
-            const adminAnterior = await this.obter(administradorId);
+            return await this.repo.find();
+        } catch (error) {
+            console.error('Erro ao listar administradores:', error);
+            throw error;
+        }
+    }
 
-            // TODO: Atualizar na base de dados
-            const adminAtualizado: AdministradorResponseDto = {
-                id: administradorId,
-                utilizador_id: adminData.utilizador_id
-            };
+    async atualizar(administradorId: number, adminData: CreateAdministradorDto, utilizadorIdLogado: number): Promise<AdministradorResponseDto> {
+        try {
+            const anterior = await this.obter(administradorId);
+            const atualizado = await this.repo.save({ ...anterior, ...adminData, id: administradorId });
 
-            // Registar auditoria
-             await this.auditoriaService.registarAuditoria(
-                 utilizadorIdLogado,
-                 'administrador',
-                 administradorId,
-                 OperacaoAuditoria.ALTERACAO,
-                 JSON.stringify(adminAnterior),
-                 JSON.stringify(adminAtualizado)
-             );
+            await this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado,
+                'administrador',
+                administradorId,
+                OperacaoAuditoria.ALTERACAO,
+                JSON.stringify(anterior),
+                JSON.stringify(atualizado)
+            );
 
-            return adminAtualizado;
+            return atualizado;
         } catch (error) {
             console.error('Erro ao atualizar administrador:', error);
             throw error;
         }
     }
 
-    /**
-     * Apagar administrador
-     */
-    async apagar(
-        administradorId: number,
-        utilizadorIdLogado: number
-    ): Promise<void> {
+    async apagar(administradorId: number, utilizadorIdLogado: number): Promise<void> {
         try {
-            const adminAnterior = await this.obter(administradorId);
-            const adminEliminado = { ...adminAnterior, deleted_at: new Date() };
-            // TODO: UPDATE administrador SET deleted_at = NOW() WHERE id = administradorId
+            const anterior = await this.obter(administradorId);
+            await this.repo.softDelete(administradorId);
+
             await this.auditoriaService.registarAuditoria(
                 utilizadorIdLogado,
                 'administrador',
                 administradorId,
                 OperacaoAuditoria.ELIMINACAO,
-                JSON.stringify(adminAnterior),
-                JSON.stringify(adminEliminado)
+                JSON.stringify(anterior),
+                null
             );
         } catch (error) {
             console.error('Erro ao apagar administrador:', error);
@@ -121,179 +96,30 @@ export class AdministradorService {
         }
     }
 
-    /**
-     * Listar todos os administradores
-     */
-    async listar(): Promise<AdministradorResponseDto[]> {
+    async gestarPerfisPermissoes(utilizadorId: number, perfil: string, permissoes: string[], utilizadorIdLogado: number): Promise<any> {
         try {
-            // TODO: Buscar na base de dados
-            const admins: AdministradorResponseDto[] = [];
-            return admins;
-        } catch (error) {
-            console.error('Erro ao listar administradores:', error);
-            throw error;
-        }
-    }
+            const dadosNovos = { perfil, permissoes };
 
-    /**
-     * RNF002: Gerir perfis e permissões
-     * Atualizar perfil e permissões de um utilizador
-     */
-    async gestarPerfisPermissoes(
-        utilizadorId: number,
-        perfil: string,
-        permissoes: string[],
-        utilizadorIdLogado: number
-    ): Promise<any> {
-        try {
-            // TODO: Validar perfil válido (Utente, Medico, Administrador)
-            // TODO: Validar permissões válidas
-            // TODO: Atualizar na base de dados
-
-            const dadosAntigos = {
-                perfil: '', // TODO: Buscar da BD
-                permissoes: [] // TODO: Buscar da BD
-            };
-
-            const dadosNovos = {
-                perfil,
-                permissoes
-            };
-
-            // Registar auditoria
-             await this.auditoriaService.registarAuditoria(
-                 utilizadorIdLogado,
-                 'utilizador_permissoes',
-                 utilizadorId,
-                 OperacaoAuditoria.ALTERACAO,
-                 JSON.stringify(dadosAntigos),
-                 JSON.stringify(dadosNovos)
-             );
-
-            return {
+            await this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado,
+                'utilizador_permissoes',
                 utilizadorId,
-                perfil,
-                permissoes
-            };
+                OperacaoAuditoria.ALTERACAO,
+                null,
+                JSON.stringify(dadosNovos)
+            );
+
+            return { utilizadorId, perfil, permissoes };
         } catch (error) {
             console.error('Erro ao gerir perfis e permissões:', error);
             throw error;
         }
     }
 
-    /**
-     * RF020: Administrador configura limiares CARAT que desencadeiam alertas
-     * RNF004: Validação de dados de entrada
-     */
-    async configurarLimiaresCarat(
-        limiarBaixo: number,
-        limiarIntermedio: number,
-        limiarAlto: number,
-        utilizadorIdLogado: number
-    ): Promise<any> {
-        try {
-            // Validações
-            if (limiarBaixo < 0 || limiarBaixo > 100) {
-                throw new Error('Limiar baixo deve estar entre 0 e 100');
-            }
-            if (limiarIntermedio < limiarBaixo || limiarIntermedio > 100) {
-                throw new Error('Limiar intermédio deve estar entre limiar baixo e 100');
-            }
-            if (limiarAlto < limiarIntermedio || limiarAlto > 100) {
-                throw new Error('Limiar alto deve estar entre limiar intermédio e 100');
-            }
-
-            // TODO: Buscar configuração anterior
-            const configAnterior = {
-                limiarBaixo: 0, // TODO: Buscar da BD
-                limiarIntermedio: 0, // TODO: Buscar da BD
-                limiarAlto: 0 // TODO: Buscar da BD
-            };
-
-            // TODO: Atualizar na base de dados
-            const configNova = {
-                limiarBaixo,
-                limiarIntermedio,
-                limiarAlto
-            };
-
-            // Registar auditoria
-             await this.auditoriaService.registarAuditoria(
-                 utilizadorIdLogado,
-                 'configuracao_carat',
-                 1, // ID da configuração global
-                 OperacaoAuditoria.ALTERACAO,
-                 JSON.stringify(configAnterior),
-                 JSON.stringify(configNova)
-             );
-
-            return configNova;
-        } catch (error) {
-            console.error('Erro ao configurar limiares CARAT:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Obter configurações CARAT
-     */
-    async obterConfigLimiaresCarat(): Promise<any> {
-        try {
-            // TODO: Buscar da base de dados
-            const config = {
-                limiarBaixo: 15,
-                limiarIntermedio: 22,
-                limiarAlto: 30
-            };
-            return config;
-        } catch (error) {
-            console.error('Erro ao obter configurações CARAT:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * RF037: Gerir dados utilizados no sistema (dados simulados, configurações, etc)
-     */
-    async gestarDados(
-        tipoOperacao: string,
-        dados: any,
-        utilizadorIdLogado: number
-    ): Promise<any> {
-        try {
-            // TODO: Validar tipo de operação
-            // TODO: Aplicar operação apropriada na base de dados
-
-            // Registar auditoria
-             await this.auditoriaService.registarAuditoria(
-                 utilizadorIdLogado,
-                 'dados_sistema',
-                 1,
-                 OperacaoAuditoria.ALTERACAO,
-                 null,
-                 JSON.stringify(dados)
-             );
-
-            return {
-                status: 'sucesso',
-                operacao: tipoOperacao,
-                dados
-            };
-        } catch (error) {
-            console.error('Erro ao gerir dados do sistema:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * RNF001: Validar autorização de administrador
-     * Verificar se utilizador tem perfil de administrador
-     */
     async validarAdministrador(utilizadorId: number): Promise<boolean> {
         try {
-            // TODO: Buscar utilizador e verificar perfil
-            // TODO: Buscar tabela de associação utilizador-administrador
-            return true;
+            const admin = await this.repo.findOne({ where: { utilizador_id: utilizadorId } });
+            return admin !== null;
         } catch (error) {
             console.error('Erro ao validar administrador:', error);
             return false;

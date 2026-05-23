@@ -1,5 +1,5 @@
 export enum OperacaoAuditoria {
-    CRIACAO = 'CRIAÇÃO',
-    ALTERACAO = 'ALTERAÇÃO',
-    ELIMINACAO = 'ELIMINAÇÃO'
+    CRIACAO = 'CRIACAO',
+    ALTERACAO = 'ALTERACAO',
+    ELIMINACAO = 'ELIMINACAO'
 }

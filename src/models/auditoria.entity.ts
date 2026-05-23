@@ -7,13 +7,13 @@ export class Auditoria {
     @PrimaryGeneratedColumn()
     log_id!: number;
 
-    @Column()
-    utilizador_id!: number;
+    @Column({ type: 'int', nullable: true })
+    utilizador_id!: number | null;
 
-    @Column()
+    @Column('text')
     tabela!: string;
 
-    @Column()
+    @Column('int')
     tabela_id!: number;
 
     @Column({ type: 'simple-enum', enum: OperacaoAuditoria })

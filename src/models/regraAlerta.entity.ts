@@ -8,19 +8,19 @@ export class RegraAlerta {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     medico_id!: number;
 
-    @Column()
+    @Column('int')
     administrador_id!: number;
 
     @Column({ type: 'simple-enum', enum: CategoriaRegraAlerta })
     categoria!: CategoriaRegraAlerta;
 
-    @Column()
+    @Column('int')
     limiar_score!: number;
 
-    @Column()
+    @Column('int')
     valor_deterioracao!: number;
 
     @Column({ type: 'simple-enum', enum: PrioridadeRegraAlerta })

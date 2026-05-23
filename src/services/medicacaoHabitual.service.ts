@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { MedicacaoHabitual } from '../models/medicacaoHabitual.entity.js';
 import type { CreateMedicacaoHabitualDto } from '../dtos/medicacaoHabitual/create-medicacaoHabitual.dto.js';
 import type { MedicacaoHabitualResponseDto } from '../dtos/medicacaoHabitual/medicacaoHabitual-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
@@ -10,33 +12,24 @@ export class MedicacaoHabitualService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    async criar(
-        medicacaoData: CreateMedicacaoHabitualDto,
-        utilizadorIdLogado: number
-    ): Promise<MedicacaoHabitualResponseDto> {
+    private get repo() { return AppDataSource.getRepository(MedicacaoHabitual); }
+
+    async criar(medicacaoData: CreateMedicacaoHabitualDto, utilizadorIdLogado: number): Promise<MedicacaoHabitualResponseDto> {
         try {
-            if (medicacaoData.anamnese_id <= 0) {
-                throw new Error('ID de anamnese deve ser válido');
-            }
+            if (medicacaoData.anamnese_id <= 0) throw new Error('ID de anamnese deve ser válido');
             if (!medicacaoData.nome || medicacaoData.nome.trim().length === 0) {
                 throw new Error('Nome da medicação habitual é obrigatório');
             }
 
-            const novaMedicacao: MedicacaoHabitualResponseDto = {
-                id: Math.random(), // TODO: Será gerado pela BD
-                ...medicacaoData
-            };
+            const medicacao = this.repo.create(medicacaoData);
+            const saved = await this.repo.save(medicacao);
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'medicacao_habitual',
-                novaMedicacao.id,
-                OperacaoAuditoria.CRIACAO,
-                null,
-                JSON.stringify(novaMedicacao)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'medicacao_habitual', saved.id,
+                OperacaoAuditoria.CRIACAO, null, JSON.stringify(saved)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return novaMedicacao;
+            return saved as unknown as MedicacaoHabitualResponseDto;
         } catch (error) {
             console.error('Erro ao criar medicação habitual:', error);
             throw error;
@@ -45,20 +38,10 @@ export class MedicacaoHabitualService {
 
     async obter(medicacaoHabitualId: number): Promise<MedicacaoHabitualResponseDto> {
         try {
-            if (medicacaoHabitualId <= 0) {
-                throw new Error('ID de medicação habitual inválido');
-            }
-
-            const medicacaoHabitual: MedicacaoHabitualResponseDto = {
-                id: medicacaoHabitualId,
-                anamnese_id: 0,
-                nome: '',
-                dose: '',
-                duracao: '',
-                periodicidade: ''
-            };
-
-            return medicacaoHabitual;
+            if (medicacaoHabitualId <= 0) throw new Error('ID de medicação habitual inválido');
+            const medicacao = await this.repo.findOne({ where: { id: medicacaoHabitualId } });
+            if (!medicacao) throw new Error('Medicação habitual não encontrada');
+            return medicacao as unknown as MedicacaoHabitualResponseDto;
         } catch (error) {
             console.error('Erro ao obter medicação habitual:', error);
             throw error;
@@ -67,8 +50,8 @@ export class MedicacaoHabitualService {
 
     async listar(): Promise<MedicacaoHabitualResponseDto[]> {
         try {
-            // TODO: Buscar todas as medicações habituais na base de dados
-            return [];
+            const result = await this.repo.find();
+            return result as unknown as MedicacaoHabitualResponseDto[];
         } catch (error) {
             console.error('Erro ao listar medicações habituais:', error);
             throw error;
@@ -77,41 +60,26 @@ export class MedicacaoHabitualService {
 
     async listarPorAnamnese(anamneseId: number): Promise<MedicacaoHabitualResponseDto[]> {
         try {
-            if (anamneseId <= 0) {
-                throw new Error('ID de anamnese inválido');
-            }
-
-            // TODO: Buscar medicações habituais por anamnese na base de dados
-            return [];
+            if (anamneseId <= 0) throw new Error('ID de anamnese inválido');
+            const result = await this.repo.find({ where: { anamnese_id: anamneseId } });
+            return result as unknown as MedicacaoHabitualResponseDto[];
         } catch (error) {
             console.error('Erro ao listar medicações habituais por anamnese:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        medicacaoHabitualId: number,
-        medicacaoData: CreateMedicacaoHabitualDto,
-        utilizadorIdLogado: number
-    ): Promise<MedicacaoHabitualResponseDto> {
+    async atualizar(medicacaoHabitualId: number, medicacaoData: CreateMedicacaoHabitualDto, utilizadorIdLogado: number): Promise<MedicacaoHabitualResponseDto> {
         try {
-            const medicacaoAnterior = await this.obter(medicacaoHabitualId);
+            const anterior = await this.obter(medicacaoHabitualId);
+            const atualizada = await this.repo.save({ ...anterior, ...medicacaoData, id: medicacaoHabitualId });
 
-            const medicacaoAtualizada: MedicacaoHabitualResponseDto = {
-                ...medicacaoAnterior,
-                ...medicacaoData
-            };
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'medicacao_habitual', medicacaoHabitualId,
+                OperacaoAuditoria.ALTERACAO, JSON.stringify(anterior), JSON.stringify(atualizada)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'medicacao_habitual',
-                medicacaoHabitualId,
-                OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(medicacaoAnterior),
-                JSON.stringify(medicacaoAtualizada)
-            );
-
-            return medicacaoAtualizada;
+            return atualizada as unknown as MedicacaoHabitualResponseDto;
         } catch (error) {
             console.error('Erro ao atualizar medicação habitual:', error);
             throw error;

@@ -80,6 +80,63 @@
 
     .vazio { color: #a0aec0; font-size: 0.875rem; padding: 1rem 0; }
 
+    .btn-sec {
+      background: #718096;
+    }
+    .btn-sec:hover { background: #4a5568; }
+
+    .fhir-resource {
+      font-size: 0.7rem; font-weight: 700; font-family: monospace;
+      padding: 2px 7px; border-radius: 4px;
+      background: #e9d8fd; color: #553c9a;
+    }
+
+    .fhir-subtabs {
+      display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 1rem;
+    }
+    .fhir-subtab {
+      padding: 5px 14px; font-size: 0.78rem; cursor: pointer;
+      border-radius: 20px; border: 1px solid #cbd5e0;
+      color: #4a5568; font-weight: 500; background: white;
+      font-family: monospace;
+    }
+    .fhir-subtab:hover { border-color: #553c9a; color: #553c9a; }
+    .fhir-subtab.active { background: #553c9a; color: white; border-color: #553c9a; }
+
+    .url-pill {
+      font-family: monospace; font-size: 0.78rem;
+      background: #f7fafc; border: 1px solid #e2e8f0;
+      border-radius: 4px; padding: 5px 10px; color: #4a5568;
+      word-break: break-all; margin: 8px 0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .url-pill span { color: #276749; font-weight: 700; flex-shrink: 0; }
+
+    .json-box {
+      background: #1a202c; color: #e2e8f0;
+      font-family: monospace; font-size: 0.75rem;
+      border-radius: 6px; padding: 1rem;
+      overflow: auto; max-height: 420px;
+      white-space: pre; margin-top: 8px;
+    }
+
+    .json-box .key    { color: #76e4f7; }
+    .json-box .str    { color: #9ae6b4; }
+    .json-box .num    { color: #fbd38d; }
+    .json-box .bool   { color: #f6ad55; }
+    .json-box .null   { color: #fc8181; }
+
+    .toggle-row {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+    .btn-tiny {
+      padding: 4px 10px; font-size: 0.75rem; border-radius: 4px;
+      cursor: pointer; border: 1px solid #cbd5e0; background: white;
+      color: #4a5568; font-weight: 500;
+    }
+    .btn-tiny:hover { background: #edf2f7; }
+    .btn-tiny.active { background: #553c9a; color: white; border-color: #553c9a; }
+
     footer {
       text-align: center; padding: 1.5rem; font-size: 0.8rem;
       color: #a0aec0; border-top: 1px solid #e2e8f0;
@@ -93,9 +150,87 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
+    /* ───── Utilizadores ───── */
+    function SecaoUtilizadores() {
+      const [utilizadores, setUtilizadores] = useState([]);
+      const [form, setForm] = useState({ nome: '', email: '', password: '', perfil: 'UTENTE' });
+      const [erro, setErro] = useState('');
+      const [sucesso, setSucesso] = useState('');
+
+      async function buscar() {
+        try {
+          const r = await fetch('/api/utilizadores');
+          if (r.ok) { const d = await r.json(); setUtilizadores(d.dados ?? []); }
+        } catch {}
+      }
+      useEffect(() => { buscar(); }, []);
+
+      function set(field) { return e => setForm(f => ({ ...f, [field]: e.target.value })); }
+
+      async function handleSubmit(e) {
+        e.preventDefault(); setErro(''); setSucesso('');
+        const r = await fetch('/api/utilizadores', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+        const d = await r.json();
+        if (r.ok) {
+          setForm({ nome: '', email: '', password: '', perfil: 'UTENTE' });
+          setSucesso(`Utilizador criado com ID ${d.dados?.id ?? '?'}.`);
+          buscar();
+        } else {
+          setErro(d.erro || 'Erro ao criar utilizador.');
+        }
+      }
+
+      const perfilBadge = { UTENTE: 'badge-green', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-orange' };
+
+      return (
+        <>
+          <div className="card">
+            <h2>Novo Utilizador</h2>
+            <form onSubmit={handleSubmit}>
+              <input value={form.nome}  onChange={set('nome')}  placeholder="Nome completo" required />
+              <input value={form.email} onChange={set('email')} placeholder="Email" type="email" required />
+              <input value={form.password} onChange={set('password')} placeholder="Password (mín. 6 caracteres)" type="password" required />
+              <select value={form.perfil} onChange={set('perfil')}>
+                <option value="UTENTE">Utente</option>
+                <option value="MEDICO">Médico</option>
+                <option value="ADMINISTRADOR">Administrador</option>
+              </select>
+              <button type="submit">Criar utilizador</button>
+              {erro    && <p className="erro">{erro}</p>}
+              {sucesso && <p className="sucesso">{sucesso}</p>}
+            </form>
+          </div>
+          <div className="card">
+            <h2>Utilizadores Registados</h2>
+            {utilizadores.length === 0 ? <p className="vazio">Nenhum utilizador registado.</p> : (
+              <table>
+                <thead><tr><th>#</th><th>Nome</th><th>Email</th><th>Perfil</th></tr></thead>
+                <tbody>
+                  {utilizadores.map(u => (
+                    <tr key={u.id}>
+                      <td>{u.id}</td>
+                      <td>{u.nome}</td>
+                      <td>{u.email}</td>
+                      <td><span className={`badge ${perfilBadge[u.perfil] || 'badge-blue'}`}>{u.perfil}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </>
+      );
+    }
+
     /* ───── Utentes ───── */
     function SecaoUtentes() {
       const [utentes, setUtentes] = useState([]);
+      const [utilizadores, setUtilizadores] = useState([]);
+      const [medicos, setMedicos] = useState([]);
       const [form, setForm] = useState({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
@@ -106,7 +241,22 @@
           if (r.ok) { const d = await r.json(); setUtentes(d.dados ?? []); }
         } catch {}
       }
-      useEffect(() => { buscar(); }, []);
+
+      async function buscarUtilizadores() {
+        try {
+          const r = await fetch('/api/utilizadores');
+          if (r.ok) { const d = await r.json(); setUtilizadores(d.dados ?? []); }
+        } catch {}
+      }
+
+      async function buscarMedicos() {
+        try {
+          const r = await fetch('/api/medicos');
+          if (r.ok) { const d = await r.json(); setMedicos(d.dados ?? []); }
+        } catch {}
+      }
+
+      useEffect(() => { buscar(); buscarUtilizadores(); buscarMedicos(); }, []);
 
       function set(field) { return e => setForm(f => ({ ...f, [field]: e.target.value })); }
 
@@ -135,14 +285,28 @@
         }
       }
 
+      const utilizadoresSemUtente = utilizadores.filter(u =>
+        !utentes.some(t => t.utilizador_id === u.id)
+      );
+
       return (
         <>
           <div className="card">
             <h2>Novo Utente</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                <input type="number" value={form.utilizador_id} onChange={set('utilizador_id')} placeholder="ID utilizador" required />
-                <input type="number" value={form.medico_id}     onChange={set('medico_id')}     placeholder="ID médico" required />
+                <select value={form.utilizador_id} onChange={set('utilizador_id')} required>
+                  <option value="">-- Seleccionar utilizador --</option>
+                  {utilizadoresSemUtente.map(u => (
+                    <option key={u.id} value={u.id}>{u.nome} ({u.email})</option>
+                  ))}
+                </select>
+                <select value={form.medico_id} onChange={set('medico_id')} required>
+                  <option value="">-- Seleccionar médico --</option>
+                  {medicos.map(m => (
+                    <option key={m.id} value={m.id}>{m.utilizador?.nome || `Médico #${m.id}`} — {m.especialidade}</option>
+                  ))}
+                </select>
               </div>
               <div className="row">
                 <input type="number" value={form.nr_utente}    onChange={set('nr_utente')}    placeholder="Nº utente" required />
@@ -184,7 +348,10 @@
     /* ───── Prescrições ───── */
     function SecaoPrescricoes() {
       const [prescricoes, setPrescricoes] = useState([]);
-      const [form, setForm] = useState({ medico_id: '', utente_id: '', tipo: 'MEDICAÇÃO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' });
+      const [medicos, setMedicos] = useState([]);
+      const [utentes, setUtentes] = useState([]);
+      const [utilizadores, setUtilizadores] = useState([]);
+      const [form, setForm] = useState({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
 
@@ -194,9 +361,37 @@
           if (r.ok) { const d = await r.json(); setPrescricoes(d.dados ?? []); }
         } catch {}
       }
-      useEffect(() => { buscar(); }, []);
+
+      async function buscarMedicos() {
+        try {
+          const r = await fetch('/api/medicos');
+          if (r.ok) { const d = await r.json(); setMedicos(d.dados ?? []); }
+        } catch {}
+      }
+
+      async function buscarUtentes() {
+        try {
+          const [ru, rutil] = await Promise.all([
+            fetch('/api/utentes'),
+            fetch('/api/utilizadores'),
+          ]);
+          if (ru.ok)   { const d = await ru.json();   setUtentes(d.dados ?? []); }
+          if (rutil.ok){ const d = await rutil.json(); setUtilizadores(d.dados ?? []); }
+        } catch {}
+      }
+
+      useEffect(() => { buscar(); buscarMedicos(); buscarUtentes(); }, []);
 
       function set(field) { return e => setForm(f => ({ ...f, [field]: e.target.value })); }
+
+      function nomeUtente(utente) {
+        const u = utilizadores.find(x => x.id === utente.utilizador_id);
+        return u ? `${u.nome} (nº ${utente.nr_utente})` : `Utente #${utente.id}`;
+      }
+
+      function nomeMedico(m) {
+        return `Médico #${m.id} — ${m.especialidade}`;
+      }
 
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
@@ -215,7 +410,7 @@
         });
         const d = await r.json();
         if (r.ok) {
-          setForm({ medico_id: '', utente_id: '', tipo: 'MEDICAÇÃO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' });
+          setForm({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' });
           setSucesso('Prescrição criada com sucesso.');
           buscar();
         } else {
@@ -231,12 +426,22 @@
             <h2>Nova Prescrição</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                <input type="number" value={form.medico_id}  onChange={set('medico_id')}  placeholder="ID médico" required />
-                <input type="number" value={form.utente_id}  onChange={set('utente_id')}  placeholder="ID utente" required />
+                <select value={form.medico_id} onChange={set('medico_id')} required>
+                  <option value="">-- Seleccionar médico --</option>
+                  {medicos.map(m => (
+                    <option key={m.id} value={m.id}>{nomeMedico(m)}</option>
+                  ))}
+                </select>
+                <select value={form.utente_id} onChange={set('utente_id')} required>
+                  <option value="">-- Seleccionar utente --</option>
+                  {utentes.map(u => (
+                    <option key={u.id} value={u.id}>{nomeUtente(u)}</option>
+                  ))}
+                </select>
               </div>
               <div className="row">
                 <select value={form.tipo}   onChange={set('tipo')}>
-                  <option value="MEDICAÇÃO">Medicação</option>
+                  <option value="MEDICACAO">Medicação</option>
                   <option value="EXAME">Exame</option>
                 </select>
                 <select value={form.estado} onChange={set('estado')}>
@@ -284,6 +489,7 @@
     /* ───── Médicos ───── */
     function SecaoMedicos() {
       const [medicos, setMedicos] = useState([]);
+      const [utilizadores, setUtilizadores] = useState([]);
       const [form, setForm] = useState({ utilizador_id: '', especialidade: 'PNEUMOLOGIA', contacto: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
@@ -294,7 +500,15 @@
           if (r.ok) { const d = await r.json(); setMedicos(d.dados ?? []); }
         } catch {}
       }
-      useEffect(() => { buscar(); }, []);
+
+      async function buscarUtilizadores() {
+        try {
+          const r = await fetch('/api/utilizadores');
+          if (r.ok) { const d = await r.json(); setUtilizadores(d.dados ?? []); }
+        } catch {}
+      }
+
+      useEffect(() => { buscar(); buscarUtilizadores(); }, []);
 
       function set(field) { return e => setForm(f => ({ ...f, [field]: e.target.value })); }
 
@@ -324,7 +538,14 @@
           <div className="card">
             <h2>Novo Médico</h2>
             <form onSubmit={handleSubmit}>
-              <input type="number" value={form.utilizador_id} onChange={set('utilizador_id')} placeholder="ID utilizador" required />
+              <select value={form.utilizador_id} onChange={set('utilizador_id')} required>
+                <option value="">-- Seleccionar utilizador --</option>
+                {utilizadores
+                  .filter(u => u.perfil === 'MEDICO' && !medicos.some(m => m.utilizador_id === u.id))
+                  .map(u => (
+                    <option key={u.id} value={u.id}>{u.nome} ({u.email})</option>
+                  ))}
+              </select>
               <select value={form.especialidade} onChange={set('especialidade')} required>
                 <option value="">-- Especialidade --</option>
                 <option value="PNEUMOLOGIA">Pneumologia</option>
@@ -364,11 +585,278 @@
       );
     }
 
+    /* ───── FHIR helpers ───── */
+    function highlightJson(obj) {
+      const json = JSON.stringify(obj, null, 2);
+      return json
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+          if (/^"/.test(match)) {
+            if (/:$/.test(match)) return `<span class="key">${match}</span>`;
+            return `<span class="str">${match}</span>`;
+          }
+          if (/true|false/.test(match)) return `<span class="bool">${match}</span>`;
+          if (/null/.test(match)) return `<span class="null">${match}</span>`;
+          return `<span class="num">${match}</span>`;
+        });
+    }
+
+    function JsonViewer({ data }) {
+      const [copied, setCopied] = React.useState(false);
+      function copy() {
+        navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
+          setCopied(true); setTimeout(() => setCopied(false), 1500);
+        });
+      }
+      return (
+        <div>
+          <button type="button" className="btn-tiny" onClick={copy} style={{marginBottom:'4px'}}>
+            {copied ? 'Copiado!' : 'Copiar JSON'}
+          </button>
+          <div className="json-box" dangerouslySetInnerHTML={{ __html: highlightJson(data) }} />
+        </div>
+      );
+    }
+
+    function ResultCard({ title, url, data, children }) {
+      const [raw, setRaw] = React.useState(false);
+      return (
+        <div className="card">
+          <h2>{title}</h2>
+          {url && (
+            <div className="url-pill">
+              <span>GET</span>{url}
+            </div>
+          )}
+          <div className="toggle-row">
+            <button type="button" className={`btn-tiny${!raw ? ' active' : ''}`} onClick={() => setRaw(false)}>Tabela</button>
+            <button type="button" className={`btn-tiny${raw ? ' active' : ''}`} onClick={() => setRaw(true)}>JSON</button>
+          </div>
+          {raw ? <JsonViewer data={data} /> : children}
+        </div>
+      );
+    }
+
+    /* ───── FHIR sub-sections ───── */
+    function FhirPatients() {
+      const [pid, setPid] = useState('');
+      const [result, setResult] = useState(null);
+      const [url, setUrl] = useState('');
+      const [erro, setErro] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      async function listarTodos() {
+        setErro(''); setResult(null);
+        const u = '/fhir/Patient'; setUrl(u); setLoading(true);
+        try {
+          const r = await fetch(u); const d = await r.json();
+          if (r.ok) setResult(d); else setErro(d.issue?.[0]?.diagnostics || 'Erro.');
+        } catch { setErro('Erro de ligação.'); }
+        setLoading(false);
+      }
+
+      async function pesquisar(e) {
+        e.preventDefault(); if (!pid) return;
+        setErro(''); setResult(null);
+        const u = `/fhir/Patient/${pid}`; setUrl(u); setLoading(true);
+        try {
+          const r = await fetch(u); const d = await r.json();
+          if (r.ok) setResult(d); else setErro(d.issue?.[0]?.diagnostics || 'Patient não encontrado.');
+        } catch { setErro('Erro de ligação.'); }
+        setLoading(false);
+      }
+
+      const isBundle = result && result.resourceType === 'Bundle';
+      const isPatient = result && result.resourceType === 'Patient';
+
+      return (
+        <>
+          <div className="card">
+            <h2><span className="fhir-resource">Patient</span></h2>
+            <form onSubmit={pesquisar}>
+              <div className="row">
+                <input type="number" value={pid} onChange={e => setPid(e.target.value)} placeholder="ID do utente (deixar vazio para listar todos)" />
+                <button type="submit" disabled={loading}>GET /:id</button>
+                <button type="button" className="btn-sec" onClick={listarTodos} disabled={loading}>GET /</button>
+              </div>
+            </form>
+            {erro && <p className="erro" style={{marginTop:'8px'}}>{erro}</p>}
+          </div>
+
+          {isBundle && (
+            <ResultCard title={<><span className="fhir-resource">Bundle</span> Patient — {result.total} resultado(s)</>} url={url} data={result}>
+              {result.total === 0 ? <p className="vazio">Nenhum patient.</p> : (
+                <table>
+                  <thead><tr><th>ID</th><th>Nome</th><th>Data Nasc.</th><th>Contacto</th><th>Nº Utente</th><th>Nº Faturação</th></tr></thead>
+                  <tbody>
+                    {result.entry.map(({ resource: p }) => (
+                      <tr key={p.id}>
+                        <td>{p.id}</td>
+                        <td>{p.name?.[0]?.text || '—'}</td>
+                        <td>{p.birthDate || '—'}</td>
+                        <td>{p.telecom?.[0]?.value || '—'}</td>
+                        <td>{p.identifier?.[0]?.value || '—'}</td>
+                        <td>{p.identifier?.[1]?.value || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </ResultCard>
+          )}
+
+          {isPatient && (
+            <ResultCard title={<><span className="fhir-resource">Patient</span> /{result.id}</>} url={url} data={result}>
+              <table>
+                <tbody>
+                  <tr><td><strong>resourceType</strong></td><td><span className="fhir-resource">{result.resourceType}</span></td></tr>
+                  <tr><td><strong>ID</strong></td><td>{result.id}</td></tr>
+                  <tr><td><strong>Nome</strong></td><td>{result.name?.[0]?.text || '—'}</td></tr>
+                  <tr><td><strong>Data Nascimento</strong></td><td>{result.birthDate || '—'}</td></tr>
+                  <tr><td><strong>Contacto</strong></td><td>{result.telecom?.[0]?.value || '—'}</td></tr>
+                  <tr><td><strong>Morada</strong></td><td>{result.address?.[0]?.text || '—'}</td></tr>
+                  <tr><td><strong>Nº Utente</strong></td><td>{result.identifier?.[0]?.value || '—'}</td></tr>
+                  <tr><td><strong>Nº Faturação</strong></td><td>{result.identifier?.[1]?.value || '—'}</td></tr>
+                </tbody>
+              </table>
+            </ResultCard>
+          )}
+        </>
+      );
+    }
+
+    function FhirRecursoComPatient({ resource, colunas, renderRow }) {
+      const [pid, setPid] = useState('');
+      const [result, setResult] = useState(null);
+      const [url, setUrl] = useState('');
+      const [erro, setErro] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      async function pesquisar(e) {
+        e.preventDefault(); if (!pid) return;
+        setErro(''); setResult(null);
+        const u = `/fhir/${resource}?patient=${pid}`; setUrl(u); setLoading(true);
+        try {
+          const r = await fetch(u); const d = await r.json();
+          if (r.ok) setResult(d); else setErro(d.issue?.[0]?.diagnostics || 'Erro.');
+        } catch { setErro('Erro de ligação.'); }
+        setLoading(false);
+      }
+
+      return (
+        <>
+          <div className="card">
+            <h2><span className="fhir-resource">{resource}</span></h2>
+            <form onSubmit={pesquisar}>
+              <div className="row">
+                <input type="number" value={pid} onChange={e => setPid(e.target.value)} placeholder="ID do utente (patient)" required />
+                <button type="submit" disabled={loading}>GET ?patient=:id</button>
+              </div>
+            </form>
+            {erro && <p className="erro" style={{marginTop:'8px'}}>{erro}</p>}
+          </div>
+
+          {result && (
+            <ResultCard title={<><span className="fhir-resource">Bundle</span> {resource} — {result.total} resultado(s)</>} url={url} data={result}>
+              {result.total === 0 ? <p className="vazio">Sem registos.</p> : (
+                <table>
+                  <thead><tr>{colunas.map(c => <th key={c}>{c}</th>)}</tr></thead>
+                  <tbody>{result.entry.map(({ resource: r }) => renderRow(r))}</tbody>
+                </table>
+              )}
+            </ResultCard>
+          )}
+        </>
+      );
+    }
+
+    function FhirAllergies() {
+      return (
+        <FhirRecursoComPatient
+          resource="AllergyIntolerance"
+          colunas={['ID', 'Descrição', 'Criticidade', 'Estado', 'Tipo', 'Freq. Crise']}
+          renderRow={a => (
+            <tr key={a.id}>
+              <td>{a.id}</td>
+              <td>{a.code?.text || '—'}</td>
+              <td><span className={`badge ${a.criticality === 'low' ? 'badge-green' : 'badge-red'}`}>{a.criticality || '—'}</span></td>
+              <td><span className="badge badge-blue">{a.clinicalStatus?.coding?.[0]?.code || '—'}</span></td>
+              <td>{a.type || '—'}</td>
+              <td>{a.note?.[0]?.text || '—'}</td>
+            </tr>
+          )}
+        />
+      );
+    }
+
+    function FhirMedications() {
+      const statusBadge = { active: 'badge-green', completed: 'badge-orange', cancelled: 'badge-red' };
+      return (
+        <FhirRecursoComPatient
+          resource="MedicationRequest"
+          colunas={['ID', 'Medicação', 'Estado', 'Prescritor', 'Dosagem', 'Validade']}
+          renderRow={m => (
+            <tr key={m.id}>
+              <td>{m.id}</td>
+              <td>{m.medicationCodeableConcept?.text || '—'}</td>
+              <td><span className={`badge ${statusBadge[m.status] || 'badge-blue'}`}>{m.status}</span></td>
+              <td>{m.requester?.reference || '—'}</td>
+              <td>{m.dosageInstruction?.[0]?.text || '—'}</td>
+              <td>{m.dispenseRequest?.validityPeriod?.end || '—'}</td>
+            </tr>
+          )}
+        />
+      );
+    }
+
+    function FhirObservations() {
+      return (
+        <FhirRecursoComPatient
+          resource="Observation"
+          colunas={['ID', 'Descrição', 'Estado', 'Data', 'Valor']}
+          renderRow={o => (
+            <tr key={o.id}>
+              <td>{o.id}</td>
+              <td>{o.code?.text || '—'}</td>
+              <td><span className="badge badge-blue">{o.status}</span></td>
+              <td>{o.effectiveDateTime ? new Date(o.effectiveDateTime).toLocaleDateString('pt-PT') : '—'}</td>
+              <td>{o.valueCodeableConcept?.text || o.valueString || '—'}</td>
+            </tr>
+          )}
+        />
+      );
+    }
+
+    /* ───── FHIR ───── */
+    function SecaoFhir() {
+      const [subtab, setSubtab] = useState('Patient');
+      const SUBTABS = ['Patient', 'AllergyIntolerance', 'MedicationRequest', 'Observation'];
+      return (
+        <>
+          <div className="card" style={{marginBottom:'0.5rem'}}>
+            <h2>Interoperabilidade FHIR R4</h2>
+            <p style={{fontSize:'0.85rem', color:'#718096', marginBottom:'0.75rem'}}>
+              Consulta de recursos FHIR expostos pela API. Cada endpoint devolve JSON conforme a especificação HL7 FHIR R4.
+            </p>
+            <div className="fhir-subtabs">
+              {SUBTABS.map(s => (
+                <div key={s} className={`fhir-subtab${subtab === s ? ' active' : ''}`} onClick={() => setSubtab(s)}>{s}</div>
+              ))}
+            </div>
+          </div>
+          {subtab === 'Patient'              && <FhirPatients />}
+          {subtab === 'AllergyIntolerance'   && <FhirAllergies />}
+          {subtab === 'MedicationRequest'    && <FhirMedications />}
+          {subtab === 'Observation'          && <FhirObservations />}
+        </>
+      );
+    }
+
     /* ───── App ───── */
-    const TABS = ['Utentes', 'Prescrições', 'Médicos'];
+    const TABS = ['Utilizadores', 'Utentes', 'Prescrições', 'Médicos', 'FHIR'];
 
     function App() {
-      const [tab, setTab] = useState('Utentes');
+      const [tab, setTab] = useState('Utilizadores');
       return (
         <>
           <header>
@@ -383,9 +871,11 @@
             ))}
           </nav>
           <div className="container">
+            {tab === 'Utilizadores' && <SecaoUtilizadores />}
             {tab === 'Utentes'     && <SecaoUtentes />}
             {tab === 'Prescrições' && <SecaoPrescricoes />}
             {tab === 'Médicos'     && <SecaoMedicos />}
+            {tab === 'FHIR'        && <SecaoFhir />}
           </div>
           <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT</footer>
         </>

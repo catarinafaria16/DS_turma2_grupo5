@@ -7,16 +7,16 @@ export class Sintoma {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     utente_id!: number;
 
-    @Column()
+    @Column('text')
     descricao!: string;
 
     @Column({ type: 'simple-enum', enum: IntensidadeSintoma })
     intensidade!: IntensidadeSintoma;
 
-    @Column()
+    @Column('text')
     duracao!: string;
 
     @CreateDateColumn()

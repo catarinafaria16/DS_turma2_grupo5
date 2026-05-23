@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { PlanoAcompanhamento } from '../models/planoAcompanhamento.entity.js';
 import type { CreatePlanoAcompanhamentoDto } from '../dtos/planoAcompanhamento/create-planoAcompanhamento.dto.js';
 import type { PlanoAcompanhamentoResponseDto } from '../dtos/planoAcompanhamento/planoAcompanhamento-response.dto.js';
 import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum.js';
@@ -11,10 +13,9 @@ export class PlanoAcompanhamentoService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    async criar(
-        planoData: CreatePlanoAcompanhamentoDto,
-        utilizadorIdLogado: number
-    ): Promise<PlanoAcompanhamentoResponseDto> {
+    private get repo() { return AppDataSource.getRepository(PlanoAcompanhamento); }
+
+    async criar(planoData: CreatePlanoAcompanhamentoDto, utilizadorIdLogado: number): Promise<PlanoAcompanhamentoResponseDto> {
         try {
             if (planoData.medico_id <= 0 || planoData.utente_id <= 0) {
                 throw new Error('IDs de médico e utente devem ser válidos');
@@ -23,21 +24,15 @@ export class PlanoAcompanhamentoService {
                 throw new Error('Data de início deve ser anterior à data de fim');
             }
 
-            const novoPlano: PlanoAcompanhamentoResponseDto = {
-                id: Math.random(), // TODO: Será gerado pela BD
-                ...planoData
-            };
+            const plano = this.repo.create(planoData);
+            const saved = await this.repo.save(plano);
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'plano_acompanhamento',
-                novoPlano.id,
-                OperacaoAuditoria.CRIACAO,
-                null,
-                JSON.stringify(novoPlano)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'plano_acompanhamento', saved.id,
+                OperacaoAuditoria.CRIACAO, null, JSON.stringify(saved)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return novoPlano;
+            return saved as unknown as PlanoAcompanhamentoResponseDto;
         } catch (error) {
             console.error('Erro ao criar plano de acompanhamento:', error);
             throw error;
@@ -46,22 +41,10 @@ export class PlanoAcompanhamentoService {
 
     async obter(planoId: number): Promise<PlanoAcompanhamentoResponseDto> {
         try {
-            if (planoId <= 0) {
-                throw new Error('ID de plano inválido');
-            }
-
-            const plano: PlanoAcompanhamentoResponseDto = {
-                id: planoId,
-                medico_id: 0,
-                utente_id: 0,
-                frequencia_avaliacao: '',
-                data_inicio: new Date(),
-                data_fim: new Date(),
-                estado: EstadoPlanoAcompanhamento.ATIVO,
-                recomendacao_medica: ''
-            };
-
-            return plano;
+            if (planoId <= 0) throw new Error('ID de plano inválido');
+            const plano = await this.repo.findOne({ where: { id: planoId } });
+            if (!plano) throw new Error('Plano de acompanhamento não encontrado');
+            return plano as unknown as PlanoAcompanhamentoResponseDto;
         } catch (error) {
             console.error('Erro ao obter plano de acompanhamento:', error);
             throw error;
@@ -70,8 +53,8 @@ export class PlanoAcompanhamentoService {
 
     async listar(): Promise<PlanoAcompanhamentoResponseDto[]> {
         try {
-            // TODO: Buscar todos os planos na base de dados
-            return [];
+            const result = await this.repo.find();
+            return result as unknown as PlanoAcompanhamentoResponseDto[];
         } catch (error) {
             console.error('Erro ao listar planos de acompanhamento:', error);
             throw error;
@@ -80,12 +63,9 @@ export class PlanoAcompanhamentoService {
 
     async listarPorUtente(utenteId: number): Promise<PlanoAcompanhamentoResponseDto[]> {
         try {
-            if (utenteId <= 0) {
-                throw new Error('ID do utente inválido');
-            }
-
-            // TODO: Filtrar planos por utente na base de dados
-            return [];
+            if (utenteId <= 0) throw new Error('ID do utente inválido');
+            const result = await this.repo.find({ where: { utente_id: utenteId } });
+            return result as unknown as PlanoAcompanhamentoResponseDto[];
         } catch (error) {
             console.error('Erro ao listar planos por utente:', error);
             throw error;
@@ -94,70 +74,43 @@ export class PlanoAcompanhamentoService {
 
     async listarPorMedico(medicoId: number): Promise<PlanoAcompanhamentoResponseDto[]> {
         try {
-            if (medicoId <= 0) {
-                throw new Error('ID do médico inválido');
-            }
-
-            // TODO: Filtrar planos por médico na base de dados
-            return [];
+            if (medicoId <= 0) throw new Error('ID do médico inválido');
+            const result = await this.repo.find({ where: { medico_id: medicoId } });
+            return result as unknown as PlanoAcompanhamentoResponseDto[];
         } catch (error) {
             console.error('Erro ao listar planos por médico:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        planoId: number,
-        planoData: CreatePlanoAcompanhamentoDto,
-        utilizadorIdLogado: number
-    ): Promise<PlanoAcompanhamentoResponseDto> {
+    async atualizar(planoId: number, planoData: CreatePlanoAcompanhamentoDto, utilizadorIdLogado: number): Promise<PlanoAcompanhamentoResponseDto> {
         try {
-            const planoAnterior = await this.obter(planoId);
+            const anterior = await this.obter(planoId);
+            const atualizado = await this.repo.save({ ...anterior, ...planoData, id: planoId });
 
-            const planoAtualizado: PlanoAcompanhamentoResponseDto = {
-                ...planoAnterior,
-                ...planoData
-            };
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'plano_acompanhamento', planoId,
+                OperacaoAuditoria.ALTERACAO, JSON.stringify(anterior), JSON.stringify(atualizado)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'plano_acompanhamento',
-                planoId,
-                OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(planoAnterior),
-                JSON.stringify(planoAtualizado)
-            );
-
-            return planoAtualizado;
+            return atualizado as unknown as PlanoAcompanhamentoResponseDto;
         } catch (error) {
             console.error('Erro ao atualizar plano de acompanhamento:', error);
             throw error;
         }
     }
 
-    async atualizarEstado(
-        planoId: number,
-        novoEstado: EstadoPlanoAcompanhamento,
-        utilizadorIdLogado: number
-    ): Promise<PlanoAcompanhamentoResponseDto> {
+    async atualizarEstado(planoId: number, novoEstado: EstadoPlanoAcompanhamento, utilizadorIdLogado: number): Promise<PlanoAcompanhamentoResponseDto> {
         try {
-            const planoAnterior = await this.obter(planoId);
+            const anterior = await this.obter(planoId);
+            const atualizado = await this.repo.save({ ...anterior, id: planoId, estado: novoEstado });
 
-            const planoAtualizado: PlanoAcompanhamentoResponseDto = {
-                ...planoAnterior,
-                estado: novoEstado
-            };
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'plano_acompanhamento', planoId,
+                OperacaoAuditoria.ALTERACAO, JSON.stringify(anterior), JSON.stringify(atualizado)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'plano_acompanhamento',
-                planoId,
-                OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(planoAnterior),
-                JSON.stringify(planoAtualizado)
-            );
-
-            return planoAtualizado;
+            return atualizado as unknown as PlanoAcompanhamentoResponseDto;
         } catch (error) {
             console.error('Erro ao atualizar estado do plano:', error);
             throw error;

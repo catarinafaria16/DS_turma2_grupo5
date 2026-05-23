@@ -1,4 +1,4 @@
 export enum TipoPrescricao {
-    MEDICACAO = 'MEDICAÇÃO',
+    MEDICACAO = 'MEDICACAO',
     EXAME = 'EXAME'
 }

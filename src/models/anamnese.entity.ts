@@ -7,7 +7,7 @@ export class Anamnese {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     utente_id!: number;
 
     @Column({ type: 'text' })

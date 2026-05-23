@@ -1,3 +1,5 @@
+import { AppDataSource } from '../database/data-source.js';
+import { Comorbidade } from '../models/comorbidade.entity.js';
 import type { CreateComorbidadeDto } from '../dtos/comorbidade/create-comorbidade.dto.js';
 import type { ComorbidadeResponseDto } from '../dtos/comorbidade/comorbidade-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
@@ -10,33 +12,24 @@ export class ComorbidadeService {
         this.auditoriaService = new AuditoriaService();
     }
 
-    async criar(
-        comorbidadeData: CreateComorbidadeDto,
-        utilizadorIdLogado: number
-    ): Promise<ComorbidadeResponseDto> {
+    private get repo() { return AppDataSource.getRepository(Comorbidade); }
+
+    async criar(comorbidadeData: CreateComorbidadeDto, utilizadorIdLogado: number): Promise<ComorbidadeResponseDto> {
         try {
-            if (comorbidadeData.anamnese_id <= 0) {
-                throw new Error('ID de anamnese deve ser válido');
-            }
+            if (comorbidadeData.anamnese_id <= 0) throw new Error('ID de anamnese deve ser válido');
             if (!comorbidadeData.descricao || comorbidadeData.descricao.trim().length === 0) {
                 throw new Error('Descrição da comorbidade é obrigatória');
             }
 
-            const novaComorbidade: ComorbidadeResponseDto = {
-                id: Math.random(), // TODO: Será gerado pela BD
-                ...comorbidadeData
-            };
+            const comorbidade = this.repo.create(comorbidadeData);
+            const saved = await this.repo.save(comorbidade);
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'comorbidade',
-                novaComorbidade.id,
-                OperacaoAuditoria.CRIACAO,
-                null,
-                JSON.stringify(novaComorbidade)
-            );
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'comorbidade', saved.id,
+                OperacaoAuditoria.CRIACAO, null, JSON.stringify(saved)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            return novaComorbidade;
+            return saved as unknown as ComorbidadeResponseDto;
         } catch (error) {
             console.error('Erro ao criar comorbidade:', error);
             throw error;
@@ -45,17 +38,10 @@ export class ComorbidadeService {
 
     async obter(comorbidadeId: number): Promise<ComorbidadeResponseDto> {
         try {
-            if (comorbidadeId <= 0) {
-                throw new Error('ID de comorbidade inválido');
-            }
-
-            const comorbidade: ComorbidadeResponseDto = {
-                id: comorbidadeId,
-                anamnese_id: 0,
-                descricao: ''
-            };
-
-            return comorbidade;
+            if (comorbidadeId <= 0) throw new Error('ID de comorbidade inválido');
+            const comorbidade = await this.repo.findOne({ where: { id: comorbidadeId } });
+            if (!comorbidade) throw new Error('Comorbidade não encontrada');
+            return comorbidade as unknown as ComorbidadeResponseDto;
         } catch (error) {
             console.error('Erro ao obter comorbidade:', error);
             throw error;
@@ -64,8 +50,8 @@ export class ComorbidadeService {
 
     async listar(): Promise<ComorbidadeResponseDto[]> {
         try {
-            // TODO: Buscar todas as comorbidades na base de dados
-            return [];
+            const result = await this.repo.find();
+            return result as unknown as ComorbidadeResponseDto[];
         } catch (error) {
             console.error('Erro ao listar comorbidades:', error);
             throw error;
@@ -74,41 +60,26 @@ export class ComorbidadeService {
 
     async listarPorAnamnese(anamneseId: number): Promise<ComorbidadeResponseDto[]> {
         try {
-            if (anamneseId <= 0) {
-                throw new Error('ID de anamnese inválido');
-            }
-
-            // TODO: Buscar comorbidades por anamnese na base de dados
-            return [];
+            if (anamneseId <= 0) throw new Error('ID de anamnese inválido');
+            const result = await this.repo.find({ where: { anamnese_id: anamneseId } });
+            return result as unknown as ComorbidadeResponseDto[];
         } catch (error) {
             console.error('Erro ao listar comorbidades por anamnese:', error);
             throw error;
         }
     }
 
-    async atualizar(
-        comorbidadeId: number,
-        comorbidadeData: CreateComorbidadeDto,
-        utilizadorIdLogado: number
-    ): Promise<ComorbidadeResponseDto> {
+    async atualizar(comorbidadeId: number, comorbidadeData: CreateComorbidadeDto, utilizadorIdLogado: number): Promise<ComorbidadeResponseDto> {
         try {
-            const comorbidadeAnterior = await this.obter(comorbidadeId);
+            const anterior = await this.obter(comorbidadeId);
+            const atualizada = await this.repo.save({ ...anterior, ...comorbidadeData, id: comorbidadeId });
 
-            const comorbidadeAtualizada: ComorbidadeResponseDto = {
-                ...comorbidadeAnterior,
-                ...comorbidadeData
-            };
+            this.auditoriaService.registarAuditoria(
+                utilizadorIdLogado, 'comorbidade', comorbidadeId,
+                OperacaoAuditoria.ALTERACAO, JSON.stringify(anterior), JSON.stringify(atualizada)
+            ).catch(e => console.error('[AUDITORIA] Falha ao registar:', e));
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
-                'comorbidade',
-                comorbidadeId,
-                OperacaoAuditoria.ALTERACAO,
-                JSON.stringify(comorbidadeAnterior),
-                JSON.stringify(comorbidadeAtualizada)
-            );
-
-            return comorbidadeAtualizada;
+            return atualizada as unknown as ComorbidadeResponseDto;
         } catch (error) {
             console.error('Erro ao atualizar comorbidade:', error);
             throw error;

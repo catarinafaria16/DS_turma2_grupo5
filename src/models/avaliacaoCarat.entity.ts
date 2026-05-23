@@ -9,34 +9,34 @@ export class AvaliacaoCarat {
     @CreateDateColumn()
     data_criacao!: Date;
 
-    @Column()
+    @Column('text')
     q1!: string;
 
-    @Column()
+    @Column('text')
     q2!: string;
 
-    @Column()
+    @Column('text')
     q3!: string;
 
-    @Column()
+    @Column('text')
     q4!: string;
 
-    @Column()
+    @Column('text')
     q5!: string;
 
-    @Column()
+    @Column('text')
     q6!: string;
 
-    @Column()
+    @Column('text')
     q7!: string;
 
-    @Column()
+    @Column('text')
     q8!: string;
 
-    @Column()
+    @Column('text')
     q9!: string;
 
-    @Column()
+    @Column('text')
     q10!: string;
 
     @Column({ type: 'simple-json' })
@@ -69,6 +69,6 @@ export class AvaliacaoCarat {
     @Column({ type: 'simple-json' })
     r10!: object;
 
-    @Column()
+    @Column('int')
     versao!: number;
 }

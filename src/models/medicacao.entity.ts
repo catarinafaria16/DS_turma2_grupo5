@@ -6,19 +6,19 @@ export class Medicacao {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column('int')
     prescricao_id!: number;
 
-    @Column()
+    @Column('text')
     nome!: string;
 
-    @Column()
+    @Column('text')
     dose!: string;
 
-    @Column()
+    @Column('text')
     duracao!: string;
 
-    @Column()
+    @Column('text')
     periodicidade!: string;
 
     @Column({ type: 'date' })
