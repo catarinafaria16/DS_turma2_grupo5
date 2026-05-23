@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import { RespostaCaratController } from '../controller/respostaCarat.controller.js';
+import { autenticar, requirePerfil } from '../middleware/auth.middleware.js';
+import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 const routes = Router();
 const controller = new RespostaCaratController();
+
+routes.use(autenticar);
+routes.use(requirePerfil(PerfilUtilizador.UTENTE, PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR));
 
 routes.get('/avaliacao/:avaliacaoId', controller.listarPorAvaliacao.bind(controller));
 routes.get('/utente/:utenteId', controller.listarPorUtente.bind(controller));

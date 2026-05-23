@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { AdministradorService } from '../services/administrador.service.js';
 import type { CreateAdministradorDto } from '../dtos/administrador/create-administrador.dto.js';
+import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 
 export class AdministradorController {
     private service = new AdministradorService();
@@ -8,8 +9,8 @@ export class AdministradorController {
     async criar(req: Request, res: Response) {
         try {
             const adminData: CreateAdministradorDto = req.body;
-            const utilizadorIdLogado = req.body.utilizadorIdLogado;
-            const novoAdmin = await this.service.criar(adminData, utilizadorIdLogado);
+            const utilizador = req.utilizador as UtilizadorAutenticado;
+            const novoAdmin = await this.service.criar(adminData, utilizador.id);
             return res.status(201).json({ mensagem: 'Administrador criado com sucesso', dados: novoAdmin });
         } catch (error: any) {
             return res.status(400).json({ erro: error.message || 'Erro ao criar administrador' });
@@ -39,8 +40,8 @@ export class AdministradorController {
         try {
             const { id } = req.params;
             const adminData: CreateAdministradorDto = req.body;
-            const utilizadorIdLogado = req.body.utilizadorIdLogado;
-            const adminAtualizado = await this.service.atualizar(Number(id), adminData, utilizadorIdLogado);
+            const utilizador = req.utilizador as UtilizadorAutenticado;
+            const adminAtualizado = await this.service.atualizar(Number(id), adminData, utilizador.id);
             return res.status(200).json({ mensagem: 'Administrador atualizado com sucesso', dados: adminAtualizado });
         } catch (error: any) {
             return res.status(400).json({ erro: error.message || 'Erro ao atualizar administrador' });
@@ -50,8 +51,8 @@ export class AdministradorController {
     async apagar(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const utilizadorIdLogado = req.body.utilizadorIdLogado;
-            await this.service.apagar(Number(id), utilizadorIdLogado);
+            const utilizador = req.utilizador as UtilizadorAutenticado;
+            await this.service.apagar(Number(id), utilizador.id);
             return res.status(204).send();
         } catch (error: any) {
             return res.status(400).json({ erro: error.message || 'Erro ao apagar administrador' });
@@ -62,19 +63,29 @@ export class AdministradorController {
         try {
             const { utilizadorId } = req.params;
             const { perfil, permissoes } = req.body;
-            const utilizadorIdLogado = req.body.utilizadorIdLogado;
-            const resultado = await this.service.gestarPerfisPermissoes(Number(utilizadorId), perfil, permissoes, utilizadorIdLogado);
-            return res.status(200).json({ mensagem: 'Perfis e permissões atualizados com sucesso', dados: resultado });
+            const utilizador = req.utilizador as UtilizadorAutenticado;
+            const resultado = await this.service.gestarPerfisPermissoes(
+                Number(utilizadorId),
+                perfil,
+                permissoes,
+                utilizador.id
+            );
+            return res.status(200).json({ mensagem: 'Perfis e permissoes atualizados com sucesso', dados: resultado });
         } catch (error: any) {
-            return res.status(400).json({ erro: error.message || 'Erro ao gerir perfis e permissões' });
+            return res.status(400).json({ erro: error.message || 'Erro ao gerir perfis e permissoes' });
         }
     }
 
     async configurarLimiaresCarat(req: Request, res: Response) {
         try {
             const { limiarBaixo, limiarIntermedio, limiarAlto } = req.body;
-            const utilizadorIdLogado = req.body.utilizadorIdLogado;
-            const config = await this.service.configurarLimiaresCarat(limiarBaixo, limiarIntermedio, limiarAlto, utilizadorIdLogado);
+            const utilizador = req.utilizador as UtilizadorAutenticado;
+            const config = await this.service.configurarLimiaresCarat(
+                limiarBaixo,
+                limiarIntermedio,
+                limiarAlto,
+                utilizador.id
+            );
             return res.status(200).json({ mensagem: 'Limiares CARAT configurados com sucesso', dados: config });
         } catch (error: any) {
             return res.status(400).json({ erro: error.message || 'Erro ao configurar limiares CARAT' });
@@ -86,15 +97,15 @@ export class AdministradorController {
             const config = await this.service.obterConfigLimiaresCarat();
             return res.status(200).json({ dados: config });
         } catch (error: any) {
-            return res.status(400).json({ erro: error.message || 'Erro ao obter configurações CARAT' });
+            return res.status(400).json({ erro: error.message || 'Erro ao obter configuracoes CARAT' });
         }
     }
 
     async gestarDados(req: Request, res: Response) {
         try {
             const { tipoOperacao, dados } = req.body;
-            const utilizadorIdLogado = req.body.utilizadorIdLogado;
-            const resultado = await this.service.gestarDados(tipoOperacao, dados, utilizadorIdLogado);
+            const utilizador = req.utilizador as UtilizadorAutenticado;
+            const resultado = await this.service.gestarDados(tipoOperacao, dados, utilizador.id);
             return res.status(200).json({ mensagem: 'Dados geridos com sucesso', dados: resultado });
         } catch (error: any) {
             return res.status(400).json({ erro: error.message || 'Erro ao gerir dados do sistema' });

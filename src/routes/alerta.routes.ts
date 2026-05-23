@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import { AlertaController } from '../controller/alerta.controller.js';
+import { autenticar, requirePerfil } from '../middleware/auth.middleware.js';
+import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 const routes = Router();
 const controller = new AlertaController();
+
+routes.use(autenticar);
+routes.use(requirePerfil(PerfilUtilizador.UTENTE, PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR));
 
 routes.get('/resumo', controller.resumo.bind(controller));               // RF047
 routes.get('/utente/:utenteId', controller.listarPorUtente.bind(controller));

@@ -2,7 +2,7 @@ import { Utente } from '../../models/utente.entity.js';
 import type { FhirPatientDto } from '../../dtos/fhir/patient/patient-fhir.dto.js';
 
 function toFhirDate(date: Date | string): string {
-    return new Date(date).toISOString().split('T')[0];
+    return new Date(date).toISOString().split('T')[0] ?? '';
 }
 
 export function mapToPatient(utente: Utente, nome: string): FhirPatientDto {

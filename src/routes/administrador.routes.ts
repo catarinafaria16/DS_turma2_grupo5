@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import { AdministradorController } from '../controller/administrador.controller.js';
+import { autenticar, requirePerfil } from '../middleware/auth.middleware.js';
+import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 const routes = Router();
 const controller = new AdministradorController();
+
+routes.use(autenticar);
+routes.use(requirePerfil(PerfilUtilizador.ADMINISTRADOR));
 
 routes.get('/config/limiares-carat', controller.obterConfigLimiaresCarat.bind(controller));
 routes.put('/config/limiares-carat', controller.configurarLimiaresCarat.bind(controller));

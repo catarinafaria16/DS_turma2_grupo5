@@ -4,6 +4,8 @@ import type { CreateUtilizadorDto } from '../dtos/utilizador/create-utilizador.d
 import type { UtilizadorResponseDto } from '../dtos/utilizador/utilizador-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
+import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
+import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 export class UtilizadorService {
     private auditoriaService: AuditoriaService;
@@ -16,20 +18,28 @@ export class UtilizadorService {
 
     async criar(utilizadorData: CreateUtilizadorDto, utilizadorIdLogado: number): Promise<UtilizadorResponseDto> {
         try {
+            // RNF004: valida os campos obrigatorios antes de criar o utilizador.
             if (!utilizadorData.nome || utilizadorData.nome.trim().length === 0) {
-                throw new Error('Nome do utilizador é obrigatório');
+                throw new Error('Nome do utilizador e obrigatorio');
             }
             if (!utilizadorData.email || utilizadorData.email.trim().length === 0) {
-                throw new Error('Email do utilizador é obrigatório');
+                throw new Error('Email do utilizador e obrigatorio');
             }
+            this.validarEmail(utilizadorData.email);
             if (!utilizadorData.password || utilizadorData.password.length < 6) {
                 throw new Error('Password do utilizador deve ter pelo menos 6 caracteres');
+            }
+            this.validarPerfil(utilizadorData.perfil);
+
+            const emailExistente = await this.repo.findOne({ where: { email: utilizadorData.email } });
+            if (emailExistente) {
+                throw new Error('Email ja esta atribuido a outro utilizador');
             }
 
             const utilizador = this.repo.create(utilizadorData);
             const saved = await this.repo.save(utilizador);
 
-            await this.auditoriaService?.registarAuditoria(
+            await this.auditoriaService.registarAuditoria(
                 utilizadorIdLogado,
                 'utilizador',
                 saved.id,
@@ -45,11 +55,21 @@ export class UtilizadorService {
         }
     }
 
-    async obter(utilizadorId: number): Promise<UtilizadorResponseDto> {
+    async obter(utilizadorId: number, utilizadorLogado?: UtilizadorAutenticado): Promise<UtilizadorResponseDto> {
         try {
-            if (utilizadorId <= 0) throw new Error('ID de utilizador inválido');
+            if (utilizadorId <= 0) throw new Error('ID de utilizador invalido');
+
+            // RNF001: perfis nao administradores so podem consultar o proprio utilizador.
+            if (
+                utilizadorLogado &&
+                utilizadorLogado.perfil !== PerfilUtilizador.ADMINISTRADOR &&
+                utilizadorLogado.id !== utilizadorId
+            ) {
+                throw new Error('Acesso negado: nao pode consultar outro utilizador');
+            }
+
             const utilizador = await this.repo.findOne({ where: { id: utilizadorId } });
-            if (!utilizador) throw new Error('Utilizador não encontrado');
+            if (!utilizador) throw new Error('Utilizador nao encontrado');
             return utilizador;
         } catch (error) {
             console.error('Erro ao obter utilizador:', error);
@@ -66,13 +86,50 @@ export class UtilizadorService {
         }
     }
 
-    async atualizar(utilizadorId: number, utilizadorData: CreateUtilizadorDto, utilizadorIdLogado: number): Promise<UtilizadorResponseDto> {
+    async atualizar(
+        utilizadorId: number,
+        utilizadorData: Partial<CreateUtilizadorDto>,
+        utilizadorLogado: UtilizadorAutenticado
+    ): Promise<UtilizadorResponseDto> {
         try {
             const anterior = await this.obter(utilizadorId);
-            const atualizado = await this.repo.save({ ...anterior, ...utilizadorData, id: utilizadorId });
+            let dadosAtualizacao: Partial<CreateUtilizadorDto> = utilizadorData;
 
-            await this.auditoriaService?.registarAuditoria(
-                utilizadorIdLogado,
+            // RNF001/RNF004: o proprio utilizador so pode alterar credenciais editaveis.
+            if (utilizadorLogado.perfil !== PerfilUtilizador.ADMINISTRADOR) {
+                if (utilizadorLogado.id !== utilizadorId) {
+                    throw new Error('Acesso negado: nao pode alterar outro utilizador');
+                }
+
+                dadosAtualizacao = {};
+                if (utilizadorData.email !== undefined) {
+                    this.validarEmail(utilizadorData.email);
+                    await this.validarEmailUnico(utilizadorData.email, utilizadorId);
+                    dadosAtualizacao.email = utilizadorData.email;
+                }
+                if (utilizadorData.password !== undefined) {
+                    if (utilizadorData.password.length < 6) {
+                        throw new Error('Password do utilizador deve ter pelo menos 6 caracteres');
+                    }
+                    dadosAtualizacao.password = utilizadorData.password;
+                }
+            } else {
+                if (utilizadorData.email !== undefined) {
+                    this.validarEmail(utilizadorData.email);
+                    await this.validarEmailUnico(utilizadorData.email, utilizadorId);
+                }
+                if (utilizadorData.password !== undefined && utilizadorData.password.length < 6) {
+                    throw new Error('Password do utilizador deve ter pelo menos 6 caracteres');
+                }
+                if (utilizadorData.perfil !== undefined) {
+                    this.validarPerfil(utilizadorData.perfil);
+                }
+            }
+
+            const atualizado = await this.repo.save({ ...anterior, ...dadosAtualizacao, id: utilizadorId });
+
+            await this.auditoriaService.registarAuditoria(
+                utilizadorLogado.id,
                 'utilizador',
                 utilizadorId,
                 OperacaoAuditoria.ALTERACAO,
@@ -92,7 +149,7 @@ export class UtilizadorService {
             const anterior = await this.obter(utilizadorId);
             await this.repo.softDelete(utilizadorId);
 
-            await this.auditoriaService?.registarAuditoria(
+            await this.auditoriaService.registarAuditoria(
                 utilizadorIdLogado,
                 'utilizador',
                 utilizadorId,
@@ -103,6 +160,26 @@ export class UtilizadorService {
         } catch (error) {
             console.error('Erro ao apagar utilizador:', error);
             throw error;
+        }
+    }
+
+    private validarEmail(email: string): void {
+        const formatoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!formatoEmail.test(email)) {
+            throw new Error('Email invalido');
+        }
+    }
+
+    private validarPerfil(perfil: PerfilUtilizador): void {
+        if (!Object.values(PerfilUtilizador).includes(perfil)) {
+            throw new Error('Perfil de utilizador invalido');
+        }
+    }
+
+    private async validarEmailUnico(email: string, utilizadorIdAtual: number): Promise<void> {
+        const utilizadorComEmail = await this.repo.findOne({ where: { email } });
+        if (utilizadorComEmail && utilizadorComEmail.id !== utilizadorIdAtual) {
+            throw new Error('Email ja esta atribuido a outro utilizador');
         }
     }
 }

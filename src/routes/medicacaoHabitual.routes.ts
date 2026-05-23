@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import { MedicacaoHabitualController } from '../controller/medicacaoHabitual.controller.js';
+import { autenticar, requirePerfil } from '../middleware/auth.middleware.js';
+import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 const routes = Router();
 const controller = new MedicacaoHabitualController();
+
+routes.use(autenticar);
+routes.use(requirePerfil(PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR));
 
 routes.get('/anamnese/:anamneseId', controller.listarPorAnamnese.bind(controller));
 routes.get('/', controller.listar.bind(controller));

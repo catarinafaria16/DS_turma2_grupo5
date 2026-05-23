@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { FhirController } from '../controller/fhir.controller.js';
+import { autenticar, requirePerfil } from '../middleware/auth.middleware.js';
+import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 const routes = Router();
 const controller = new FhirController();
@@ -8,6 +10,8 @@ routes.use((_req, res, next) => {
     res.setHeader('Content-Type', 'application/fhir+json; charset=utf-8');
     next();
 });
+routes.use(autenticar);
+routes.use(requirePerfil(PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR));
 
 // Patient
 routes.get('/Patient', controller.listarPatients.bind(controller));

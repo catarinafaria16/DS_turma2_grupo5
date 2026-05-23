@@ -1,3 +1,8 @@
+import { AppDataSource } from '../database/data-source.js';
+import { Utente } from '../models/utente.entity.js';
+import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
+import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+
 export interface EvolucaoScore {
     data: Date;
     score: number;
@@ -22,26 +27,52 @@ export interface AlertaAtivo {
 
 export interface DashboardUtenteDto {
     utente_id: number;
-    estado_doenca: string | null;        // RF025
-    evolucao_scores: EvolucaoScore[];    // RF026
-    limiar_controlo: number;             // RF026
-    historico_avaliacoes: ResumoAvaliacaoCarat[]; // RF027
-    alertas_ativos: AlertaAtivo[];       // RF028
-    recomendacoes: string[];             // RF029
+    estado_doenca: string | null;
+    evolucao_scores: EvolucaoScore[];
+    limiar_controlo: number;
+    historico_avaliacoes: ResumoAvaliacaoCarat[];
+    alertas_ativos: AlertaAtivo[];
+    recomendacoes: string[];
 }
 
 export class DashboardService {
+    private get utenteRepo() { return AppDataSource.getRepository(Utente); }
 
-    // RF025-RF029: Dashboard pessoal do Utente
-    async obterDashboardUtente(utenteId: number): Promise<DashboardUtenteDto> {
-        if (utenteId <= 0) {
-            throw new Error('ID de utente inválido');
+    private async validarAcessoDashboard(utenteId: number, utilizador: UtilizadorAutenticado): Promise<Utente> {
+        const utente = await this.utenteRepo.findOne({ where: { id: utenteId } });
+
+        if (!utente) {
+            throw new Error('Utente nao encontrado');
         }
 
-        // TODO: buscar avaliações CARAT do utente na BD
-        // TODO: calcular evolução de scores
-        // TODO: buscar alertas ativos do utente
-        // TODO: extrair recomendações da última avaliação
+        if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) {
+            return utente;
+        }
+
+        if (utilizador.perfil === PerfilUtilizador.MEDICO) {
+            if (utente.medico_id !== utilizador.id) {
+                throw new Error('Acesso negado: este utente nao pertence ao medico autenticado');
+            }
+            return utente;
+        }
+
+        if (utilizador.perfil === PerfilUtilizador.UTENTE) {
+            if (utente.utilizador_id !== utilizador.id) {
+                throw new Error('Acesso negado: nao pode consultar o dashboard de outro utente');
+            }
+            return utente;
+        }
+
+        throw new Error('Perfil nao reconhecido');
+    }
+
+    // RF025-RF029: Dashboard pessoal do Utente
+    async obterDashboardUtente(utenteId: number, utilizador: UtilizadorAutenticado): Promise<DashboardUtenteDto> {
+        if (utenteId <= 0) {
+            throw new Error('ID de utente invalido');
+        }
+
+        await this.validarAcessoDashboard(utenteId, utilizador);
 
         return {
             utente_id: utenteId,

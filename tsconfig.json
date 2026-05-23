@@ -30,5 +30,10 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force"
-  }
+  },
+  "exclude": [
+    "dist",
+    "exemplo-implementacao-utentes.ts",
+    "dados-teste.md"
+  ]
 }

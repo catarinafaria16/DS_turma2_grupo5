@@ -4,7 +4,7 @@ import { EstadoPrescricao } from '../../enums/EstadoPrescricao.enum.js';
 import type { FhirMedicationRequestDto, MedicationRequestStatus } from '../../dtos/fhir/medicationRequest/medicationRequest-fhir.dto.js';
 
 function toFhirDate(date: Date | string): string {
-    return new Date(date).toISOString().split('T')[0];
+    return new Date(date).toISOString().split('T')[0] ?? '';
 }
 
 function mapMedicationStatus(estado: EstadoPrescricao): MedicationRequestStatus {

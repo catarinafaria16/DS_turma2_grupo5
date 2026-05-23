@@ -3,1437 +3,236 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistema CARAT</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>Login - Sistema CARAT</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #2d3748; }
-    header { background: #2b6cb0; color: white; padding: 1.25rem 2rem; display: flex; align-items: center; gap: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    header h1 { font-size: 1.4rem; font-weight: 600; }
-    header span { font-size: 0.85rem; opacity: 0.8; }
-    .tabs { background: white; border-bottom: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; padding: 0 1rem; }
-    .tab { padding: 0.75rem 1rem; font-size: 0.82rem; cursor: pointer; border-bottom: 3px solid transparent; color: #718096; font-weight: 500; white-space: nowrap; }
-    .tab:hover { color: #2b6cb0; }
-    .tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; }
-    .container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
-    .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 1.5rem; margin-bottom: 1.5rem; }
-    .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #2b6cb0; }
-    form { display: flex; flex-direction: column; gap: 8px; max-width: 480px; }
-    input, select, textarea { padding: 8px 10px; font-size: 14px; border: 1px solid #cbd5e0; border-radius: 5px; background: white; font-family: inherit; }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #2b6cb0; box-shadow: 0 0 0 2px rgba(43,108,176,0.15); }
-    textarea { resize: vertical; min-height: 70px; }
-    .row { display: flex; gap: 8px; }
-    .row input, .row select { flex: 1; }
-    button { padding: 9px 18px; background: #2b6cb0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 500; align-self: flex-start; }
-    button:hover { background: #2c5282; }
-    .erro    { color: #e53e3e; font-size: 0.85rem; margin-top: 4px; }
-    .sucesso { color: #276749; font-size: 0.85rem; margin-top: 4px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.875rem; }
-    th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #edf2f7; }
-    th { background: #f7fafc; color: #4a5568; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #f7fafc; }
-    .badge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
-    .badge-blue   { background: #ebf8ff; color: #2b6cb0; }
-    .badge-green  { background: #f0fff4; color: #276749; }
-    .badge-orange { background: #fffaf0; color: #c05621; }
-    .badge-red    { background: #fff5f5; color: #c53030; }
-    .vazio { color: #a0aec0; font-size: 0.875rem; padding: 1rem 0; }
-    .btn-sec { background: #718096; }
-    .btn-sec:hover { background: #4a5568; }
-    .fhir-resource { font-size: 0.7rem; font-weight: 700; font-family: monospace; padding: 2px 7px; border-radius: 4px; background: #e9d8fd; color: #553c9a; }
-    .fhir-subtabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 1rem; }
-    .fhir-subtab { padding: 5px 14px; font-size: 0.78rem; cursor: pointer; border-radius: 20px; border: 1px solid #cbd5e0; color: #4a5568; font-weight: 500; background: white; font-family: monospace; }
-    .fhir-subtab:hover { border-color: #553c9a; color: #553c9a; }
-    .fhir-subtab.active { background: #553c9a; color: white; border-color: #553c9a; }
-    .url-pill { font-family: monospace; font-size: 0.78rem; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 5px 10px; color: #4a5568; word-break: break-all; margin: 8px 0; display: flex; align-items: center; gap: 8px; }
-    .url-pill span { color: #276749; font-weight: 700; flex-shrink: 0; }
-    .json-box { background: #1a202c; color: #e2e8f0; font-family: monospace; font-size: 0.75rem; border-radius: 6px; padding: 1rem; overflow: auto; max-height: 420px; white-space: pre; margin-top: 8px; }
-    .json-box .key  { color: #76e4f7; }
-    .json-box .str  { color: #9ae6b4; }
-    .json-box .num  { color: #fbd38d; }
-    .json-box .bool { color: #f6ad55; }
-    .json-box .null { color: #fc8181; }
-    .toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .btn-tiny { padding: 4px 10px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e0; background: white; color: #4a5568; font-weight: 500; }
-    .btn-tiny:hover { background: #edf2f7; }
-    .btn-tiny.active { background: #553c9a; color: white; border-color: #553c9a; }
-    .filtro-row { display: flex; gap: 8px; margin-bottom: 10px; max-width: 480px; }
-    .filtro-row input { flex: 1; }
-    footer { text-align: center; padding: 1.5rem; font-size: 0.8rem; color: #a0aec0; border-top: 1px solid #e2e8f0; background: white; margin-top: 2rem; }
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #eef3f8;
+      color: #263445;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    main {
+      width: min(100%, 420px);
+      background: #ffffff;
+      border: 1px solid #dbe4ee;
+      border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(29, 57, 89, 0.12);
+      padding: 28px;
+    }
+    h1 {
+      color: #245f9f;
+      font-size: 1.45rem;
+      font-weight: 650;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      color: #617187;
+      font-size: 0.86rem;
+      line-height: 1.35;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    h2 {
+      color: #245f9f;
+      font-size: 1rem;
+      margin: 24px 0 12px;
+    }
+    form {
+      display: grid;
+      gap: 10px;
+    }
+    label {
+      color: #4b5d73;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      border: 1px solid #c7d4e2;
+      border-radius: 6px;
+      padding: 10px 11px;
+      font: inherit;
+      font-size: 0.95rem;
+      background: #ffffff;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #245f9f;
+      box-shadow: 0 0 0 3px rgba(36, 95, 159, 0.14);
+    }
+    button {
+      border: 0;
+      border-radius: 6px;
+      background: #245f9f;
+      color: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 650;
+      padding: 11px 14px;
+      margin-top: 4px;
+    }
+    button:hover { background: #1d4f86; }
+    button:disabled { opacity: 0.65; cursor: not-allowed; }
+    .secondary {
+      background: #56677c;
+    }
+    .secondary:hover {
+      background: #455468;
+    }
+    .divider {
+      border: 0;
+      border-top: 1px solid #e2e8f0;
+      margin: 24px 0 0;
+    }
+    .message {
+      border-radius: 6px;
+      font-size: 0.86rem;
+      line-height: 1.35;
+      padding: 9px 10px;
+      margin-top: 10px;
+    }
+    .error { background: #fff5f5; color: #b83232; border: 1px solid #fed7d7; }
+    .success { background: #f0fff4; color: #276749; border: 1px solid #c6f6d5; }
+    .hint {
+      color: #718096;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+  <main>
+    <h1>Sistema CARAT</h1>
+    <p class="subtitle">Autenticacao por ID e password</p>
 
-    /* ───── Utilizadores ───── */
-    function SecaoUtilizadores() {
-      const [utilizadores, setUtilizadores] = useState([]);
-      const [form, setForm] = useState({ nome: '', email: '', password: '', perfil: 'UTENTE' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar() {
-        try { const r = await fetch('/api/utilizadores'); if (r.ok) { const d = await r.json(); setUtilizadores(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/utilizadores', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
-        const d = await r.json();
-        if (r.ok) { setForm({ nome: '', email: '', password: '', perfil: 'UTENTE' }); setSucesso(`Utilizador criado com ID ${d.dados?.id ?? '?'}.`); buscar(); }
-        else setErro(d.erro || 'Erro ao criar utilizador.');
-      }
-      const perfilBadge = { UTENTE: 'badge-green', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-orange' };
-      return (
-        <>
-          <div className="card">
-            <h2>Novo Utilizador</h2>
-            <form onSubmit={handleSubmit}>
-              <input value={form.nome} onChange={set('nome')} placeholder="Nome completo" required />
-              <input value={form.email} onChange={set('email')} placeholder="Email" type="email" required />
-              <input value={form.password} onChange={set('password')} placeholder="Password (mín. 6 caracteres)" type="password" required />
-              <select value={form.perfil} onChange={set('perfil')}>
-                <option value="UTENTE">Utente</option>
-                <option value="MEDICO">Médico</option>
-                <option value="ADMINISTRADOR">Administrador</option>
-              </select>
-              <button type="submit">Criar utilizador</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Utilizadores Registados</h2>
-            {utilizadores.length === 0 ? <p className="vazio">Nenhum utilizador registado.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Nome</th><th>Email</th><th>Perfil</th></tr></thead>
-                <tbody>{utilizadores.map(u => (
-                  <tr key={u.id}><td>{u.id}</td><td>{u.nome}</td><td>{u.email}</td>
-                    <td><span className={`badge ${perfilBadge[u.perfil] || 'badge-blue'}`}>{u.perfil}</span></td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
+    <form id="login-form">
+      <label for="login-id">ID do utilizador</label>
+      <input id="login-id" name="id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="username" required />
+
+      <label for="login-password">Password</label>
+      <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+
+      <button id="login-button" type="submit">Entrar</button>
+      <p class="hint">Utilizadores de teste: IDs 1001-1005, 2001-2005 ou 3001-3005. Exemplo: ID <strong>1001</strong> com password <strong>pass1001</strong>.</p>
+      <div id="login-message"></div>
+    </form>
+
+    <hr class="divider" />
+
+    <h2>Adicionar novo utilizador</h2>
+    <form id="register-form">
+      <label for="reg-nome">Nome</label>
+      <input id="reg-nome" name="nome" type="text" autocomplete="name" required />
+
+      <label for="reg-email">Email</label>
+      <input id="reg-email" name="email" type="email" autocomplete="email" required />
+
+      <label for="reg-password">Password</label>
+      <input id="reg-password" name="password" type="password" minlength="6" autocomplete="new-password" required />
+
+      <label for="reg-perfil">Perfil</label>
+      <select id="reg-perfil" name="perfil" required>
+        <option value="UTENTE">Utente</option>
+      </select>
+
+      <button id="register-button" class="secondary" type="submit">Adicionar utilizador</button>
+      <p class="hint">O registo publico cria apenas utilizadores com perfil de utente.</p>
+      <div id="register-message"></div>
+    </form>
+  </main>
+
+  <script>
+    const API_BASE = '';
+    const APP_URL = '/app.html';
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const loginButton = document.getElementById('login-button');
+    const registerButton = document.getElementById('register-button');
+    const loginMessage = document.getElementById('login-message');
+    const registerMessage = document.getElementById('register-message');
+
+    function showMessage(target, type, text) {
+      target.className = `message ${type}`;
+      target.textContent = text;
     }
 
-    /* ───── Médicos ───── */
-    function SecaoMedicos() {
-      const [medicos, setMedicos] = useState([]);
-      const [utilizadores, setUtilizadores] = useState([]);
-      const [form, setForm] = useState({ utilizador_id: '', especialidade: 'PNEUMOLOGIA', contacto: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar() {
-        try { const r = await fetch('/api/medicos'); if (r.ok) { const d = await r.json(); setMedicos(d.dados ?? []); } } catch {}
-      }
-      async function buscarUtilizadores() {
-        try { const r = await fetch('/api/utilizadores'); if (r.ok) { const d = await r.json(); setUtilizadores(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(); buscarUtilizadores(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/medicos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ utilizador_id: Number(form.utilizador_id), especialidade: form.especialidade, contacto: form.contacto }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ utilizador_id: '', especialidade: 'PNEUMOLOGIA', contacto: '' }); setSucesso('Médico registado com sucesso.'); buscar(); }
-        else setErro(d.erro || 'Erro ao registar médico.');
-      }
-      return (
-        <>
-          <div className="card">
-            <h2>Novo Médico</h2>
-            <form onSubmit={handleSubmit}>
-              <select value={form.utilizador_id} onChange={set('utilizador_id')} required>
-                <option value="">-- Seleccionar utilizador --</option>
-                {utilizadores.filter(u => u.perfil === 'MEDICO' && !medicos.some(m => m.utilizador_id === u.id)).map(u => (
-                  <option key={u.id} value={u.id}>{u.nome} ({u.email})</option>
-                ))}
-              </select>
-              <select value={form.especialidade} onChange={set('especialidade')} required>
-                <option value="PNEUMOLOGIA">Pneumologia</option>
-                <option value="ALERGOLOGIA">Alergologia</option>
-                <option value="IMUNOALERGOLOGIA">Imunoalergologia</option>
-                <option value="MEDICINA INTERNA">Medicina Interna</option>
-                <option value="MEDICINA GERAL E FAMILIAR">Medicina Geral e Familiar</option>
-                <option value="OTORRINOLARINGOLOGIA">Otorrinolaringologia</option>
-                <option value="PEDIATRIA">Pediatria</option>
-              </select>
-              <input value={form.contacto} onChange={set('contacto')} placeholder="Contacto" required />
-              <button type="submit">Registar médico</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Médicos Registados</h2>
-            {medicos.length === 0 ? <p className="vazio">Nenhum médico registado.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Especialidade</th><th>Contacto</th><th>Utilizador ID</th></tr></thead>
-                <tbody>{medicos.map(m => (
-                  <tr key={m.id}><td>{m.id}</td><td>{m.especialidade}</td><td>{m.contacto}</td>
-                    <td><span className="badge badge-blue">{m.utilizador_id}</span></td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
+    function clearMessage(target) {
+      target.className = '';
+      target.textContent = '';
     }
 
-    /* ───── Utentes ───── */
-    function SecaoUtentes() {
-      const [utentes, setUtentes] = useState([]);
-      const [utilizadores, setUtilizadores] = useState([]);
-      const [medicos, setMedicos] = useState([]);
-      const [form, setForm] = useState({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar() {
-        try { const r = await fetch('/api/utentes'); if (r.ok) { const d = await r.json(); setUtentes(d.dados ?? []); } } catch {}
-      }
-      async function buscarDeps() {
-        try {
-          const [ru, rm] = await Promise.all([fetch('/api/utilizadores'), fetch('/api/medicos')]);
-          if (ru.ok) { const d = await ru.json(); setUtilizadores(d.dados ?? []); }
-          if (rm.ok) { const d = await rm.json(); setMedicos(d.dados ?? []); }
-        } catch {}
-      }
-      useEffect(() => { buscar(); buscarDeps(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/utentes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ utilizador_id: Number(form.utilizador_id), medico_id: Number(form.medico_id), nr_utente: Number(form.nr_utente), data_nascimento: form.data_nascimento, morada: form.morada, contacto: form.contacto, nr_faturacao: Number(form.nr_faturacao) }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' }); setSucesso('Utente criado com sucesso.'); buscar(); }
-        else setErro(d.erro || 'Erro ao criar utente.');
-      }
-      return (
-        <>
-          <div className="card">
-            <h2>Novo Utente</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="row">
-                <select value={form.utilizador_id} onChange={set('utilizador_id')} required>
-                  <option value="">-- Seleccionar utilizador --</option>
-                  {utilizadores.filter(u => !utentes.some(t => t.utilizador_id === u.id)).map(u => (
-                    <option key={u.id} value={u.id}>{u.nome} ({u.email})</option>
-                  ))}
-                </select>
-                <select value={form.medico_id} onChange={set('medico_id')} required>
-                  <option value="">-- Seleccionar médico --</option>
-                  {medicos.map(m => <option key={m.id} value={m.id}>Médico #{m.id} — {m.especialidade}</option>)}
-                </select>
-              </div>
-              <div className="row">
-                <input type="number" value={form.nr_utente} onChange={set('nr_utente')} placeholder="Nº utente" required />
-                <input type="number" value={form.nr_faturacao} onChange={set('nr_faturacao')} placeholder="Nº faturação" required />
-              </div>
-              <input type="date" value={form.data_nascimento} onChange={set('data_nascimento')} required />
-              <input value={form.morada} onChange={set('morada')} placeholder="Morada" required />
-              <input value={form.contacto} onChange={set('contacto')} placeholder="Contacto" required />
-              <button type="submit">Registar utente</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Utentes Registados</h2>
-            {utentes.length === 0 ? <p className="vazio">Nenhum utente registado.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Médico ID</th></tr></thead>
-                <tbody>{utentes.map(u => (
-                  <tr key={u.id}><td>{u.id}</td><td>{u.nr_utente}</td><td>{u.morada}</td><td>{u.contacto}</td>
-                    <td>{u.data_nascimento ? new Date(u.data_nascimento).toLocaleDateString('pt-PT') : '—'}</td>
-                    <td><span className="badge badge-blue">{u.medico_id}</span></td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearMessage(loginMessage);
+      loginButton.disabled = true;
 
-    /* ───── Prescrições ───── */
-    function SecaoPrescricoes() {
-      const [prescricoes, setPrescricoes] = useState([]);
-      const [medicos, setMedicos] = useState([]);
-      const [utentes, setUtentes] = useState([]);
-      const [form, setForm] = useState({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar() {
-        try { const r = await fetch('/api/prescricoes'); if (r.ok) { const d = await r.json(); setPrescricoes(d.dados ?? []); } } catch {}
-      }
-      async function buscarDeps() {
-        try {
-          const [rm, ru] = await Promise.all([fetch('/api/medicos'), fetch('/api/utentes')]);
-          if (rm.ok) { const d = await rm.json(); setMedicos(d.dados ?? []); }
-          if (ru.ok) { const d = await ru.json(); setUtentes(d.dados ?? []); }
-        } catch {}
-      }
-      useEffect(() => { buscar(); buscarDeps(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/prescricoes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ medico_id: Number(form.medico_id), utente_id: Number(form.utente_id), tipo: form.tipo, data_emissao: form.data_emissao, data_validade: form.data_validade, estado: form.estado, assinatura: form.assinatura }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' }); setSucesso('Prescrição criada com sucesso.'); buscar(); }
-        else setErro(d.erro || 'Erro ao criar prescrição.');
-      }
-      const estadoBadge = { ATIVA: 'badge-green', DISPENSADA: 'badge-orange', CANCELADA: 'badge-red' };
-      return (
-        <>
-          <div className="card">
-            <h2>Nova Prescrição</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="row">
-                <select value={form.medico_id} onChange={set('medico_id')} required>
-                  <option value="">-- Seleccionar médico --</option>
-                  {medicos.map(m => <option key={m.id} value={m.id}>Médico #{m.id} — {m.especialidade}</option>)}
-                </select>
-                <select value={form.utente_id} onChange={set('utente_id')} required>
-                  <option value="">-- Seleccionar utente --</option>
-                  {utentes.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
-                </select>
-              </div>
-              <div className="row">
-                <select value={form.tipo} onChange={set('tipo')}>
-                  <option value="MEDICACAO">Medicação</option>
-                  <option value="EXAME">Exame</option>
-                </select>
-                <select value={form.estado} onChange={set('estado')}>
-                  <option value="ATIVA">Ativa</option>
-                  <option value="DISPENSADA">Dispensada</option>
-                  <option value="CANCELADA">Cancelada</option>
-                </select>
-              </div>
-              <div className="row">
-                <input type="date" value={form.data_emissao} onChange={set('data_emissao')} required />
-                <input type="date" value={form.data_validade} onChange={set('data_validade')} required />
-              </div>
-              <input value={form.assinatura} onChange={set('assinatura')} placeholder="Assinatura do médico" required />
-              <button type="submit">Criar prescrição</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Prescrições Registadas</h2>
-            {prescricoes.length === 0 ? <p className="vazio">Nenhuma prescrição registada.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Tipo</th><th>Estado</th><th>Emissão</th><th>Validade</th><th>Utente</th><th>Médico</th></tr></thead>
-                <tbody>{prescricoes.map(p => (
-                  <tr key={p.id}><td>{p.id}</td><td>{p.tipo}</td>
-                    <td><span className={`badge ${estadoBadge[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
-                    <td>{p.data_emissao ? new Date(p.data_emissao).toLocaleDateString('pt-PT') : '—'}</td>
-                    <td>{p.data_validade ? new Date(p.data_validade).toLocaleDateString('pt-PT') : '—'}</td>
-                    <td><span className="badge badge-green">{p.utente_id}</span></td>
-                    <td><span className="badge badge-blue">{p.medico_id}</span></td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
+      const body = {
+        id: Number(loginForm.id.value),
+        password: loginForm.password.value
+      };
 
-    /* ───── Anamneses ───── */
-    function SecaoAnamneses() {
-      const [anamneses, setAnamneses] = useState([]);
-      const [utentes, setUtentes] = useState([]);
-      const [form, setForm] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar() {
-        try { const r = await fetch('/api/anamneses'); if (r.ok) { const d = await r.json(); setAnamneses(d.dados ?? []); } } catch {}
-      }
-      async function buscarUtentes() {
-        try { const r = await fetch('/api/utentes'); if (r.ok) { const d = await r.json(); setUtentes(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(); buscarUtentes(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/anamneses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ utente_id: Number(form.utente_id), historico_familiar: form.historico_familiar, tabagismo: form.tabagismo }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR' }); setSucesso(`Anamnese criada com ID ${d.dados?.id ?? '?'}.`); buscar(); }
-        else setErro(d.erro || 'Erro ao criar anamnese.');
-      }
-      return (
-        <>
-          <div className="card">
-            <h2>Nova Anamnese</h2>
-            <form onSubmit={handleSubmit}>
-              <select value={form.utente_id} onChange={set('utente_id')} required>
-                <option value="">-- Seleccionar utente --</option>
-                {utentes.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
-              </select>
-              <textarea value={form.historico_familiar} onChange={set('historico_familiar')} placeholder="Histórico familiar" required />
-              <select value={form.tabagismo} onChange={set('tabagismo')}>
-                <option value="NAO FUMADOR">Não Fumador</option>
-                <option value="EX-FUMADOR">Ex-Fumador</option>
-                <option value="EXPOSICAO PASSIVA">Exposição Passiva</option>
-                <option value="OCASIONAL">Ocasional</option>
-                <option value="MENOS DE 10 CIGARROS/DIA">Menos de 10 cigarros/dia</option>
-                <option value="10 A 20 CIGARROS/DIA">10 a 20 cigarros/dia</option>
-                <option value="MAIS DE 20 CIGARROS/DIA">Mais de 20 cigarros/dia</option>
-              </select>
-              <button type="submit">Criar anamnese</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Anamneses Registadas</h2>
-            {anamneses.length === 0 ? <p className="vazio">Nenhuma anamnese registada.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Utente ID</th><th>Tabagismo</th><th>Histórico Familiar</th></tr></thead>
-                <tbody>{anamneses.map(a => (
-                  <tr key={a.id}><td>{a.id}</td>
-                    <td><span className="badge badge-green">{a.utente_id}</span></td>
-                    <td><span className="badge badge-orange">{a.tabagismo}</span></td>
-                    <td style={{maxWidth:'300px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.historico_familiar}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Alergias ───── */
-    function SecaoAlergias() {
-      const [alergias, setAlergias] = useState([]);
-      const [filtro, setFiltro] = useState('');
-      const [form, setForm] = useState({ anamnese_id: '', descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar(id) {
-        try { const r = await fetch(id ? `/api/alergias/anamnese/${id}` : '/api/alergias'); if (r.ok) { const d = await r.json(); setAlergias(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(''); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/alergias', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ anamnese_id: Number(form.anamnese_id), descricao: form.descricao, intensidade_crise: form.intensidade_crise, frequencia_crise: form.frequencia_crise }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ anamnese_id: '', descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' }); setSucesso(`Alergia criada com ID ${d.dados?.id ?? '?'}.`); buscar(filtro); }
-        else setErro(d.erro || 'Erro ao criar alergia.');
-      }
-      const ib = { LEVE: 'badge-green', MODERADA: 'badge-orange', GRAVE: 'badge-red' };
-      return (
-        <>
-          <div className="card">
-            <h2>Nova Alergia</h2>
-            <form onSubmit={handleSubmit}>
-              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" required />
-              <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição da alergia" required />
-              <div className="row">
-                <select value={form.intensidade_crise} onChange={set('intensidade_crise')}>
-                  <option value="LEVE">Leve</option>
-                  <option value="MODERADA">Moderada</option>
-                  <option value="GRAVE">Grave</option>
-                </select>
-                <input value={form.frequencia_crise} onChange={set('frequencia_crise')} placeholder="Frequência de crise" required />
-              </div>
-              <button type="submit">Registar alergia</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Alergias</h2>
-            <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de anamnese" />
-              <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
-              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todas</button>
-            </div>
-            {alergias.length === 0 ? <p className="vazio">Nenhuma alergia encontrada.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Anamnese</th><th>Descrição</th><th>Intensidade</th><th>Frequência</th></tr></thead>
-                <tbody>{alergias.map(a => (
-                  <tr key={a.id}><td>{a.id}</td>
-                    <td><span className="badge badge-blue">{a.anamnese_id}</span></td>
-                    <td>{a.descricao}</td>
-                    <td><span className={`badge ${ib[a.intensidade_crise] || 'badge-blue'}`}>{a.intensidade_crise}</span></td>
-                    <td>{a.frequencia_crise}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Comorbidades ───── */
-    function SecaoComorbidades() {
-      const [comorbidades, setComorbidades] = useState([]);
-      const [filtro, setFiltro] = useState('');
-      const [form, setForm] = useState({ anamnese_id: '', descricao: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar(id) {
-        try { const r = await fetch(id ? `/api/comorbidades/anamnese/${id}` : '/api/comorbidades'); if (r.ok) { const d = await r.json(); setComorbidades(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(''); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/comorbidades', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ anamnese_id: Number(form.anamnese_id), descricao: form.descricao }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ anamnese_id: '', descricao: '' }); setSucesso(`Comorbidade criada com ID ${d.dados?.id ?? '?'}.`); buscar(filtro); }
-        else setErro(d.erro || 'Erro ao criar comorbidade.');
-      }
-      return (
-        <>
-          <div className="card">
-            <h2>Nova Comorbidade</h2>
-            <form onSubmit={handleSubmit}>
-              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" required />
-              <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição" required />
-              <button type="submit">Registar comorbidade</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Comorbidades</h2>
-            <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de anamnese" />
-              <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
-              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todas</button>
-            </div>
-            {comorbidades.length === 0 ? <p className="vazio">Nenhuma comorbidade encontrada.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Anamnese</th><th>Descrição</th></tr></thead>
-                <tbody>{comorbidades.map(c => (
-                  <tr key={c.id}><td>{c.id}</td>
-                    <td><span className="badge badge-blue">{c.anamnese_id}</span></td>
-                    <td>{c.descricao}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Sintomas ───── */
-    function SecaoSintomas() {
-      const [sintomas, setSintomas] = useState([]);
-      const [utentes, setUtentes] = useState([]);
-      const [filtro, setFiltro] = useState('');
-      const [form, setForm] = useState({ utente_id: '', descricao: '', intensidade: 'LIGEIRA', duracao: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar(id) {
-        try { const r = await fetch(id ? `/api/sintomas/utente/${id}` : '/api/sintomas'); if (r.ok) { const d = await r.json(); setSintomas(d.dados ?? []); } } catch {}
-      }
-      async function buscarUtentes() {
-        try { const r = await fetch('/api/utentes'); if (r.ok) { const d = await r.json(); setUtentes(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(''); buscarUtentes(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/sintomas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ utente_id: Number(form.utente_id), descricao: form.descricao, intensidade: form.intensidade, duracao: form.duracao }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ utente_id: '', descricao: '', intensidade: 'LIGEIRA', duracao: '' }); setSucesso(`Sintoma registado com ID ${d.dados?.id ?? '?'}.`); buscar(filtro); }
-        else setErro(d.erro || 'Erro ao registar sintoma.');
-      }
-      const ib = { LIGEIRA: 'badge-green', MODERADA: 'badge-orange', GRAVE: 'badge-red' };
-      return (
-        <>
-          <div className="card">
-            <h2>Novo Sintoma</h2>
-            <form onSubmit={handleSubmit}>
-              <select value={form.utente_id} onChange={set('utente_id')} required>
-                <option value="">-- Seleccionar utente --</option>
-                {utentes.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
-              </select>
-              <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição do sintoma" required />
-              <div className="row">
-                <select value={form.intensidade} onChange={set('intensidade')}>
-                  <option value="LIGEIRA">Ligeira</option>
-                  <option value="MODERADA">Moderada</option>
-                  <option value="GRAVE">Grave</option>
-                </select>
-                <input value={form.duracao} onChange={set('duracao')} placeholder="Duração (ex: 3 dias)" required />
-              </div>
-              <button type="submit">Registar sintoma</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Sintomas</h2>
-            <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de utente" />
-              <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
-              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todos</button>
-            </div>
-            {sintomas.length === 0 ? <p className="vazio">Nenhum sintoma encontrado.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Utente</th><th>Descrição</th><th>Intensidade</th><th>Duração</th><th>Data</th></tr></thead>
-                <tbody>{sintomas.map(s => (
-                  <tr key={s.id}><td>{s.id}</td>
-                    <td><span className="badge badge-green">{s.utente_id}</span></td>
-                    <td>{s.descricao}</td>
-                    <td><span className={`badge ${ib[s.intensidade] || 'badge-blue'}`}>{s.intensidade}</span></td>
-                    <td>{s.duracao}</td>
-                    <td>{s.data_registo ? new Date(s.data_registo).toLocaleDateString('pt-PT') : '—'}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Medicações ───── */
-    function SecaoMedicacoes() {
-      const [medicacoes, setMedicacoes] = useState([]);
-      const [filtro, setFiltro] = useState('');
-      const [form, setForm] = useState({ prescricao_id: '', nome: '', dose: '', duracao: '', periodicidade: '', validade: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar(id) {
-        try { const r = await fetch(id ? `/api/medicacoes/prescricao/${id}` : '/api/medicacoes'); if (r.ok) { const d = await r.json(); setMedicacoes(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(''); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/medicacoes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prescricao_id: Number(form.prescricao_id), nome: form.nome, dose: form.dose, duracao: form.duracao, periodicidade: form.periodicidade, validade: form.validade }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ prescricao_id: '', nome: '', dose: '', duracao: '', periodicidade: '', validade: '' }); setSucesso(`Medicação criada com ID ${d.dados?.id ?? '?'}.`); buscar(filtro); }
-        else setErro(d.erro || 'Erro ao criar medicação.');
-      }
-      return (
-        <>
-          <div className="card">
-            <h2>Nova Medicação</h2>
-            <form onSubmit={handleSubmit}>
-              <input type="number" value={form.prescricao_id} onChange={set('prescricao_id')} placeholder="ID da prescrição" required />
-              <input value={form.nome} onChange={set('nome')} placeholder="Nome do medicamento" required />
-              <div className="row">
-                <input value={form.dose} onChange={set('dose')} placeholder="Dose (ex: 500mg)" required />
-                <input value={form.periodicidade} onChange={set('periodicidade')} placeholder="Periodicidade (ex: 8/8h)" required />
-              </div>
-              <div className="row">
-                <input value={form.duracao} onChange={set('duracao')} placeholder="Duração (ex: 7 dias)" required />
-                <input type="date" value={form.validade} onChange={set('validade')} required />
-              </div>
-              <button type="submit">Registar medicação</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Medicações</h2>
-            <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de prescrição" />
-              <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
-              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todas</button>
-            </div>
-            {medicacoes.length === 0 ? <p className="vazio">Nenhuma medicação encontrada.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Prescrição</th><th>Nome</th><th>Dose</th><th>Periodicidade</th><th>Duração</th><th>Validade</th></tr></thead>
-                <tbody>{medicacoes.map(m => (
-                  <tr key={m.id}><td>{m.id}</td>
-                    <td><span className="badge badge-blue">{m.prescricao_id}</span></td>
-                    <td>{m.nome}</td><td>{m.dose}</td><td>{m.periodicidade}</td><td>{m.duracao}</td>
-                    <td>{m.validade ? new Date(m.validade).toLocaleDateString('pt-PT') : '—'}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Medicações Habituais ───── */
-    function SecaoMedicacoesHabituais() {
-      const [medicacoes, setMedicacoes] = useState([]);
-      const [filtro, setFiltro] = useState('');
-      const [form, setForm] = useState({ anamnese_id: '', nome: '', dose: '', duracao: '', periodicidade: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar(id) {
-        try { const r = await fetch(id ? `/api/medicacoes-habituais/anamnese/${id}` : '/api/medicacoes-habituais'); if (r.ok) { const d = await r.json(); setMedicacoes(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(''); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/medicacoes-habituais', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ anamnese_id: Number(form.anamnese_id), nome: form.nome, dose: form.dose, duracao: form.duracao, periodicidade: form.periodicidade }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ anamnese_id: '', nome: '', dose: '', duracao: '', periodicidade: '' }); setSucesso(`Medicação habitual criada com ID ${d.dados?.id ?? '?'}.`); buscar(filtro); }
-        else setErro(d.erro || 'Erro ao criar medicação habitual.');
-      }
-      return (
-        <>
-          <div className="card">
-            <h2>Nova Medicação Habitual</h2>
-            <form onSubmit={handleSubmit}>
-              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" required />
-              <input value={form.nome} onChange={set('nome')} placeholder="Nome do medicamento" required />
-              <div className="row">
-                <input value={form.dose} onChange={set('dose')} placeholder="Dose (ex: 500mg)" required />
-                <input value={form.periodicidade} onChange={set('periodicidade')} placeholder="Periodicidade (ex: diário)" required />
-              </div>
-              <input value={form.duracao} onChange={set('duracao')} placeholder="Duração (ex: uso contínuo)" required />
-              <button type="submit">Registar medicação habitual</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Medicações Habituais</h2>
-            <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de anamnese" />
-              <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
-              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todas</button>
-            </div>
-            {medicacoes.length === 0 ? <p className="vazio">Nenhuma medicação habitual encontrada.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Anamnese</th><th>Nome</th><th>Dose</th><th>Periodicidade</th><th>Duração</th></tr></thead>
-                <tbody>{medicacoes.map(m => (
-                  <tr key={m.id}><td>{m.id}</td>
-                    <td><span className="badge badge-blue">{m.anamnese_id}</span></td>
-                    <td>{m.nome}</td><td>{m.dose}</td><td>{m.periodicidade}</td><td>{m.duracao}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Exames ───── */
-    function SecaoExames() {
-      const [exames, setExames] = useState([]);
-      const [filtro, setFiltro] = useState('');
-      const [form, setForm] = useState({ prescricao_id: '', tipo_exame: '', data: '', resultado: '{}', consentimento: 'true', estado: 'PENDENTE' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar(id) {
-        try { const r = await fetch(id ? `/api/exames/prescricao/${id}` : '/api/exames'); if (r.ok) { const d = await r.json(); setExames(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(''); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        let resultadoObj;
-        try { resultadoObj = JSON.parse(form.resultado); } catch { setErro('Resultado deve ser JSON válido (ex: {} ou {"valor": 42}).'); return; }
-        const r = await fetch('/api/exames', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prescricao_id: Number(form.prescricao_id), tipo_exame: form.tipo_exame, data: form.data, resultado: resultadoObj, consentimento: form.consentimento === 'true', estado: form.estado }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ prescricao_id: '', tipo_exame: '', data: '', resultado: '{}', consentimento: 'true', estado: 'PENDENTE' }); setSucesso(`Exame criado com ID ${d.dados?.id ?? '?'}.`); buscar(filtro); }
-        else setErro(d.erro || 'Erro ao criar exame.');
-      }
-      const eb = { PENDENTE: 'badge-orange', REALIZADO: 'badge-blue', ANALISADO: 'badge-green', CANCELADO: 'badge-red' };
-      return (
-        <>
-          <div className="card">
-            <h2>Novo Exame</h2>
-            <form onSubmit={handleSubmit}>
-              <input type="number" value={form.prescricao_id} onChange={set('prescricao_id')} placeholder="ID da prescrição" required />
-              <div className="row">
-                <input value={form.tipo_exame} onChange={set('tipo_exame')} placeholder="Tipo de exame (ex: Espirometria)" required />
-                <input type="datetime-local" value={form.data} onChange={set('data')} required />
-              </div>
-              <input value={form.resultado} onChange={set('resultado')} placeholder='Resultado JSON (ex: {"fev1": 2.5})' required />
-              <div className="row">
-                <select value={form.consentimento} onChange={set('consentimento')}>
-                  <option value="true">Consentimento: Sim</option>
-                  <option value="false">Consentimento: Não</option>
-                </select>
-                <select value={form.estado} onChange={set('estado')}>
-                  <option value="PENDENTE">Pendente</option>
-                  <option value="REALIZADO">Realizado</option>
-                  <option value="ANALISADO">Analisado</option>
-                  <option value="CANCELADO">Cancelado</option>
-                </select>
-              </div>
-              <button type="submit">Registar exame</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Exames</h2>
-            <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de prescrição" />
-              <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
-              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todos</button>
-            </div>
-            {exames.length === 0 ? <p className="vazio">Nenhum exame encontrado.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Prescrição</th><th>Tipo</th><th>Data</th><th>Estado</th><th>Consent.</th></tr></thead>
-                <tbody>{exames.map(x => (
-                  <tr key={x.id}><td>{x.id}</td>
-                    <td><span className="badge badge-blue">{x.prescricao_id}</span></td>
-                    <td>{x.tipo_exame}</td>
-                    <td>{x.data ? new Date(x.data).toLocaleDateString('pt-PT') : '—'}</td>
-                    <td><span className={`badge ${eb[x.estado] || 'badge-blue'}`}>{x.estado}</span></td>
-                    <td style={{textAlign:'center'}}>{x.consentimento ? '✓' : '✗'}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Alertas ───── */
-    function SecaoAlertas() {
-      const [alertas, setAlertas] = useState([]);
-      const [form, setForm] = useState({ utente_id: '', medico_id: '', regra_id: '', tipo: 'SCORE BAIXO', estado: 'NOVO', prioridade: 'MEDIA', notas: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar() {
-        try { const r = await fetch('/api/alertas'); if (r.ok) { const d = await r.json(); setAlertas(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/alertas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ utente_id: Number(form.utente_id), medico_id: Number(form.medico_id), regra_id: Number(form.regra_id), tipo: form.tipo, estado: form.estado, prioridade: form.prioridade, notas: form.notas || undefined, data_atualizacao_estado: new Date().toISOString() }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ utente_id: '', medico_id: '', regra_id: '', tipo: 'SCORE BAIXO', estado: 'NOVO', prioridade: 'MEDIA', notas: '' }); setSucesso(`Alerta criado com ID ${d.dados?.id ?? '?'}.`); buscar(); }
-        else setErro(d.erro || 'Erro ao criar alerta.');
-      }
-      const eb = { NOVO: 'badge-red', VISTO: 'badge-orange', 'EM SEGUIMENTO': 'badge-blue', FECHADO: 'badge-green' };
-      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-blue', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
-      return (
-        <>
-          <div className="card">
-            <h2>Novo Alerta</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="row">
-                <input type="number" value={form.utente_id} onChange={set('utente_id')} placeholder="ID do utente" required />
-                <input type="number" value={form.medico_id} onChange={set('medico_id')} placeholder="ID do médico" required />
-                <input type="number" value={form.regra_id}  onChange={set('regra_id')}  placeholder="ID da regra" required />
-              </div>
-              <div className="row">
-                <select value={form.tipo} onChange={set('tipo')}>
-                  <option value="SCORE BAIXO">Score Baixo</option>
-                  <option value="DETERIORACAO">Deterioração</option>
-                  <option value="EXAME NECESSARIO">Exame Necessário</option>
-                </select>
-                <select value={form.estado} onChange={set('estado')}>
-                  <option value="NOVO">Novo</option>
-                  <option value="VISTO">Visto</option>
-                  <option value="EM SEGUIMENTO">Em Seguimento</option>
-                  <option value="FECHADO">Fechado</option>
-                </select>
-              </div>
-              <select value={form.prioridade} onChange={set('prioridade')}>
-                <option value="BAIXA">Baixa</option>
-                <option value="MEDIA">Média</option>
-                <option value="ALTA">Alta</option>
-                <option value="MUITO ALTA">Muito Alta</option>
-              </select>
-              <input value={form.notas} onChange={set('notas')} placeholder="Notas (opcional)" />
-              <button type="submit">Criar alerta</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Alertas</h2>
-            {alertas.length === 0 ? <p className="vazio">Nenhum alerta registado.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Utente</th><th>Médico</th><th>Tipo</th><th>Estado</th><th>Prioridade</th></tr></thead>
-                <tbody>{alertas.map(a => (
-                  <tr key={a.id}><td>{a.id}</td>
-                    <td><span className="badge badge-green">{a.utente_id}</span></td>
-                    <td><span className="badge badge-blue">{a.medico_id}</span></td>
-                    <td>{a.tipo}</td>
-                    <td><span className={`badge ${eb[a.estado] || 'badge-blue'}`}>{a.estado}</span></td>
-                    <td><span className={`badge ${pb[a.prioridade] || 'badge-blue'}`}>{a.prioridade}</span></td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Regras de Alerta ───── */
-    function SecaoRegrasAlerta() {
-      const [regras, setRegras] = useState([]);
-      const [form, setForm] = useState({ medico_id: '', administrador_id: '', categoria: 'SCORE', limiar_score: '', valor_deterioracao: '', prioridade: 'MEDIA' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar() {
-        try { const r = await fetch('/api/regras-alerta'); if (r.ok) { const d = await r.json(); setRegras(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/regras-alerta', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ medico_id: Number(form.medico_id), administrador_id: Number(form.administrador_id), categoria: form.categoria, limiar_score: Number(form.limiar_score), valor_deterioracao: Number(form.valor_deterioracao), prioridade: form.prioridade }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ medico_id: '', administrador_id: '', categoria: 'SCORE', limiar_score: '', valor_deterioracao: '', prioridade: 'MEDIA' }); setSucesso(`Regra criada com ID ${d.dados?.id ?? '?'}.`); buscar(); }
-        else setErro(d.erro || 'Erro ao criar regra de alerta.');
-      }
-      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-blue', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
-      return (
-        <>
-          <div className="card">
-            <h2>Nova Regra de Alerta</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="row">
-                <input type="number" value={form.medico_id} onChange={set('medico_id')} placeholder="ID do médico" required />
-                <input type="number" value={form.administrador_id} onChange={set('administrador_id')} placeholder="ID do administrador" required />
-              </div>
-              <div className="row">
-                <select value={form.categoria} onChange={set('categoria')}>
-                  <option value="SCORE">Score</option>
-                  <option value="SINTOMA">Sintoma</option>
-                  <option value="EXAME">Exame</option>
-                  <option value="MEDICACAO">Medicação</option>
-                </select>
-                <select value={form.prioridade} onChange={set('prioridade')}>
-                  <option value="BAIXA">Baixa</option>
-                  <option value="MEDIA">Média</option>
-                  <option value="ALTA">Alta</option>
-                  <option value="MUITO ALTA">Muito Alta</option>
-                </select>
-              </div>
-              <div className="row">
-                <input type="number" value={form.limiar_score} onChange={set('limiar_score')} placeholder="Limiar score" required />
-                <input type="number" value={form.valor_deterioracao} onChange={set('valor_deterioracao')} placeholder="Valor deterioração" required />
-              </div>
-              <button type="submit">Criar regra</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Regras de Alerta</h2>
-            {regras.length === 0 ? <p className="vazio">Nenhuma regra registada.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Médico</th><th>Admin</th><th>Categoria</th><th>Limiar</th><th>Deterioração</th><th>Prioridade</th></tr></thead>
-                <tbody>{regras.map(r => (
-                  <tr key={r.id}><td>{r.id}</td>
-                    <td><span className="badge badge-blue">{r.medico_id}</span></td>
-                    <td><span className="badge badge-orange">{r.administrador_id}</span></td>
-                    <td>{r.categoria}</td>
-                    <td>{r.limiar_score}</td>
-                    <td>{r.valor_deterioracao}</td>
-                    <td><span className={`badge ${pb[r.prioridade] || 'badge-blue'}`}>{r.prioridade}</span></td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Avaliações CARAT ───── */
-    function SecaoAvaliacoesCarat() {
-      const [avaliacoes, setAvaliacoes] = useState([]);
-      const OPTS_1_9 = ["Nunca", "Até 1 ou 2 dias", "Mais de 2 dias por semana", "Quase todos os dias"];
-      const OPTS_10  = ["Não toma medicamentos", "Nunca", "Menos de 7 dias", "7 ou mais dias"];
-      const QS_DEFAULT = [
-        'Nos últimos 7 dias, teve nariz entupido?',
-        'Nos últimos 7 dias, teve corrimento nasal?',
-        'Nos últimos 7 dias, espirrou?',
-        'Nos últimos 7 dias, teve comichão no nariz?',
-        'Nos últimos 7 dias, acordou durante a noite devido à tosse, pieira ou dificuldade em respirar?',
-        'Nos últimos 7 dias, teve crises de tosse ou pieira de manhã ao acordar?',
-        'Nos últimos 7 dias, teve falta de ar durante as atividades do dia a dia?',
-        'Nos últimos 7 dias, teve pieira?',
-        'Nos últimos 7 dias, sentiu aperto no peito?',
-        'Nos últimos 7 dias, usou medicamento de alívio (ex: broncodilatador)?',
-      ];
-      const initForm = { versao: '1', q1: QS_DEFAULT[0], q2: QS_DEFAULT[1], q3: QS_DEFAULT[2], q4: QS_DEFAULT[3], q5: QS_DEFAULT[4], q6: QS_DEFAULT[5], q7: QS_DEFAULT[6], q8: QS_DEFAULT[7], q9: QS_DEFAULT[8], q10: QS_DEFAULT[9] };
-      const [form, setForm] = useState(initForm);
-      const [mostrar, setMostrar] = useState(false);
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar() {
-        try { const r = await fetch('/api/avaliacoes-carat'); if (r.ok) { const d = await r.json(); setAvaliacoes(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const body = { versao: Number(form.versao), r1: OPTS_1_9, r2: OPTS_1_9, r3: OPTS_1_9, r4: OPTS_1_9, r5: OPTS_1_9, r6: OPTS_1_9, r7: OPTS_1_9, r8: OPTS_1_9, r9: OPTS_1_9, r10: OPTS_10 };
-        [1,2,3,4,5,6,7,8,9,10].forEach(n => body[`q${n}`] = form[`q${n}`]);
-        const r = await fetch('/api/avaliacoes-carat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-        const d = await r.json();
-        if (r.ok) { setSucesso(`Avaliação CARAT criada com ID ${d.dados?.id ?? '?'}.`); buscar(); }
-        else setErro(d.erro || 'Erro ao criar avaliação CARAT.');
-      }
-      return (
-        <>
-          <div className="card">
-            <h2>Nova Avaliação CARAT (Template de Questionário)</h2>
-            <form onSubmit={handleSubmit}>
-              <input type="number" value={form.versao} onChange={set('versao')} placeholder="Versão" required min="1" />
-              <button type="button" className="btn-tiny" style={{alignSelf:'flex-start', marginBottom:'4px'}} onClick={() => setMostrar(!mostrar)}>
-                {mostrar ? 'Ocultar questões' : 'Editar questões (CARAT padrão pré-preenchido)'}
-              </button>
-              {mostrar && [1,2,3,4,5,6,7,8,9,10].map(n => (
-                <input key={n} value={form[`q${n}`]} onChange={set(`q${n}`)} placeholder={`Questão ${n}`} required />
-              ))}
-              <button type="submit">Criar avaliação</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Avaliações CARAT</h2>
-            {avaliacoes.length === 0 ? <p className="vazio">Nenhuma avaliação registada.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Versão</th><th>Q1 (resumo)</th><th>Data Criação</th></tr></thead>
-                <tbody>{avaliacoes.map(a => (
-                  <tr key={a.id}><td>{a.id}</td>
-                    <td><span className="badge badge-blue">v{a.versao}</span></td>
-                    <td style={{maxWidth:'280px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.q1}</td>
-                    <td>{a.data_criacao ? new Date(a.data_criacao).toLocaleDateString('pt-PT') : '—'}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Respostas CARAT ───── */
-    function SecaoRespostasCarat() {
-      const [respostas, setRespostas] = useState([]);
-      const [filtro, setFiltro] = useState('');
-      const R1_9 = [{v:'0',l:'0 — Nunca'},{v:'1',l:'1 — Até 1 ou 2 dias'},{v:'2',l:'2 — Mais de 2 dias/semana'},{v:'3',l:'3 — Quase todos os dias'}];
-      const R10  = [{v:'0',l:'0 — Não toma medicamentos'},{v:'1',l:'1 — Nunca'},{v:'2',l:'2 — Menos de 7 dias'},{v:'3',l:'3 — 7 ou mais dias'}];
-      const init = { avaliacao_id:'', utente_id:'', data_avaliacao:'', r1:'0',r2:'0',r3:'0',r4:'0',r5:'0',r6:'0',r7:'0',r8:'0',r9:'0',r10:'0' };
-      const [form, setForm] = useState(init);
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar(id) {
-        try { const r = await fetch(id ? `/api/respostas-carat/utente/${id}` : '/api/respostas-carat'); if (r.ok) { const d = await r.json(); setRespostas(d.dados ?? []); } } catch {}
-      }
-      useEffect(() => { buscar(''); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const body = { avaliacao_id: Number(form.avaliacao_id), utente_id: Number(form.utente_id), data_avaliacao: form.data_avaliacao };
-        [1,2,3,4,5,6,7,8,9,10].forEach(n => body[`r${n}`] = Number(form[`r${n}`]));
-        const r = await fetch('/api/respostas-carat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-        const d = await r.json();
-        if (r.ok) { setForm(init); setSucesso(`Resposta submetida — Score: ${d.dados?.score_total ?? '?'} — ${d.dados?.interpretacao ?? ''}`); buscar(filtro); }
-        else setErro(d.erro || 'Erro ao submeter resposta CARAT.');
-      }
-      const scoreBadge = s => s <= 7 ? 'badge-red' : s <= 14 ? 'badge-orange' : 'badge-green';
-      return (
-        <>
-          <div className="card">
-            <h2>Nova Resposta CARAT</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="row">
-                <input type="number" value={form.avaliacao_id} onChange={set('avaliacao_id')} placeholder="ID da avaliação CARAT" required />
-                <input type="number" value={form.utente_id} onChange={set('utente_id')} placeholder="ID do utente" required />
-              </div>
-              <input type="datetime-local" value={form.data_avaliacao} onChange={set('data_avaliacao')} required />
-              <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Respostas R1–R9 (sintomas rinite e asma nos últimos 7 dias):</p>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'6px',maxWidth:'480px'}}>
-                {[1,2,3,4,5,6,7,8,9].map(n => (
-                  <div key={n}>
-                    <label style={{fontSize:'0.75rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>R{n}</label>
-                    <select value={form[`r${n}`]} onChange={set(`r${n}`)} style={{width:'100%'}}>
-                      {R1_9.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
-                    </select>
-                  </div>
-                ))}
-              </div>
-              <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>R10 — Uso de medicamento de alívio nos últimos 7 dias:</p>
-              <select value={form.r10} onChange={set('r10')} style={{maxWidth:'480px'}}>
-                {R10.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
-              </select>
-              <button type="submit">Submeter resposta</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Respostas CARAT</h2>
-            <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de utente" />
-              <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
-              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todas</button>
-            </div>
-            {respostas.length === 0 ? <p className="vazio">Nenhuma resposta encontrada.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Utente</th><th>Avaliação</th><th>Score</th><th>Interpretação</th><th>Data</th></tr></thead>
-                <tbody>{respostas.map(r => (
-                  <tr key={r.id}><td>{r.id}</td>
-                    <td><span className="badge badge-green">{r.utente_id}</span></td>
-                    <td><span className="badge badge-blue">{r.avaliacao_id}</span></td>
-                    <td><span className={`badge ${scoreBadge(r.score_total)}`}>{r.score_total}/30</span></td>
-                    <td>{r.interpretacao}</td>
-                    <td>{r.data_avaliacao ? new Date(r.data_avaliacao).toLocaleDateString('pt-PT') : '—'}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── Planos de Acompanhamento ───── */
-    function SecaoPlanos() {
-      const [planos, setPlanos] = useState([]);
-      const [medicos, setMedicos] = useState([]);
-      const [utentes, setUtentes] = useState([]);
-      const [form, setForm] = useState({ medico_id: '', utente_id: '', frequencia_avaliacao: '', data_inicio: '', data_fim: '', estado: 'ATIVO', recomendacao_medica: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
-      async function buscar() {
-        try { const r = await fetch('/api/planos-acompanhamento'); if (r.ok) { const d = await r.json(); setPlanos(d.dados ?? []); } } catch {}
-      }
-      async function buscarDeps() {
-        try {
-          const [rm, ru] = await Promise.all([fetch('/api/medicos'), fetch('/api/utentes')]);
-          if (rm.ok) { const d = await rm.json(); setMedicos(d.dados ?? []); }
-          if (ru.ok) { const d = await ru.json(); setUtentes(d.dados ?? []); }
-        } catch {}
-      }
-      useEffect(() => { buscar(); buscarDeps(); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await fetch('/api/planos-acompanhamento', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ medico_id: Number(form.medico_id), utente_id: Number(form.utente_id), frequencia_avaliacao: form.frequencia_avaliacao, data_inicio: form.data_inicio, data_fim: form.data_fim, estado: form.estado, recomendacao_medica: form.recomendacao_medica }) });
-        const d = await r.json();
-        if (r.ok) { setForm({ medico_id: '', utente_id: '', frequencia_avaliacao: '', data_inicio: '', data_fim: '', estado: 'ATIVO', recomendacao_medica: '' }); setSucesso(`Plano criado com ID ${d.dados?.id ?? '?'}.`); buscar(); }
-        else setErro(d.erro || 'Erro ao criar plano.');
-      }
-      const eb = { ATIVO: 'badge-green', CONCLUIDO: 'badge-blue', SUSPENSO: 'badge-orange', CANCELADO: 'badge-red' };
-      return (
-        <>
-          <div className="card">
-            <h2>Novo Plano de Acompanhamento</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="row">
-                <select value={form.medico_id} onChange={set('medico_id')} required>
-                  <option value="">-- Seleccionar médico --</option>
-                  {medicos.map(m => <option key={m.id} value={m.id}>Médico #{m.id} — {m.especialidade}</option>)}
-                </select>
-                <select value={form.utente_id} onChange={set('utente_id')} required>
-                  <option value="">-- Seleccionar utente --</option>
-                  {utentes.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
-                </select>
-              </div>
-              <div className="row">
-                <input value={form.frequencia_avaliacao} onChange={set('frequencia_avaliacao')} placeholder="Frequência (ex: mensal)" required />
-                <select value={form.estado} onChange={set('estado')}>
-                  <option value="ATIVO">Ativo</option>
-                  <option value="SUSPENSO">Suspenso</option>
-                  <option value="CONCLUIDO">Concluído</option>
-                  <option value="CANCELADO">Cancelado</option>
-                </select>
-              </div>
-              <div className="row">
-                <input type="date" value={form.data_inicio} onChange={set('data_inicio')} required />
-                <input type="date" value={form.data_fim}    onChange={set('data_fim')}    required />
-              </div>
-              <textarea value={form.recomendacao_medica} onChange={set('recomendacao_medica')} placeholder="Recomendação médica" required />
-              <button type="submit">Criar plano</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
-            <h2>Planos de Acompanhamento</h2>
-            {planos.length === 0 ? <p className="vazio">Nenhum plano registado.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Médico</th><th>Utente</th><th>Frequência</th><th>Estado</th><th>Início</th><th>Fim</th></tr></thead>
-                <tbody>{planos.map(p => (
-                  <tr key={p.id}><td>{p.id}</td>
-                    <td><span className="badge badge-blue">{p.medico_id}</span></td>
-                    <td><span className="badge badge-green">{p.utente_id}</span></td>
-                    <td>{p.frequencia_avaliacao}</td>
-                    <td><span className={`badge ${eb[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
-                    <td>{p.data_inicio ? new Date(p.data_inicio).toLocaleDateString('pt-PT') : '—'}</td>
-                    <td>{p.data_fim ? new Date(p.data_fim).toLocaleDateString('pt-PT') : '—'}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* ───── FHIR helpers ───── */
-    function highlightJson(obj) {
-      const json = JSON.stringify(obj, null, 2);
-      return json
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
-          if (/^"/.test(match)) { if (/:$/.test(match)) return `<span class="key">${match}</span>`; return `<span class="str">${match}</span>`; }
-          if (/true|false/.test(match)) return `<span class="bool">${match}</span>`;
-          if (/null/.test(match)) return `<span class="null">${match}</span>`;
-          return `<span class="num">${match}</span>`;
+      try {
+        const response = await fetch(`${API_BASE}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
         });
-    }
-    function JsonViewer({ data }) {
-      const [copied, setCopied] = React.useState(false);
-      function copy() { navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }); }
-      return (
-        <div>
-          <button type="button" className="btn-tiny" onClick={copy} style={{marginBottom:'4px'}}>{copied ? 'Copiado!' : 'Copiar JSON'}</button>
-          <div className="json-box" dangerouslySetInnerHTML={{ __html: highlightJson(data) }} />
-        </div>
-      );
-    }
-    function ResultCard({ title, url, data, children }) {
-      const [raw, setRaw] = React.useState(false);
-      return (
-        <div className="card">
-          <h2>{title}</h2>
-          {url && <div className="url-pill"><span>GET</span>{url}</div>}
-          <div className="toggle-row">
-            <button type="button" className={`btn-tiny${!raw ? ' active' : ''}`} onClick={() => setRaw(false)}>Tabela</button>
-            <button type="button" className={`btn-tiny${raw ? ' active' : ''}`} onClick={() => setRaw(true)}>JSON</button>
-          </div>
-          {raw ? <JsonViewer data={data} /> : children}
-        </div>
-      );
-    }
+        const data = await response.json().catch(() => ({}));
 
-    function FhirPatients() {
-      const [pid, setPid] = useState('');
-      const [result, setResult] = useState(null);
-      const [url, setUrl] = useState('');
-      const [erro, setErro] = useState('');
-      const [loading, setLoading] = useState(false);
-      async function listarTodos() {
-        setErro(''); setResult(null); const u = '/fhir/Patient'; setUrl(u); setLoading(true);
-        try { const r = await fetch(u); const d = await r.json(); if (r.ok) setResult(d); else setErro(d.issue?.[0]?.diagnostics || 'Erro.'); } catch { setErro('Erro de ligação.'); }
-        setLoading(false);
+        if (!response.ok) {
+          showMessage(loginMessage, 'error', data.erro || 'Login invalido.');
+          return;
+        }
+
+        localStorage.setItem('carat_token', data.token);
+        localStorage.setItem('carat_user', JSON.stringify(data.user));
+        window.location.href = APP_URL;
+      } catch {
+        showMessage(loginMessage, 'error', 'Nao foi possivel contactar o servidor em http://localhost/.');
+      } finally {
+        loginButton.disabled = false;
       }
-      async function pesquisar(e) {
-        e.preventDefault(); if (!pid) return;
-        setErro(''); setResult(null); const u = `/fhir/Patient/${pid}`; setUrl(u); setLoading(true);
-        try { const r = await fetch(u); const d = await r.json(); if (r.ok) setResult(d); else setErro(d.issue?.[0]?.diagnostics || 'Patient não encontrado.'); } catch { setErro('Erro de ligação.'); }
-        setLoading(false);
+    });
+
+    registerForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearMessage(registerMessage);
+      registerButton.disabled = true;
+
+      const body = {
+        nome: registerForm.nome.value.trim(),
+        email: registerForm.email.value.trim(),
+        password: registerForm.password.value,
+        perfil: registerForm.perfil.value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/api/registar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          showMessage(registerMessage, 'error', data.erro || 'Erro ao adicionar utilizador.');
+          return;
+        }
+
+        registerForm.reset();
+        showMessage(registerMessage, 'success', `Utilizador criado com ID ${data.dados.id}.`);
+      } catch {
+        showMessage(registerMessage, 'error', 'Nao foi possivel contactar o servidor em http://localhost/.');
+      } finally {
+        registerButton.disabled = false;
       }
-      const isBundle = result && result.resourceType === 'Bundle';
-      const isPatient = result && result.resourceType === 'Patient';
-      return (
-        <>
-          <div className="card">
-            <h2><span className="fhir-resource">Patient</span></h2>
-            <form onSubmit={pesquisar}>
-              <div className="row">
-                <input type="number" value={pid} onChange={e => setPid(e.target.value)} placeholder="ID do utente (deixar vazio para listar todos)" />
-                <button type="submit" disabled={loading}>GET /:id</button>
-                <button type="button" className="btn-sec" onClick={listarTodos} disabled={loading}>GET /</button>
-              </div>
-            </form>
-            {erro && <p className="erro" style={{marginTop:'8px'}}>{erro}</p>}
-          </div>
-          {isBundle && (
-            <ResultCard title={<><span className="fhir-resource">Bundle</span> Patient — {result.total} resultado(s)</>} url={url} data={result}>
-              {result.total === 0 ? <p className="vazio">Nenhum patient.</p> : (
-                <table>
-                  <thead><tr><th>ID</th><th>Nome</th><th>Data Nasc.</th><th>Contacto</th><th>Nº Utente</th><th>Nº Faturação</th></tr></thead>
-                  <tbody>{result.entry.map(({ resource: p }) => (
-                    <tr key={p.id}><td>{p.id}</td><td>{p.name?.[0]?.text || '—'}</td><td>{p.birthDate || '—'}</td>
-                      <td>{p.telecom?.[0]?.value || '—'}</td><td>{p.identifier?.[0]?.value || '—'}</td><td>{p.identifier?.[1]?.value || '—'}</td>
-                    </tr>
-                  ))}</tbody>
-                </table>
-              )}
-            </ResultCard>
-          )}
-          {isPatient && (
-            <ResultCard title={<><span className="fhir-resource">Patient</span> /{result.id}</>} url={url} data={result}>
-              <table><tbody>
-                <tr><td><strong>resourceType</strong></td><td><span className="fhir-resource">{result.resourceType}</span></td></tr>
-                <tr><td><strong>ID</strong></td><td>{result.id}</td></tr>
-                <tr><td><strong>Nome</strong></td><td>{result.name?.[0]?.text || '—'}</td></tr>
-                <tr><td><strong>Data Nascimento</strong></td><td>{result.birthDate || '—'}</td></tr>
-                <tr><td><strong>Contacto</strong></td><td>{result.telecom?.[0]?.value || '—'}</td></tr>
-                <tr><td><strong>Morada</strong></td><td>{result.address?.[0]?.text || '—'}</td></tr>
-                <tr><td><strong>Nº Utente</strong></td><td>{result.identifier?.[0]?.value || '—'}</td></tr>
-                <tr><td><strong>Nº Faturação</strong></td><td>{result.identifier?.[1]?.value || '—'}</td></tr>
-              </tbody></table>
-            </ResultCard>
-          )}
-        </>
-      );
-    }
-
-    function FhirRecursoComPatient({ resource, colunas, renderRow }) {
-      const [pid, setPid] = useState('');
-      const [result, setResult] = useState(null);
-      const [url, setUrl] = useState('');
-      const [erro, setErro] = useState('');
-      const [loading, setLoading] = useState(false);
-      async function pesquisar(e) {
-        e.preventDefault(); if (!pid) return;
-        setErro(''); setResult(null); const u = `/fhir/${resource}?patient=${pid}`; setUrl(u); setLoading(true);
-        try { const r = await fetch(u); const d = await r.json(); if (r.ok) setResult(d); else setErro(d.issue?.[0]?.diagnostics || 'Erro.'); } catch { setErro('Erro de ligação.'); }
-        setLoading(false);
-      }
-      return (
-        <>
-          <div className="card">
-            <h2><span className="fhir-resource">{resource}</span></h2>
-            <form onSubmit={pesquisar}>
-              <div className="row">
-                <input type="number" value={pid} onChange={e => setPid(e.target.value)} placeholder="ID do utente (patient)" required />
-                <button type="submit" disabled={loading}>GET ?patient=:id</button>
-              </div>
-            </form>
-            {erro && <p className="erro" style={{marginTop:'8px'}}>{erro}</p>}
-          </div>
-          {result && (
-            <ResultCard title={<><span className="fhir-resource">Bundle</span> {resource} — {result.total} resultado(s)</>} url={url} data={result}>
-              {result.total === 0 ? <p className="vazio">Sem registos.</p> : (
-                <table>
-                  <thead><tr>{colunas.map(c => <th key={c}>{c}</th>)}</tr></thead>
-                  <tbody>{result.entry.map(({ resource: r }) => renderRow(r))}</tbody>
-                </table>
-              )}
-            </ResultCard>
-          )}
-        </>
-      );
-    }
-
-    function FhirAllergies() {
-      return (
-        <FhirRecursoComPatient resource="AllergyIntolerance"
-          colunas={['ID', 'Descrição', 'Criticidade', 'Estado', 'Freq. Crise']}
-          renderRow={a => (
-            <tr key={a.id}><td>{a.id}</td><td>{a.code?.text || '—'}</td>
-              <td><span className={`badge ${a.criticality === 'low' ? 'badge-green' : 'badge-red'}`}>{a.criticality || '—'}</span></td>
-              <td><span className="badge badge-blue">{a.clinicalStatus?.coding?.[0]?.code || '—'}</span></td>
-              <td>{a.note?.[0]?.text || '—'}</td>
-            </tr>
-          )}
-        />
-      );
-    }
-    function FhirMedications() {
-      const sb = { active: 'badge-green', completed: 'badge-orange', cancelled: 'badge-red' };
-      return (
-        <FhirRecursoComPatient resource="MedicationRequest"
-          colunas={['ID', 'Medicação', 'Estado', 'Prescritor', 'Dosagem', 'Validade']}
-          renderRow={m => (
-            <tr key={m.id}><td>{m.id}</td><td>{m.medicationCodeableConcept?.text || '—'}</td>
-              <td><span className={`badge ${sb[m.status] || 'badge-blue'}`}>{m.status}</span></td>
-              <td>{m.requester?.reference || '—'}</td>
-              <td>{m.dosageInstruction?.[0]?.text || '—'}</td>
-              <td>{m.dispenseRequest?.validityPeriod?.end || '—'}</td>
-            </tr>
-          )}
-        />
-      );
-    }
-    function FhirObservations() {
-      return (
-        <FhirRecursoComPatient resource="Observation"
-          colunas={['ID', 'Descrição', 'Estado', 'Data', 'Valor']}
-          renderRow={o => (
-            <tr key={o.id}><td>{o.id}</td><td>{o.code?.text || '—'}</td>
-              <td><span className="badge badge-blue">{o.status}</span></td>
-              <td>{o.effectiveDateTime ? new Date(o.effectiveDateTime).toLocaleDateString('pt-PT') : '—'}</td>
-              <td>{o.valueCodeableConcept?.text || o.valueString || '—'}</td>
-            </tr>
-          )}
-        />
-      );
-    }
-
-    function SecaoFhir() {
-      const [subtab, setSubtab] = useState('Patient');
-      const SUBTABS = ['Patient', 'AllergyIntolerance', 'MedicationRequest', 'Observation'];
-      return (
-        <>
-          <div className="card" style={{marginBottom:'0.5rem'}}>
-            <h2>Interoperabilidade FHIR R4</h2>
-            <p style={{fontSize:'0.85rem', color:'#718096', marginBottom:'0.75rem'}}>Consulta de recursos FHIR expostos pela API. Cada endpoint devolve JSON conforme a especificação HL7 FHIR R4.</p>
-            <div className="fhir-subtabs">
-              {SUBTABS.map(s => <div key={s} className={`fhir-subtab${subtab === s ? ' active' : ''}`} onClick={() => setSubtab(s)}>{s}</div>)}
-            </div>
-          </div>
-          {subtab === 'Patient'            && <FhirPatients />}
-          {subtab === 'AllergyIntolerance' && <FhirAllergies />}
-          {subtab === 'MedicationRequest'  && <FhirMedications />}
-          {subtab === 'Observation'        && <FhirObservations />}
-        </>
-      );
-    }
-
-    /* ───── App ───── */
-    const TABS = ['Utilizadores','Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Medicações','Med. Habituais','Exames','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
-
-    function App() {
-      const [tab, setTab] = useState('Utilizadores');
-      return (
-        <>
-          <header>
-            <div>
-              <h1>Sistema CARAT</h1>
-              <span>Controlo e Acompanhamento Respiratório e Alergológico em Tratamento</span>
-            </div>
-          </header>
-          <nav className="tabs">
-            {TABS.map(t => <div key={t} className={`tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>{t}</div>)}
-          </nav>
-          <div className="container">
-            {tab === 'Utilizadores'   && <SecaoUtilizadores />}
-            {tab === 'Médicos'        && <SecaoMedicos />}
-            {tab === 'Utentes'        && <SecaoUtentes />}
-            {tab === 'Prescrições'    && <SecaoPrescricoes />}
-            {tab === 'Anamneses'      && <SecaoAnamneses />}
-            {tab === 'Alergias'       && <SecaoAlergias />}
-            {tab === 'Comorbidades'   && <SecaoComorbidades />}
-            {tab === 'Sintomas'       && <SecaoSintomas />}
-            {tab === 'Medicações'     && <SecaoMedicacoes />}
-            {tab === 'Med. Habituais' && <SecaoMedicacoesHabituais />}
-            {tab === 'Exames'         && <SecaoExames />}
-            {tab === 'Alertas'        && <SecaoAlertas />}
-            {tab === 'Regras Alerta'  && <SecaoRegrasAlerta />}
-            {tab === 'Aval. CARAT'    && <SecaoAvaliacoesCarat />}
-            {tab === 'Resp. CARAT'    && <SecaoRespostasCarat />}
-            {tab === 'Planos'         && <SecaoPlanos />}
-            {tab === 'FHIR'           && <SecaoFhir />}
-          </div>
-          <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT</footer>
-        </>
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    });
   </script>
 </body>
 </html>

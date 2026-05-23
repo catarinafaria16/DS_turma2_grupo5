@@ -7,6 +7,11 @@ import { AuditoriaService } from './auditoria.service.js';
 
 export class AdministradorService {
     private auditoriaService: AuditoriaService;
+    private static limiaresCarat = {
+        limiarBaixo: 10,
+        limiarIntermedio: 20,
+        limiarAlto: 30
+    };
 
     constructor() {
         this.auditoriaService = new AuditoriaService();
@@ -114,6 +119,60 @@ export class AdministradorService {
             console.error('Erro ao gerir perfis e permissões:', error);
             throw error;
         }
+    }
+
+    async configurarLimiaresCarat(
+        limiarBaixo: number,
+        limiarIntermedio: number,
+        limiarAlto: number,
+        utilizadorIdLogado: number
+    ): Promise<{ limiarBaixo: number; limiarIntermedio: number; limiarAlto: number }> {
+        if (
+            !Number.isFinite(limiarBaixo) ||
+            !Number.isFinite(limiarIntermedio) ||
+            !Number.isFinite(limiarAlto) ||
+            limiarBaixo < 0 ||
+            limiarIntermedio <= limiarBaixo ||
+            limiarAlto <= limiarIntermedio
+        ) {
+            throw new Error('Limiares CARAT inválidos');
+        }
+
+        AdministradorService.limiaresCarat = { limiarBaixo, limiarIntermedio, limiarAlto };
+
+        await this.auditoriaService.registarAuditoria(
+            utilizadorIdLogado,
+            'config_limiares_carat',
+            0,
+            OperacaoAuditoria.ALTERACAO,
+            null,
+            JSON.stringify(AdministradorService.limiaresCarat)
+        );
+
+        return AdministradorService.limiaresCarat;
+    }
+
+    async obterConfigLimiaresCarat(): Promise<{ limiarBaixo: number; limiarIntermedio: number; limiarAlto: number }> {
+        return AdministradorService.limiaresCarat;
+    }
+
+    async gestarDados(tipoOperacao: string, dados: unknown, utilizadorIdLogado: number): Promise<{ tipoOperacao: string; dados: unknown }> {
+        if (!tipoOperacao || tipoOperacao.trim().length === 0) {
+            throw new Error('Tipo de operação é obrigatório');
+        }
+
+        const resultado = { tipoOperacao, dados };
+
+        await this.auditoriaService.registarAuditoria(
+            utilizadorIdLogado,
+            'dados_sistema',
+            0,
+            OperacaoAuditoria.ALTERACAO,
+            null,
+            JSON.stringify(resultado)
+        );
+
+        return resultado;
     }
 
     async validarAdministrador(utilizadorId: number): Promise<boolean> {

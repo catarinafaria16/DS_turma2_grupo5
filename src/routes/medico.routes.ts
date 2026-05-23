@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import { MedicoController } from '../controller/medico.controller.js';
+import { autenticar, requirePerfil } from '../middleware/auth.middleware.js';
+import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 const routes = Router();
 const controller = new MedicoController();
+
+routes.use(autenticar);
+routes.use(requirePerfil(PerfilUtilizador.ADMINISTRADOR));
 
 routes.get('/especialidade/:especialidade', controller.listarPorEspecialidade.bind(controller));
 routes.get('/', controller.listar.bind(controller));

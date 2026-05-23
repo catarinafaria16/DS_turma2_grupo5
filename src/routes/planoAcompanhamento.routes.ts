@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import { PlanoAcompanhamentoController } from '../controller/planoAcompanhamento.controller.js';
+import { autenticar, requirePerfil } from '../middleware/auth.middleware.js';
+import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 const routes = Router();
 const controller = new PlanoAcompanhamentoController();
+
+routes.use(autenticar);
+routes.use(requirePerfil(PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR));
 
 routes.get('/utente/:utenteId', controller.listarPorUtente.bind(controller));
 routes.get('/medico/:medicoId', controller.listarPorMedico.bind(controller));
