@@ -247,7 +247,7 @@
       return (
         <div className="login-container">
           <div className="login-card">
-            <h1>🏥 Sistema CARAT</h1>
+            <h1>Sistema CARAT</h1>
             <p className="subtitulo">Controlo e Acompanhamento Respiratório e Alergológico em Tratamento</p>
 
             <div className="login-tabs">
@@ -465,7 +465,7 @@
       const [utentes, setUtentes] = useState([]);
       const [utilizadores, setUtilizadores] = useState([]);
       const [medicos, setMedicos] = useState([]);
-      const [form, setForm] = useState({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' });
+      const [form, setForm] = useState({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '', genero: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
@@ -482,8 +482,10 @@
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const r = await apiFetch('/api/utentes', { method: 'POST', body: { utilizador_id: Number(form.utilizador_id), medico_id: Number(form.medico_id), nr_utente: Number(form.nr_utente), data_nascimento: form.data_nascimento, morada: form.morada, contacto: form.contacto, nr_faturacao: Number(form.nr_faturacao) } });
-        if (r.ok) { setForm({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' }); setSucesso('Utente criado com sucesso.'); buscar(); }
+        const body = { utilizador_id: Number(form.utilizador_id), medico_id: Number(form.medico_id), nr_utente: Number(form.nr_utente), data_nascimento: form.data_nascimento, morada: form.morada, contacto: form.contacto, nr_faturacao: Number(form.nr_faturacao) };
+        if (form.genero) body.genero = form.genero;
+        const r = await apiFetch('/api/utentes', { method: 'POST', body });
+        if (r.ok) { setForm({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '', genero: '' }); setSucesso('Utente criado com sucesso.'); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar utente.');
       }
       return (
@@ -510,6 +512,12 @@
               <input type="date" value={form.data_nascimento} onChange={set('data_nascimento')} required />
               <input value={form.morada} onChange={set('morada')} placeholder="Morada" required />
               <input value={form.contacto} onChange={set('contacto')} placeholder="Contacto" required />
+              <select value={form.genero} onChange={set('genero')}>
+                <option value="">-- Género (opcional) --</option>
+                <option value="FEMININO">Feminino</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="OUTRO">Outro</option>
+              </select>
               <button type="submit">Registar utente</button>
               {erro && <p className="erro">{erro}</p>}
               {sucesso && <p className="sucesso">{sucesso}</p>}
@@ -519,10 +527,11 @@
             <h2>Utentes Registados</h2>
             {utentes.length === 0 ? <p className="vazio">Nenhum utente registado.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Médico ID</th></tr></thead>
+                <thead><tr><th>#</th><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Género</th><th>Médico ID</th></tr></thead>
                 <tbody>{utentes.map(u => (
                   <tr key={u.id}><td>{u.id}</td><td>{u.nr_utente}</td><td>{u.morada}</td><td>{u.contacto}</td>
                     <td>{u.data_nascimento ? new Date(u.data_nascimento).toLocaleDateString('pt-PT') : '—'}</td>
+                    <td>{u.genero || '—'}</td>
                     <td><span className="badge badge-blue">{u.medico_id}</span></td>
                   </tr>
                 ))}</tbody>
@@ -713,7 +722,7 @@
           <div className="card">
             <h2>Nova Alergia</h2>
             <form onSubmit={handleSubmit}>
-              <input  min="1" da anamnese" required />
+              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" min="1" required />
               <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição da alergia" required />
               <div className="row">
                 <select value={form.intensidade_crise} onChange={set('intensidade_crise')}>
@@ -776,7 +785,7 @@
           <div className="card">
             <h2>Nova Comorbidade</h2>
             <form onSubmit={handleSubmit}>
-              <input  min="1" da anamnese" required />
+              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" min="1" required />
               <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição" required />
               <button type="submit">Registar comorbidade</button>
               {erro && <p className="erro">{erro}</p>}
@@ -901,7 +910,7 @@
           <div className="card">
             <h2>Nova Medicação</h2>
             <form onSubmit={handleSubmit}>
-              <input  min="1" da prescrição" required />
+              <input type="number" value={form.prescricao_id} onChange={set('prescricao_id')} placeholder="ID da prescrição" min="1" required />
               <input value={form.nome} onChange={set('nome')} placeholder="Nome do medicamento" required />
               <div className="row">
                 <input value={form.dose} onChange={set('dose')} placeholder="Dose (ex: 500mg)" required />
@@ -963,7 +972,7 @@
           <div className="card">
             <h2>Nova Medicação Habitual</h2>
             <form onSubmit={handleSubmit}>
-              <input  min="1" da anamnese" required />
+              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" min="1" required />
               <input value={form.nome} onChange={set('nome')} placeholder="Nome do medicamento" required />
               <div className="row">
                 <input value={form.dose} onChange={set('dose')} placeholder="Dose (ex: 500mg)" required />
@@ -1024,7 +1033,7 @@
           <div className="card">
             <h2>Novo Exame</h2>
             <form onSubmit={handleSubmit}>
-              <input  min="1" da prescrição" required />
+              <input type="number" value={form.prescricao_id} onChange={set('prescricao_id')} placeholder="ID da prescrição" min="1" required />
               <div className="row">
                 <input value={form.tipo_exame} onChange={set('tipo_exame')} placeholder="Tipo de exame (ex: Espirometria)" required />
                 <input type="datetime-local" value={form.data} onChange={set('data')} required />
@@ -1361,8 +1370,8 @@
             <h2>Nova Resposta CARAT</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                <input  min="1" da avaliação CARAT" required />
-                <input  min="1" do utente" required />
+                <input type="number" value={form.avaliacao_id} onChange={set('avaliacao_id')} placeholder="ID da avaliação CARAT" min="1" required />
+                <input type="number" value={form.utente_id} onChange={set('utente_id')} placeholder="ID do utente" min="1" required />
               </div>
               <input type="datetime-local" value={form.data_avaliacao} onChange={set('data_avaliacao')} required />
               <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Respostas às perguntas 1–9 (nas últimas 4 semanas):</p>
@@ -1722,7 +1731,7 @@
             <div style={{flex:1}}>
               <div className="user-bar">
                 <div>
-                  <h1 style={{margin:0}}>🏥 Sistema CARAT</h1>
+                  <h1 style={{margin:0}}>Sistema CARAT</h1>
                   <span>Controlo e Acompanhamento Respiratório e Alergológico em Tratamento</span>
                 </div>
                 <div style={{textAlign:'right'}}>
@@ -1730,7 +1739,7 @@
                   <span className={`badge ${perfilBadge[user.perfil] || 'badge-blue'}`} style={{fontSize:'0.72rem'}}>{user.perfil}</span>
                   <button className="logout-btn" style={{marginLeft:'12px', fontSize:'0.78rem', padding:'5px 12px'}} onClick={() => { logout(); window.location.href = '/index.html'; }}>Sair</button>
                   <div className="token-info" style={{maxWidth:'200px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', marginTop:'4px'}}>
-                    🔐 Token: {token.substring(0, 20)}...
+                    Token: {token.substring(0, 20)}...
                   </div>
                 </div>
               </div>

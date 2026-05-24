@@ -173,7 +173,7 @@
       loginButton.disabled = true;
 
       const body = {
-        id: Number(loginForm.id.value),
+        id: Number(document.getElementById('login-id').value),
         password: loginForm.password.value
       };
 

@@ -1,3 +1,4 @@
+import { GeneroUtilizador } from '../../enums/GeneroUtilizador.enum.js';
 
 export interface UtenteResponseDto {
     id: number;
@@ -8,5 +9,6 @@ export interface UtenteResponseDto {
     morada: string;
     contacto: string;
     nr_faturacao: number;
+    genero?: GeneroUtilizador;
     deleted_at?: Date;
 }

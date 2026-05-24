@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn } from 'typeorm';
+import { GeneroUtilizador } from '../enums/GeneroUtilizador.enum.js';
 
 @Entity()
 export class Utente {
@@ -26,6 +27,9 @@ export class Utente {
 
     @Column('int')
     nr_faturacao!: number;
+
+    @Column({ type: 'simple-enum', enum: GeneroUtilizador, nullable: true })
+    genero?: GeneroUtilizador;
 
     @DeleteDateColumn({ nullable: true })
     deleted_at?: Date;
