@@ -14,6 +14,9 @@ export class RegraAlerta {
     @Column('int')
     administrador_id!: number;
 
+    @Column({ type: 'int', nullable: true })
+    utente_id?: number;
+
     @Column({ type: 'simple-enum', enum: CategoriaRegraAlerta })
     categoria!: CategoriaRegraAlerta;
 

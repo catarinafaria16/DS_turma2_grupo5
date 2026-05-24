@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn } from 'typeorm';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { GeneroUtilizador } from '../enums/GeneroUtilizador.enum.js';
 
 @Entity()
 export class Utilizador {
@@ -18,6 +19,9 @@ export class Utilizador {
 
     @Column({ type: 'simple-enum', enum: PerfilUtilizador })
     perfil!: PerfilUtilizador;
+
+    @Column({ type: 'simple-enum', enum: GeneroUtilizador, nullable: true })
+    genero?: GeneroUtilizador;
 
     @DeleteDateColumn({ nullable: true })
     deleted_at?: Date;

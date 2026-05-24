@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { Tabagismo } from '../enums/Tabagismo.enum.js';
+import { SexoAnamnese } from '../enums/SexoAnamnese.enum.js';
 
 @Entity()
 export class Anamnese {
@@ -15,4 +16,7 @@ export class Anamnese {
 
     @Column({ type: 'simple-enum', enum: Tabagismo })
     tabagismo!: Tabagismo;
+
+    @Column({ type: 'simple-enum', enum: SexoAnamnese, nullable: true })
+    sexo?: SexoAnamnese;
 }

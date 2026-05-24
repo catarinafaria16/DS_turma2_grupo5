@@ -49,8 +49,11 @@ export class AlertaService {
 
     async criar(alertaData: CreateAlertaDto, utilizador: UtilizadorAutenticado): Promise<AlertaResponseDto> {
         try {
-            if (alertaData.utente_id <= 0 || alertaData.medico_id <= 0 || alertaData.regra_id <= 0) {
-                throw new Error('IDs de utente, medico e regra devem ser validos');
+            if (alertaData.utente_id <= 0 || alertaData.medico_id <= 0) {
+                throw new Error('IDs de utente e medico devem ser validos');
+            }
+            if (alertaData.regra_id !== undefined && alertaData.regra_id <= 0) {
+                throw new Error('ID de regra invalido');
             }
 
             const utente = await this.validarAcessoUtente(alertaData.utente_id, utilizador);

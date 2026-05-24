@@ -15,8 +15,8 @@ export class Alerta {
     @Column('int')
     medico_id!: number;
 
-    @Column('int')
-    regra_id!: number;
+    @Column({ type: 'int', nullable: true })
+    regra_id?: number;
 
     @Column({ type: 'simple-enum', enum: TipoAlerta })
     tipo!: TipoAlerta;

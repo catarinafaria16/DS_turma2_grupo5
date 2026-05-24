@@ -337,7 +337,7 @@
     /* ───── Utilizadores ───── */
     function SecaoUtilizadores({ apiFetch }) {
       const [utilizadores, setUtilizadores] = useState([]);
-      const [form, setForm] = useState({ nome: '', email: '', password: '', perfil: 'UTENTE' });
+      const [form, setForm] = useState({ nome: '', email: '', password: '', perfil: 'UTENTE', genero: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
@@ -347,8 +347,10 @@
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const r = await apiFetch('/api/utilizadores', { method: 'POST', body: form });
-        if (r.ok) { setForm({ nome: '', email: '', password: '', perfil: 'UTENTE' }); setSucesso(`Utilizador criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
+        const body = { nome: form.nome, email: form.email, password: form.password, perfil: form.perfil };
+        if (form.genero) body.genero = form.genero;
+        const r = await apiFetch('/api/utilizadores', { method: 'POST', body });
+        if (r.ok) { setForm({ nome: '', email: '', password: '', perfil: 'UTENTE', genero: '' }); setSucesso(`Utilizador criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar utilizador.');
       }
       const perfilBadge = { UTENTE: 'badge-green', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-orange' };
@@ -365,6 +367,12 @@
                 <option value="MEDICO">Médico</option>
                 <option value="ADMINISTRADOR">Administrador</option>
               </select>
+              <select value={form.genero} onChange={set('genero')}>
+                <option value="">-- Género (opcional) --</option>
+                <option value="FEMININO">Feminino</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="OUTRO">Outro</option>
+              </select>
               <button type="submit">Criar utilizador</button>
               {erro && <p className="erro">{erro}</p>}
               {sucesso && <p className="sucesso">{sucesso}</p>}
@@ -374,10 +382,11 @@
             <h2>Utilizadores Registados</h2>
             {utilizadores.length === 0 ? <p className="vazio">Nenhum utilizador registado.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Nome</th><th>Email</th><th>Perfil</th></tr></thead>
+                <thead><tr><th>#</th><th>Nome</th><th>Email</th><th>Perfil</th><th>Género</th></tr></thead>
                 <tbody>{utilizadores.map(u => (
                   <tr key={u.id}><td>{u.id}</td><td>{u.nome}</td><td>{u.email}</td>
                     <td><span className={`badge ${perfilBadge[u.perfil] || 'badge-blue'}`}>{u.perfil}</span></td>
+                    <td>{u.genero || '—'}</td>
                   </tr>
                 ))}</tbody>
               </table>
@@ -612,7 +621,7 @@
     function SecaoAnamneses({ apiFetch }) {
       const [anamneses, setAnamneses] = useState([]);
       const [utentes, setUtentes] = useState([]);
-      const [form, setForm] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR' });
+      const [form, setForm] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
@@ -625,8 +634,10 @@
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const r = await apiFetch('/api/anamneses', { method: 'POST', body: { utente_id: Number(form.utente_id), historico_familiar: form.historico_familiar, tabagismo: form.tabagismo } });
-        if (r.ok) { setForm({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR' }); setSucesso(`Anamnese criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
+        const body = { utente_id: Number(form.utente_id), historico_familiar: form.historico_familiar, tabagismo: form.tabagismo };
+        if (form.sexo) body.sexo = form.sexo;
+        const r = await apiFetch('/api/anamneses', { method: 'POST', body });
+        if (r.ok) { setForm({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' }); setSucesso(`Anamnese criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar anamnese.');
       }
       return (
@@ -648,6 +659,11 @@
                 <option value="10 A 20 CIGARROS/DIA">10 a 20 cigarros/dia</option>
                 <option value="MAIS DE 20 CIGARROS/DIA">Mais de 20 cigarros/dia</option>
               </select>
+              <select value={form.sexo} onChange={set('sexo')}>
+                <option value="">-- Sexo (opcional) --</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="FEMININO">Feminino</option>
+              </select>
               <button type="submit">Criar anamnese</button>
               {erro && <p className="erro">{erro}</p>}
               {sucesso && <p className="sucesso">{sucesso}</p>}
@@ -657,10 +673,11 @@
             <h2>Anamneses Registadas</h2>
             {anamneses.length === 0 ? <p className="vazio">Nenhuma anamnese registada.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Utente ID</th><th>Tabagismo</th><th>Histórico Familiar</th></tr></thead>
+                <thead><tr><th>#</th><th>Utente ID</th><th>Sexo</th><th>Tabagismo</th><th>Histórico Familiar</th></tr></thead>
                 <tbody>{anamneses.map(a => (
                   <tr key={a.id}><td>{a.id}</td>
                     <td><span className="badge badge-green">{a.utente_id}</span></td>
+                    <td>{a.sexo || '—'}</td>
                     <td><span className="badge badge-orange">{a.tabagismo}</span></td>
                     <td style={{maxWidth:'300px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.historico_familiar}</td>
                   </tr>
@@ -696,7 +713,7 @@
           <div className="card">
             <h2>Nova Alergia</h2>
             <form onSubmit={handleSubmit}>
-              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" required />
+              <input  min="1" da anamnese" required />
               <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição da alergia" required />
               <div className="row">
                 <select value={form.intensidade_crise} onChange={set('intensidade_crise')}>
@@ -759,7 +776,7 @@
           <div className="card">
             <h2>Nova Comorbidade</h2>
             <form onSubmit={handleSubmit}>
-              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" required />
+              <input  min="1" da anamnese" required />
               <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição" required />
               <button type="submit">Registar comorbidade</button>
               {erro && <p className="erro">{erro}</p>}
@@ -884,7 +901,7 @@
           <div className="card">
             <h2>Nova Medicação</h2>
             <form onSubmit={handleSubmit}>
-              <input type="number" value={form.prescricao_id} onChange={set('prescricao_id')} placeholder="ID da prescrição" required />
+              <input  min="1" da prescrição" required />
               <input value={form.nome} onChange={set('nome')} placeholder="Nome do medicamento" required />
               <div className="row">
                 <input value={form.dose} onChange={set('dose')} placeholder="Dose (ex: 500mg)" required />
@@ -946,7 +963,7 @@
           <div className="card">
             <h2>Nova Medicação Habitual</h2>
             <form onSubmit={handleSubmit}>
-              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" required />
+              <input  min="1" da anamnese" required />
               <input value={form.nome} onChange={set('nome')} placeholder="Nome do medicamento" required />
               <div className="row">
                 <input value={form.dose} onChange={set('dose')} placeholder="Dose (ex: 500mg)" required />
@@ -1007,7 +1024,7 @@
           <div className="card">
             <h2>Novo Exame</h2>
             <form onSubmit={handleSubmit}>
-              <input type="number" value={form.prescricao_id} onChange={set('prescricao_id')} placeholder="ID da prescrição" required />
+              <input  min="1" da prescrição" required />
               <div className="row">
                 <input value={form.tipo_exame} onChange={set('tipo_exame')} placeholder="Tipo de exame (ex: Espirometria)" required />
                 <input type="datetime-local" value={form.data} onChange={set('data')} required />
@@ -1081,9 +1098,9 @@
             <h2>Novo Alerta</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                <input type="number" value={form.utente_id} onChange={set('utente_id')} placeholder="ID do utente" required />
-                <input type="number" value={form.medico_id} onChange={set('medico_id')} placeholder="ID do médico" required />
-                <input type="number" value={form.regra_id}  onChange={set('regra_id')}  placeholder="ID da regra" required />
+                <input type="number" min="1" value={form.utente_id} onChange={set('utente_id')} placeholder="ID do utente" required />
+                <input type="number" min="1" value={form.medico_id} onChange={set('medico_id')} placeholder="ID do médico" required />
+                <input type="number" min="1" value={form.regra_id}  onChange={set('regra_id')}  placeholder="ID da regra" required />
               </div>
               <div className="row">
                 <select value={form.tipo} onChange={set('tipo')}>
@@ -1134,18 +1151,31 @@
     /* ───── Regras de Alerta ───── */
     function SecaoRegrasAlerta({ apiFetch }) {
       const [regras, setRegras] = useState([]);
-      const [form, setForm] = useState({ medico_id: '', administrador_id: '', categoria: 'SCORE', limiar_score: '', valor_deterioracao: '', prioridade: 'MEDIA' });
+      const [utentes, setUtentes] = useState([]);
+      const [form, setForm] = useState({ medico_id: '', administrador_id: '', utente_id: '', categoria: 'SCORE', limiar_score: '', valor_deterioracao: '', prioridade: 'MEDIA' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
         try { const r = await apiFetch('/api/regras-alerta'); if (r.ok) setRegras(r.data.dados ?? []); } catch {}
       }
-      useEffect(() => { buscar(); }, []);
+      async function buscarUtentes() {
+        try { const r = await apiFetch('/api/utentes'); if (r.ok) setUtentes(r.data.dados ?? []); } catch {}
+      }
+      useEffect(() => { buscar(); buscarUtentes(); }, []);
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const r = await apiFetch('/api/regras-alerta', { method: 'POST', body: { medico_id: Number(form.medico_id), administrador_id: Number(form.administrador_id), categoria: form.categoria, limiar_score: Number(form.limiar_score), valor_deterioracao: Number(form.valor_deterioracao), prioridade: form.prioridade } });
-        if (r.ok) { setForm({ medico_id: '', administrador_id: '', categoria: 'SCORE', limiar_score: '', valor_deterioracao: '', prioridade: 'MEDIA' }); setSucesso(`Regra criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
+        const body = {
+          medico_id: Number(form.medico_id),
+          administrador_id: Number(form.administrador_id),
+          categoria: form.categoria,
+          limiar_score: Number(form.limiar_score),
+          valor_deterioracao: Number(form.valor_deterioracao),
+          prioridade: form.prioridade
+        };
+        if (form.utente_id) body.utente_id = Number(form.utente_id);
+        const r = await apiFetch('/api/regras-alerta', { method: 'POST', body });
+        if (r.ok) { setForm({ medico_id: '', administrador_id: '', utente_id: '', categoria: 'SCORE', limiar_score: '', valor_deterioracao: '', prioridade: 'MEDIA' }); setSucesso(`Regra criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar regra de alerta.');
       }
       const pb = { BAIXA: 'badge-green', MEDIA: 'badge-blue', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
@@ -1153,14 +1183,21 @@
         <>
           <div className="card">
             <h2>Nova Regra de Alerta</h2>
+            <p style={{fontSize:'0.8rem',color:'#718096',marginBottom:'8px'}}>
+              As regras permitem definir limiares personalizados. Deixe "Utente" vazio para aplicar a <strong>todos os utentes</strong> do médico.
+            </p>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                <input type="number" value={form.medico_id} onChange={set('medico_id')} placeholder="ID do médico" required />
-                <input type="number" value={form.administrador_id} onChange={set('administrador_id')} placeholder="ID do administrador" required />
+                <input type="number" min="1" value={form.medico_id} onChange={set('medico_id')} placeholder="ID do médico" required />
+                <input type="number" min="1" value={form.administrador_id} onChange={set('administrador_id')} placeholder="ID do administrador" required />
               </div>
+              <select value={form.utente_id} onChange={set('utente_id')}>
+                <option value="">— Aplicar a todos os utentes do médico —</option>
+                {utentes.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
+              </select>
               <div className="row">
                 <select value={form.categoria} onChange={set('categoria')}>
-                  <option value="SCORE">Score</option>
+                  <option value="SCORE">Score CARAT</option>
                   <option value="SINTOMA">Sintoma</option>
                   <option value="EXAME">Exame</option>
                   <option value="MEDICACAO">Medicação</option>
@@ -1173,8 +1210,14 @@
                 </select>
               </div>
               <div className="row">
-                <input type="number" value={form.limiar_score} onChange={set('limiar_score')} placeholder="Limiar score" required />
-                <input type="number" value={form.valor_deterioracao} onChange={set('valor_deterioracao')} placeholder="Valor deterioração" required />
+                <div style={{flex:1}}>
+                  <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>Limiar score — alerta se score ≤ este valor</label>
+                  <input type="number" value={form.limiar_score} onChange={set('limiar_score')} placeholder="Ex: 20 (parcialmente controlada)" required style={{width:'100%'}} />
+                </div>
+                <div style={{flex:1}}>
+                  <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>Valor deterioração</label>
+                  <input type="number" value={form.valor_deterioracao} onChange={set('valor_deterioracao')} placeholder="Ex: 5" required style={{width:'100%'}} />
+                </div>
               </div>
               <button type="submit">Criar regra</button>
               {erro && <p className="erro">{erro}</p>}
@@ -1183,16 +1226,19 @@
           </div>
           <div className="card">
             <h2>Regras de Alerta</h2>
+            <p style={{fontSize:'0.78rem',color:'#718096',marginBottom:'8px'}}>
+              Nota: os alertas CARAT são também criados automaticamente (score &lt; 16 = MUITO ALTA, score 16–20 = ALTA), independentemente das regras abaixo.
+            </p>
             {regras.length === 0 ? <p className="vazio">Nenhuma regra registada.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Médico</th><th>Admin</th><th>Categoria</th><th>Limiar</th><th>Deterioração</th><th>Prioridade</th></tr></thead>
+                <thead><tr><th>#</th><th>Médico</th><th>Admin</th><th>Utente</th><th>Categoria</th><th>Limiar</th><th>Prioridade</th></tr></thead>
                 <tbody>{regras.map(r => (
                   <tr key={r.id}><td>{r.id}</td>
                     <td><span className="badge badge-blue">{r.medico_id}</span></td>
                     <td><span className="badge badge-orange">{r.administrador_id}</span></td>
+                    <td>{r.utente_id ? <span className="badge badge-green">{r.utente_id}</span> : <span style={{color:'#a0aec0',fontSize:'0.78rem'}}>todos</span>}</td>
                     <td>{r.categoria}</td>
                     <td>{r.limiar_score}</td>
-                    <td>{r.valor_deterioracao}</td>
                     <td><span className={`badge ${pb[r.prioridade] || 'badge-blue'}`}>{r.prioridade}</span></td>
                   </tr>
                 ))}</tbody>
@@ -1206,19 +1252,19 @@
     /* ───── Avaliações CARAT ───── */
     function SecaoAvaliacoesCarat({ apiFetch }) {
       const [avaliacoes, setAvaliacoes] = useState([]);
-      const OPTS_1_9 = ["Nunca", "Até 1 ou 2 dias", "Mais de 2 dias por semana", "Quase todos os dias"];
-      const OPTS_10  = ["Não toma medicamentos", "Nunca", "Menos de 7 dias", "7 ou mais dias"];
+      const OPTS_1_9 = ["Nunca", "Até 2 dias por semana", "Mais de 2 dias por semana", "Quase todos os dias"];
+      const OPTS_10  = ["Não estou a tomar medicamentos", "Nunca", "Menos de 7 dias", "7 ou mais dias"];
       const QS_DEFAULT = [
-        'Nos últimos 7 dias, teve nariz entupido?',
-        'Nos últimos 7 dias, teve corrimento nasal?',
-        'Nos últimos 7 dias, espirrou?',
-        'Nos últimos 7 dias, teve comichão no nariz?',
-        'Nos últimos 7 dias, acordou durante a noite devido à tosse, pieira ou dificuldade em respirar?',
-        'Nos últimos 7 dias, teve crises de tosse ou pieira de manhã ao acordar?',
-        'Nos últimos 7 dias, teve falta de ar durante as atividades do dia a dia?',
-        'Nos últimos 7 dias, teve pieira?',
-        'Nos últimos 7 dias, sentiu aperto no peito?',
-        'Nos últimos 7 dias, usou medicamento de alívio (ex: broncodilatador)?',
+        'Nariz entupido?',
+        'Espirros?',
+        'Comichão no nariz?',
+        'Corrimento/pingo do nariz?',
+        'Falta de ar/dispneia?',
+        'Chiadeira no peito/pieira?',
+        'Aperto no peito com esforço físico?',
+        'Cansaço/dificuldade em fazer as suas actividades ou tarefas do dia-a-dia?',
+        'Acordou durante a noite por causa das suas doenças alérgicas respiratórias?',
+        'Aumentar a utilização dos seus medicamentos por causa das suas doenças alérgicas respiratórias (asma/rinite/alergia)?',
       ];
       const initForm = { versao: '1', q1: QS_DEFAULT[0], q2: QS_DEFAULT[1], q3: QS_DEFAULT[2], q4: QS_DEFAULT[3], q5: QS_DEFAULT[4], q6: QS_DEFAULT[5], q7: QS_DEFAULT[6], q8: QS_DEFAULT[7], q9: QS_DEFAULT[8], q10: QS_DEFAULT[9] };
       const [form, setForm] = useState(initForm);
@@ -1278,8 +1324,19 @@
     function SecaoRespostasCarat({ apiFetch }) {
       const [respostas, setRespostas] = useState([]);
       const [filtro, setFiltro] = useState('');
-      const R1_9 = [{v:'0',l:'0 — Nunca'},{v:'1',l:'1 — Até 1 ou 2 dias'},{v:'2',l:'2 — Mais de 2 dias/semana'},{v:'3',l:'3 — Quase todos os dias'}];
-      const R10  = [{v:'0',l:'0 — Não toma medicamentos'},{v:'1',l:'1 — Nunca'},{v:'2',l:'2 — Menos de 7 dias'},{v:'3',l:'3 — 7 ou mais dias'}];
+      const R1_9 = [{v:'0',l:'Nunca'},{v:'1',l:'Até 2 dias por semana'},{v:'2',l:'Mais de 2 dias por semana'},{v:'3',l:'Quase todos os dias'}];
+      const R10  = [{v:'0',l:'Não estou a tomar medicamentos'},{v:'1',l:'Nunca'},{v:'2',l:'Menos de 7 dias'},{v:'3',l:'7 ou mais dias'}];
+      const PERGUNTAS_1_9 = [
+        'Nariz entupido?',
+        'Espirros?',
+        'Comichão no nariz?',
+        'Corrimento/pingo do nariz?',
+        'Falta de ar/dispneia?',
+        'Chiadeira no peito/pieira?',
+        'Aperto no peito com esforço físico?',
+        'Cansaço/dificuldade em fazer as actividades do dia-a-dia?',
+        'Acordou durante a noite por causa das doenças alérgicas respiratórias?',
+      ];
       const init = { avaliacao_id:'', utente_id:'', data_avaliacao:'', r1:'0',r2:'0',r3:'0',r4:'0',r5:'0',r6:'0',r7:'0',r8:'0',r9:'0',r10:'0' };
       const [form, setForm] = useState(init);
       const [erro, setErro] = useState('');
@@ -1297,29 +1354,30 @@
         if (r.ok) { setForm(init); setSucesso(`Resposta submetida — Score: ${r.data.dados?.score_total ?? '?'} — ${r.data.dados?.interpretacao ?? ''}`); buscar(filtro); }
         else setErro(r.data.erro || 'Erro ao submeter resposta CARAT.');
       }
-      const scoreBadge = s => s <= 7 ? 'badge-red' : s <= 14 ? 'badge-orange' : 'badge-green';
+      const scoreBadge = s => s < 16 ? 'badge-red' : s < 21 ? 'badge-orange' : 'badge-green';
       return (
         <>
           <div className="card">
             <h2>Nova Resposta CARAT</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                <input type="number" value={form.avaliacao_id} onChange={set('avaliacao_id')} placeholder="ID da avaliação CARAT" required />
-                <input type="number" value={form.utente_id} onChange={set('utente_id')} placeholder="ID do utente" required />
+                <input  min="1" da avaliação CARAT" required />
+                <input  min="1" do utente" required />
               </div>
               <input type="datetime-local" value={form.data_avaliacao} onChange={set('data_avaliacao')} required />
-              <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Respostas R1–R9 (sintomas rinite e asma nos últimos 7 dias):</p>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'6px',maxWidth:'480px'}}>
+              <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Respostas às perguntas 1–9 (nas últimas 4 semanas):</p>
+              <div style={{display:'flex',flexDirection:'column',gap:'6px',maxWidth:'480px'}}>
                 {[1,2,3,4,5,6,7,8,9].map(n => (
                   <div key={n}>
-                    <label style={{fontSize:'0.75rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>R{n}</label>
+                    <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>{n}. {PERGUNTAS_1_9[n-1]}</label>
                     <select value={form[`r${n}`]} onChange={set(`r${n}`)} style={{width:'100%'}}>
                       {R1_9.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
                     </select>
                   </div>
                 ))}
               </div>
-              <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>R10 — Uso de medicamento de alívio nos últimos 7 dias:</p>
+              <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Pergunta 10 — Utilização de medicamentos (nas últimas 4 semanas):</p>
+              <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>10. Aumentar a utilização dos seus medicamentos por causa das suas doenças alérgicas respiratórias (asma/rinite/alergia)?</label>
               <select value={form.r10} onChange={set('r10')} style={{maxWidth:'480px'}}>
                 {R10.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
               </select>
@@ -1337,13 +1395,14 @@
             </div>
             {respostas.length === 0 ? <p className="vazio">Nenhuma resposta encontrada.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Utente</th><th>Avaliação</th><th>Score</th><th>Interpretação</th><th>Data</th></tr></thead>
+                <thead><tr><th>#</th><th>Utente</th><th>Avaliação</th><th>Score</th><th>Interpretação</th><th>Recomendação</th><th>Data</th></tr></thead>
                 <tbody>{respostas.map(r => (
                   <tr key={r.id}><td>{r.id}</td>
                     <td><span className="badge badge-green">{r.utente_id}</span></td>
                     <td><span className="badge badge-blue">{r.avaliacao_id}</span></td>
                     <td><span className={`badge ${scoreBadge(r.score_total)}`}>{r.score_total}/30</span></td>
                     <td>{r.interpretacao}</td>
+                    <td style={{maxWidth:'260px',fontSize:'0.85em',color:'#555'}}>{r.recomendacao_automatica || '—'}</td>
                     <td>{r.data_avaliacao ? new Date(r.data_avaliacao).toLocaleDateString('pt-PT') : '—'}</td>
                   </tr>
                 ))}</tbody>
@@ -1499,7 +1558,7 @@
             <h2><span className="fhir-resource">Patient</span></h2>
             <form onSubmit={pesquisar}>
               <div className="row">
-                <input type="number" value={pid} onChange={e => setPid(e.target.value)} placeholder="ID do utente (deixar vazio para listar todos)" />
+                <input type="number" min="1" value={pid} onChange={e => setPid(e.target.value)} placeholder="ID do utente (deixar vazio para listar todos)" />
                 <button type="submit" disabled={loading}>GET /:id</button>
                 <button type="button" className="btn-sec" onClick={listarTodos} disabled={loading}>GET /</button>
               </div>
@@ -1556,7 +1615,7 @@
             <h2><span className="fhir-resource">{resource}</span></h2>
             <form onSubmit={pesquisar}>
               <div className="row">
-                <input type="number" value={pid} onChange={e => setPid(e.target.value)} placeholder="ID do utente (patient)" required />
+                <input type="number" min="1" value={pid} onChange={e => setPid(e.target.value)} placeholder="ID do utente (patient)" required />
                 <button type="submit" disabled={loading}>GET ?patient=:id</button>
               </div>
             </form>
