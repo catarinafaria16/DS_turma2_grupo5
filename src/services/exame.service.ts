@@ -46,6 +46,13 @@ export class ExameService {
             return prescricao;
         }
 
+        if (utilizador.perfil === PerfilUtilizador.UTENTE) {
+            if (utente.utilizador_id !== utilizador.id) {
+                throw new Error('Acesso negado: nao pode consultar exames de outro utente');
+            }
+            return prescricao;
+        }
+
         throw new Error('Acesso negado: perfil sem permissao para exames');
     }
 
@@ -102,7 +109,17 @@ export class ExameService {
                 return await this.repo.find() as ExameResponseDto[];
             }
 
-            const prescricoes = await this.prescricaoRepo.find({ where: { medico_id: utilizador.id } });
+            let prescricoes: Prescricao[] = [];
+            if (utilizador.perfil === PerfilUtilizador.MEDICO) {
+                prescricoes = await this.prescricaoRepo.find({ where: { medico_id: utilizador.id } });
+            } else {
+                const utente = await this.utenteRepo.findOne({ where: { utilizador_id: utilizador.id } });
+                if (!utente) {
+                    return [];
+                }
+                prescricoes = await this.prescricaoRepo.find({ where: { utente_id: utente.id } });
+            }
+
             const prescricaoIds = prescricoes.map((prescricao) => prescricao.id);
             if (prescricaoIds.length === 0) {
                 return [];

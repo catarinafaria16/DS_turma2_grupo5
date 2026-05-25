@@ -11,6 +11,33 @@ import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 export class MedicacaoService {
     private auditoriaService: AuditoriaService;
+    private static readonly catalogoMedicamentos: Record<string, { minMg: number; maxMg: number; unidades: string[] }> = {
+        paracetamol: { minMg: 125, maxMg: 1000, unidades: ['mg', 'g'] },
+        ibuprofeno: { minMg: 100, maxMg: 800, unidades: ['mg'] },
+        amoxicilina: { minMg: 250, maxMg: 1000, unidades: ['mg', 'g'] },
+        azitromicina: { minMg: 250, maxMg: 500, unidades: ['mg'] },
+        claritromicina: { minMg: 250, maxMg: 500, unidades: ['mg'] },
+        prednisolona: { minMg: 5, maxMg: 60, unidades: ['mg'] },
+        metilprednisolona: { minMg: 4, maxMg: 64, unidades: ['mg'] },
+        cetirizina: { minMg: 5, maxMg: 20, unidades: ['mg'] },
+        loratadina: { minMg: 5, maxMg: 10, unidades: ['mg'] },
+        desloratadina: { minMg: 2.5, maxMg: 5, unidades: ['mg'] },
+        rupatadina: { minMg: 10, maxMg: 20, unidades: ['mg'] },
+        montelucaste: { minMg: 4, maxMg: 10, unidades: ['mg'] },
+        bilastina: { minMg: 20, maxMg: 20, unidades: ['mg'] },
+        levocetirizina: { minMg: 5, maxMg: 5, unidades: ['mg'] },
+        budesonida: { minMg: 0.05, maxMg: 2, unidades: ['mg', 'mcg'] },
+        beclometasona: { minMg: 0.05, maxMg: 2, unidades: ['mg', 'mcg'] },
+        fluticasona: { minMg: 0.05, maxMg: 1, unidades: ['mg', 'mcg'] },
+        formoterol: { minMg: 0.0045, maxMg: 0.024, unidades: ['mg', 'mcg'] },
+        salmeterol: { minMg: 0.025, maxMg: 0.05, unidades: ['mg', 'mcg'] },
+        tiotropio: { minMg: 0.0025, maxMg: 0.018, unidades: ['mg', 'mcg'] },
+        salbutamol: { minMg: 0.05, maxMg: 8, unidades: ['mg', 'mcg'] },
+        omeprazol: { minMg: 10, maxMg: 40, unidades: ['mg'] },
+        amlodipina: { minMg: 2.5, maxMg: 10, unidades: ['mg'] },
+        losartan: { minMg: 25, maxMg: 100, unidades: ['mg'] },
+        metformina: { minMg: 500, maxMg: 1000, unidades: ['mg', 'g'] }
+    };
 
     constructor() {
         this.auditoriaService = new AuditoriaService();
@@ -46,6 +73,13 @@ export class MedicacaoService {
             return prescricao;
         }
 
+        if (utilizador.perfil === PerfilUtilizador.UTENTE) {
+            if (utente.utilizador_id !== utilizador.id) {
+                throw new Error('Acesso negado: nao pode consultar medicacao de outro utente');
+            }
+            return prescricao;
+        }
+
         throw new Error('Acesso negado: perfil sem permissao para medicacao');
     }
 
@@ -62,11 +96,78 @@ export class MedicacaoService {
         return medicacao;
     }
 
+    private normalizarNomeMedicamento(nome: string): string {
+        return nome
+            .trim()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    private converterDoseParaMg(valor: number, unidade: string): number {
+        if (unidade === 'g') return valor * 1000;
+        if (unidade === 'mcg') return valor / 1000;
+        return valor;
+    }
+
+    private validarMedicacao(medicacaoData: CreateMedicacaoDto): void {
+        if (!medicacaoData.nome || medicacaoData.nome.trim().length === 0) {
+            throw new Error('Nome da medicacao e obrigatorio');
+        }
+        if (!medicacaoData.dose || medicacaoData.dose.trim().length === 0) {
+            throw new Error('Dose da medicacao e obrigatoria');
+        }
+        if (!medicacaoData.duracao || medicacaoData.duracao.trim().length === 0) {
+            throw new Error('Duracao da medicacao e obrigatoria');
+        }
+        if (!medicacaoData.periodicidade || medicacaoData.periodicidade.trim().length === 0) {
+            throw new Error('Periodicidade da medicacao e obrigatoria');
+        }
+
+        const nomeNormalizado = this.normalizarNomeMedicamento(medicacaoData.nome);
+        const medicamento = MedicacaoService.catalogoMedicamentos[nomeNormalizado];
+        if (!medicamento) {
+            throw new Error('Medicamento nao encontrado no catalogo local de validacao');
+        }
+
+        const doseNormalizada = medicacaoData.dose.trim().toLowerCase().replace(',', '.');
+        const doseMatch = doseNormalizada.match(/^(\d+(?:\.\d+)?)\s*(mg|g|mcg)$/);
+        if (!doseMatch) {
+            throw new Error('Dose invalida: use um formato como 500 mg, 1 g ou 200 mcg');
+        }
+
+        const valorTexto = doseMatch[1];
+        const unidadeTexto = doseMatch[2];
+        if (!valorTexto || !unidadeTexto) {
+            throw new Error('Dose invalida: formato incompleto');
+        }
+
+        const valor = Number(valorTexto);
+        const unidade = unidadeTexto;
+        if (!Number.isFinite(valor) || valor <= 0) {
+            throw new Error('Dose invalida: o valor deve ser numerico e maior que zero');
+        }
+        if (!medicamento.unidades.includes(unidade)) {
+            throw new Error(`Dose invalida para ${medicacaoData.nome}: unidade nao suportada`);
+        }
+
+        const doseMg = this.converterDoseParaMg(valor, unidade);
+        if (doseMg < medicamento.minMg || doseMg > medicamento.maxMg) {
+            throw new Error(`Dose clinicamente implausivel para ${medicacaoData.nome}`);
+        }
+
+        const validade = new Date(medicacaoData.validade);
+        if (Number.isNaN(validade.getTime())) {
+            throw new Error('Validade da medicacao invalida');
+        }
+        if (validade < new Date(new Date().toDateString())) {
+            throw new Error('Validade da medicacao deve ser atual ou futura');
+        }
+    }
+
     async criar(medicacaoData: CreateMedicacaoDto, utilizador: UtilizadorAutenticado): Promise<MedicacaoResponseDto> {
         try {
-            if (!medicacaoData.nome || medicacaoData.nome.trim().length === 0) {
-                throw new Error('Nome da medicacao e obrigatorio');
-            }
+            this.validarMedicacao(medicacaoData);
 
             await this.validarAcessoPrescricao(medicacaoData.prescricao_id, utilizador);
 
@@ -106,7 +207,17 @@ export class MedicacaoService {
                 return await this.repo.find() as MedicacaoResponseDto[];
             }
 
-            const prescricoes = await this.prescricaoRepo.find({ where: { medico_id: utilizador.id } });
+            let prescricoes: Prescricao[] = [];
+            if (utilizador.perfil === PerfilUtilizador.MEDICO) {
+                prescricoes = await this.prescricaoRepo.find({ where: { medico_id: utilizador.id } });
+            } else {
+                const utente = await this.utenteRepo.findOne({ where: { utilizador_id: utilizador.id } });
+                if (!utente) {
+                    return [];
+                }
+                prescricoes = await this.prescricaoRepo.find({ where: { utente_id: utente.id } });
+            }
+
             const prescricaoIds = prescricoes.map((prescricao) => prescricao.id);
             if (prescricaoIds.length === 0) {
                 return [];
@@ -141,6 +252,7 @@ export class MedicacaoService {
             const anterior = await this.obterInterna(medicacaoId);
             await this.validarAcessoPrescricao(anterior.prescricao_id, utilizador);
             await this.validarAcessoPrescricao(medicacaoData.prescricao_id, utilizador);
+            this.validarMedicacao(medicacaoData);
 
             const atualizada = await this.repo.save({ ...anterior, ...medicacaoData, id: medicacaoId });
 

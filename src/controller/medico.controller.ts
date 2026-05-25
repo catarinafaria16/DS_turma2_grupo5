@@ -10,18 +10,25 @@ export class MedicoController {
         try {
             const medicoData: CreateMedicoDto = req.body;
             const utilizador = req.utilizador as UtilizadorAutenticado;
-            const novoMedico = await this.service.criar(medicoData, utilizador.id);
+            const novoMedico = await this.service.criar(medicoData, utilizador);
             return res.status(201).json({ mensagem: 'Medico criado com sucesso', dados: novoMedico });
         } catch (error: any) {
+            if (error.message.includes('Acesso negado')) {
+                return res.status(403).json({ erro: error.message });
+            }
             return res.status(400).json({ erro: error.message || 'Erro ao criar medico' });
         }
     }
 
-    async listar(_req: Request, res: Response) {
+    async listar(req: Request, res: Response) {
         try {
-            const medicos = await this.service.listar();
+            const utilizador = req.utilizador as UtilizadorAutenticado;
+            const medicos = await this.service.listar(utilizador);
             return res.status(200).json({ dados: medicos, total: medicos.length });
         } catch (error: any) {
+            if (error.message.includes('Acesso negado')) {
+                return res.status(403).json({ erro: error.message });
+            }
             return res.status(400).json({ erro: error.message || 'Erro ao listar medicos' });
         }
     }
@@ -29,9 +36,13 @@ export class MedicoController {
     async obter(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const medico = await this.service.obter(Number(id));
+            const utilizador = req.utilizador as UtilizadorAutenticado;
+            const medico = await this.service.obter(Number(id), utilizador);
             return res.status(200).json({ dados: medico });
         } catch (error: any) {
+            if (error.message.includes('Acesso negado')) {
+                return res.status(403).json({ erro: error.message });
+            }
             return res.status(400).json({ erro: error.message || 'Erro ao obter medico' });
         }
     }
@@ -39,11 +50,14 @@ export class MedicoController {
     async atualizar(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const medicoData: CreateMedicoDto = req.body;
+            const medicoData: Partial<CreateMedicoDto> = req.body;
             const utilizador = req.utilizador as UtilizadorAutenticado;
-            const medicoAtualizado = await this.service.atualizar(Number(id), medicoData, utilizador.id);
+            const medicoAtualizado = await this.service.atualizar(Number(id), medicoData, utilizador);
             return res.status(200).json({ mensagem: 'Medico atualizado com sucesso', dados: medicoAtualizado });
         } catch (error: any) {
+            if (error.message.includes('Acesso negado')) {
+                return res.status(403).json({ erro: error.message });
+            }
             return res.status(400).json({ erro: error.message || 'Erro ao atualizar medico' });
         }
     }
@@ -52,9 +66,12 @@ export class MedicoController {
         try {
             const { id } = req.params;
             const utilizador = req.utilizador as UtilizadorAutenticado;
-            await this.service.apagar(Number(id), utilizador.id);
+            await this.service.apagar(Number(id), utilizador);
             return res.status(204).send();
         } catch (error: any) {
+            if (error.message.includes('Acesso negado')) {
+                return res.status(403).json({ erro: error.message });
+            }
             return res.status(400).json({ erro: error.message || 'Erro ao apagar medico' });
         }
     }
@@ -62,9 +79,13 @@ export class MedicoController {
     async listarPorEspecialidade(req: Request, res: Response) {
         try {
             const { especialidade } = req.params;
-            const medicos = await this.service.listarPorEspecialidade(String(especialidade));
+            const utilizador = req.utilizador as UtilizadorAutenticado;
+            const medicos = await this.service.listarPorEspecialidade(String(especialidade), utilizador);
             return res.status(200).json({ dados: medicos, total: medicos.length });
         } catch (error: any) {
+            if (error.message.includes('Acesso negado')) {
+                return res.status(403).json({ erro: error.message });
+            }
             return res.status(400).json({ erro: error.message || 'Erro ao listar medicos por especialidade' });
         }
     }

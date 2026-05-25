@@ -7,13 +7,17 @@ const routes = Router();
 const controller = new MedicacaoController();
 
 routes.use(autenticar);
-routes.use(requirePerfil(PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR));
 
-routes.get('/prescricao/:prescricaoId', controller.listarPorPrescricao.bind(controller));
-routes.get('/', controller.listar.bind(controller));
-routes.post('/', controller.criar.bind(controller));
-routes.get('/:id', controller.obter.bind(controller));
-routes.put('/:id', controller.atualizar.bind(controller));
+// RNF001: o Utente pode consultar a propria medicacao; criacao e alteracao ficam reservadas ao Medico e ao Administrador.
+routes.get(
+    '/prescricao/:prescricaoId',
+    requirePerfil(PerfilUtilizador.UTENTE, PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR),
+    controller.listarPorPrescricao.bind(controller)
+);
+routes.get('/', requirePerfil(PerfilUtilizador.UTENTE, PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR), controller.listar.bind(controller));
+routes.post('/', requirePerfil(PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR), controller.criar.bind(controller));
+routes.get('/:id', requirePerfil(PerfilUtilizador.UTENTE, PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR), controller.obter.bind(controller));
+routes.put('/:id', requirePerfil(PerfilUtilizador.MEDICO, PerfilUtilizador.ADMINISTRADOR), controller.atualizar.bind(controller));
 
 
 export default routes;

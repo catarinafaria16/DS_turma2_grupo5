@@ -79,10 +79,12 @@ export class RegraAlertaService {
 
     async listar(utilizador: UtilizadorAutenticado): Promise<RegraAlertaResponseDto[]> {
         try {
+            // Administrador ve e gere todos os limiares do sistema.
             if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) {
                 return await this.repo.find() as RegraAlertaResponseDto[];
             }
 
+            // Medico ve e ajusta apenas os valores das regras ligadas aos seus proprios utentes.
             return await this.repo.find({ where: { medico_id: utilizador.id } }) as RegraAlertaResponseDto[];
         } catch (error) {
             console.error('Erro ao listar regras de alerta:', error);
