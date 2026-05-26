@@ -5,5 +5,5 @@ export interface CreateAnamneseDto {
     utente_id: number;
     historico_familiar: string;
     tabagismo: Tabagismo;
-    sexo?: SexoAnamnese;
+    sexo: SexoAnamnese;
 }

@@ -1,5 +1,3 @@
-import { GeneroUtilizador } from '../../enums/GeneroUtilizador.enum.js';
-
 export interface CreateUtenteDto {
     utilizador_id: number;
     medico_id: number;
@@ -8,5 +6,4 @@ export interface CreateUtenteDto {
     morada: string;
     contacto: string;
     nr_faturacao: number;
-    genero?: GeneroUtilizador;
 }

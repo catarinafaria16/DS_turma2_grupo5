@@ -20,8 +20,8 @@ export class Utilizador {
     @Column({ type: 'simple-enum', enum: PerfilUtilizador })
     perfil!: PerfilUtilizador;
 
-    @Column({ type: 'simple-enum', enum: GeneroUtilizador, nullable: true })
-    genero?: GeneroUtilizador;
+    @Column({ type: 'simple-enum', enum: GeneroUtilizador })
+    genero!: GeneroUtilizador;
 
     @DeleteDateColumn({ nullable: true })
     deleted_at?: Date;

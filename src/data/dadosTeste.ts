@@ -1,4 +1,5 @@
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { GeneroUtilizador } from '../enums/GeneroUtilizador.enum.js';
 
 export const testeUtilizadores = [
     {
@@ -7,6 +8,7 @@ export const testeUtilizadores = [
         email: 'luana.gaspar@administrador.pt',
         password: 'pass1001',
         perfil: PerfilUtilizador.ADMINISTRADOR,
+        genero: GeneroUtilizador.FEMININO,
     },
     {
         id: 1002,
@@ -14,6 +16,7 @@ export const testeUtilizadores = [
         email: 'bruno.almeida@administrador.pt',
         password: 'pass1002',
         perfil: PerfilUtilizador.ADMINISTRADOR,
+        genero: GeneroUtilizador.MASCULINO,
     },
     {
         id: 1003,
@@ -21,6 +24,7 @@ export const testeUtilizadores = [
         email: 'carla.mendes@administrador.pt',
         password: 'pass1003',
         perfil: PerfilUtilizador.ADMINISTRADOR,
+        genero: GeneroUtilizador.FEMININO,
     },
     {
         id: 1004,
@@ -28,6 +32,7 @@ export const testeUtilizadores = [
         email: 'diogo.pereira@administrador.pt',
         password: 'pass1004',
         perfil: PerfilUtilizador.ADMINISTRADOR,
+        genero: GeneroUtilizador.MASCULINO,
     },
     {
         id: 1005,
@@ -35,6 +40,7 @@ export const testeUtilizadores = [
         email: 'eva.rodrigues@administrador.pt',
         password: 'pass1005',
         perfil: PerfilUtilizador.ADMINISTRADOR,
+        genero: GeneroUtilizador.FEMININO,
     },
     {
         id: 2001,
@@ -42,6 +48,7 @@ export const testeUtilizadores = [
         email: 'marta.silva@medico.pt',
         password: 'pass2001',
         perfil: PerfilUtilizador.MEDICO,
+        genero: GeneroUtilizador.FEMININO,
     },
     {
         id: 2002,
@@ -49,6 +56,7 @@ export const testeUtilizadores = [
         email: 'pedro.costa@medico.pt',
         password: 'pass2002',
         perfil: PerfilUtilizador.MEDICO,
+        genero: GeneroUtilizador.MASCULINO,
     },
     {
         id: 2003,
@@ -56,6 +64,7 @@ export const testeUtilizadores = [
         email: 'ines.almeida@medico.pt',
         password: 'pass2003',
         perfil: PerfilUtilizador.MEDICO,
+        genero: GeneroUtilizador.FEMININO,
     },
     {
         id: 2004,
@@ -63,6 +72,7 @@ export const testeUtilizadores = [
         email: 'tiago.ferreira@medico.pt',
         password: 'pass2004',
         perfil: PerfilUtilizador.MEDICO,
+        genero: GeneroUtilizador.MASCULINO,
     },
     {
         id: 2005,
@@ -70,6 +80,7 @@ export const testeUtilizadores = [
         email: 'sofia.ribeiro@medico.pt',
         password: 'pass2005',
         perfil: PerfilUtilizador.MEDICO,
+        genero: GeneroUtilizador.FEMININO,
     },
     {
         id: 3001,
@@ -77,6 +88,7 @@ export const testeUtilizadores = [
         email: 'carlos.santos@utente.pt',
         password: 'pass3001',
         perfil: PerfilUtilizador.UTENTE,
+        genero: GeneroUtilizador.MASCULINO,
     },
     {
         id: 3002,
@@ -84,6 +96,7 @@ export const testeUtilizadores = [
         email: 'beatriz.martins@utente.pt',
         password: 'pass3002',
         perfil: PerfilUtilizador.UTENTE,
+        genero: GeneroUtilizador.FEMININO,
     },
     {
         id: 3003,
@@ -91,6 +104,7 @@ export const testeUtilizadores = [
         email: 'rui.oliveira@utente.pt',
         password: 'pass3003',
         perfil: PerfilUtilizador.UTENTE,
+        genero: GeneroUtilizador.MASCULINO,
     },
     {
         id: 3004,
@@ -98,6 +112,7 @@ export const testeUtilizadores = [
         email: 'laura.gomes@utente.pt',
         password: 'pass3004',
         perfil: PerfilUtilizador.UTENTE,
+        genero: GeneroUtilizador.FEMININO,
     },
     {
         id: 3005,
@@ -105,6 +120,7 @@ export const testeUtilizadores = [
         email: 'miguel.rocha@utente.pt',
         password: 'pass3005',
         perfil: PerfilUtilizador.UTENTE,
+        genero: GeneroUtilizador.MASCULINO,
     },
 ];
 

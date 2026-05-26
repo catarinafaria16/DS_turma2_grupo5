@@ -30,6 +30,9 @@ export class UtilizadorService {
                 throw new Error('Password do utilizador deve ter pelo menos 6 caracteres');
             }
             this.validarPerfil(utilizadorData.perfil);
+            if (!utilizadorData.genero) {
+                throw new Error('Genero do utilizador e obrigatorio');
+            }
 
             const emailExistente = await this.repo.findOne({ where: { email: utilizadorData.email } });
             if (emailExistente) {

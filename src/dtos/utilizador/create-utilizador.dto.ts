@@ -6,5 +6,5 @@ export interface CreateUtilizadorDto {
     email: string;
     password: string;
     perfil: PerfilUtilizador;
-    genero?: GeneroUtilizador;
+    genero: GeneroUtilizador;
 }

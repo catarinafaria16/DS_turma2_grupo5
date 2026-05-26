@@ -48,6 +48,7 @@ export class AnamneseService {
     async criar(anamneseData: CreateAnamneseDto, utilizador: UtilizadorAutenticado): Promise<AnamneseResponseDto> {
         try {
             if (anamneseData.utente_id <= 0) throw new Error('ID do utente deve ser valido');
+            if (!anamneseData.sexo) throw new Error('Sexo da anamnese e obrigatorio');
             await this.validarAcessoUtente(anamneseData.utente_id, utilizador);
 
             const anamnese = this.repo.create(anamneseData);

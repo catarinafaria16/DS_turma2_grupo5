@@ -17,6 +17,6 @@ export class Anamnese {
     @Column({ type: 'simple-enum', enum: Tabagismo })
     tabagismo!: Tabagismo;
 
-    @Column({ type: 'simple-enum', enum: SexoAnamnese, nullable: true })
-    sexo?: SexoAnamnese;
+    @Column({ type: 'simple-enum', enum: SexoAnamnese })
+    sexo!: SexoAnamnese;
 }

@@ -188,7 +188,7 @@
     function EcraLogin({ onLogin, registar }) {
       const [modo, setModo] = useState('login'); // 'login' | 'registo' | 'token'
       const [formLogin, setFormLogin] = useState({ id: '', password: '' });
-      const [formRegisto, setFormRegisto] = useState({ nome: '', email: '', password: '', perfil: 'UTENTE' });
+      const [formRegisto, setFormRegisto] = useState({ nome: '', email: '', password: '', perfil: 'UTENTE', genero: '' });
       const [tokenInput, setTokenInput] = useState('');
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
@@ -208,7 +208,7 @@
         e.preventDefault(); setErro(''); setSucesso(''); setLoading(true);
         const result = await registar(formRegisto);
         if (result.ok) {
-          setFormRegisto({ nome: '', email: '', password: '', perfil: 'UTENTE' });
+          setFormRegisto({ nome: '', email: '', password: '', perfil: 'UTENTE', genero: '' });
           setSucesso(result.message);
           setTimeout(() => setModo('login'), 2000);
         } else {
@@ -279,6 +279,12 @@
                   <option value="MEDICO">Médico</option>
                   <option value="ADMINISTRADOR">Administrador</option>
                 </select>
+                <select value={formRegisto.genero} onChange={setRegisto('genero')} required>
+                  <option value="">-- Seleccionar género --</option>
+                  <option value="FEMININO">Feminino</option>
+                  <option value="MASCULINO">Masculino</option>
+                  <option value="OUTRO">Outro</option>
+                </select>
                 <button type="submit" style={{width:'100%'}} disabled={loading}>
                   {loading ? 'A registar...' : 'Registar'}
                 </button>
@@ -347,8 +353,8 @@
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const body = { nome: form.nome, email: form.email, password: form.password, perfil: form.perfil };
-        if (form.genero) body.genero = form.genero;
+        if (!form.genero) { setErro('Género é obrigatório.'); return; }
+        const body = { nome: form.nome, email: form.email, password: form.password, perfil: form.perfil, genero: form.genero };
         const r = await apiFetch('/api/utilizadores', { method: 'POST', body });
         if (r.ok) { setForm({ nome: '', email: '', password: '', perfil: 'UTENTE', genero: '' }); setSucesso(`Utilizador criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar utilizador.');
@@ -367,8 +373,8 @@
                 <option value="MEDICO">Médico</option>
                 <option value="ADMINISTRADOR">Administrador</option>
               </select>
-              <select value={form.genero} onChange={set('genero')}>
-                <option value="">-- Género (opcional) --</option>
+              <select value={form.genero} onChange={set('genero')} required>
+                <option value="">-- Seleccionar género --</option>
                 <option value="FEMININO">Feminino</option>
                 <option value="MASCULINO">Masculino</option>
                 <option value="OUTRO">Outro</option>
@@ -465,7 +471,7 @@
       const [utentes, setUtentes] = useState([]);
       const [utilizadores, setUtilizadores] = useState([]);
       const [medicos, setMedicos] = useState([]);
-      const [form, setForm] = useState({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '', genero: '' });
+      const [form, setForm] = useState({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
@@ -483,9 +489,8 @@
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
         const body = { utilizador_id: Number(form.utilizador_id), medico_id: Number(form.medico_id), nr_utente: Number(form.nr_utente), data_nascimento: form.data_nascimento, morada: form.morada, contacto: form.contacto, nr_faturacao: Number(form.nr_faturacao) };
-        if (form.genero) body.genero = form.genero;
         const r = await apiFetch('/api/utentes', { method: 'POST', body });
-        if (r.ok) { setForm({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '', genero: '' }); setSucesso('Utente criado com sucesso.'); buscar(); }
+        if (r.ok) { setForm({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' }); setSucesso('Utente criado com sucesso.'); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar utente.');
       }
       return (
@@ -512,12 +517,6 @@
               <input type="date" value={form.data_nascimento} onChange={set('data_nascimento')} required />
               <input value={form.morada} onChange={set('morada')} placeholder="Morada" required />
               <input value={form.contacto} onChange={set('contacto')} placeholder="Contacto" required />
-              <select value={form.genero} onChange={set('genero')}>
-                <option value="">-- Género (opcional) --</option>
-                <option value="FEMININO">Feminino</option>
-                <option value="MASCULINO">Masculino</option>
-                <option value="OUTRO">Outro</option>
-              </select>
               <button type="submit">Registar utente</button>
               {erro && <p className="erro">{erro}</p>}
               {sucesso && <p className="sucesso">{sucesso}</p>}
@@ -527,11 +526,10 @@
             <h2>Utentes Registados</h2>
             {utentes.length === 0 ? <p className="vazio">Nenhum utente registado.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Género</th><th>Médico ID</th></tr></thead>
+                <thead><tr><th>#</th><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Médico ID</th></tr></thead>
                 <tbody>{utentes.map(u => (
                   <tr key={u.id}><td>{u.id}</td><td>{u.nr_utente}</td><td>{u.morada}</td><td>{u.contacto}</td>
                     <td>{u.data_nascimento ? new Date(u.data_nascimento).toLocaleDateString('pt-PT') : '—'}</td>
-                    <td>{u.genero || '—'}</td>
                     <td><span className="badge badge-blue">{u.medico_id}</span></td>
                   </tr>
                 ))}</tbody>
@@ -643,8 +641,8 @@
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const body = { utente_id: Number(form.utente_id), historico_familiar: form.historico_familiar, tabagismo: form.tabagismo };
-        if (form.sexo) body.sexo = form.sexo;
+        if (!form.sexo) { setErro('Sexo é obrigatório.'); return; }
+        const body = { utente_id: Number(form.utente_id), historico_familiar: form.historico_familiar, tabagismo: form.tabagismo, sexo: form.sexo };
         const r = await apiFetch('/api/anamneses', { method: 'POST', body });
         if (r.ok) { setForm({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' }); setSucesso(`Anamnese criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar anamnese.');
@@ -668,8 +666,8 @@
                 <option value="10 A 20 CIGARROS/DIA">10 a 20 cigarros/dia</option>
                 <option value="MAIS DE 20 CIGARROS/DIA">Mais de 20 cigarros/dia</option>
               </select>
-              <select value={form.sexo} onChange={set('sexo')}>
-                <option value="">-- Sexo (opcional) --</option>
+              <select value={form.sexo} onChange={set('sexo')} required>
+                <option value="">-- Seleccionar sexo --</option>
                 <option value="MASCULINO">Masculino</option>
                 <option value="FEMININO">Feminino</option>
               </select>
@@ -1712,11 +1710,17 @@
     /* ══════════════════════════════════════════════════════════════════════════
        APP PRINCIPAL
        ══════════════════════════════════════════════════════════════════════ */
-    const TABS = ['Utilizadores','Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Medicações','Med. Habituais','Exames','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
+    const TODAS_TABS = ['Utilizadores','Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Medicações','Med. Habituais','Exames','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
+    const TABS_POR_PERFIL = {
+      ADMINISTRADOR: TODAS_TABS,
+      MEDICO: ['Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Medicações','Med. Habituais','Exames','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'],
+      UTENTE: ['Utentes','Prescrições','Sintomas','Medicações','Exames','Aval. CARAT','Resp. CARAT','Planos','FHIR'],
+    };
 
     function App() {
       const { token, user, login, registar, logout, apiFetch } = useApi();
-      const [tab, setTab] = useState('Utilizadores');
+      const tabs = TABS_POR_PERFIL[user?.perfil] ?? TODAS_TABS;
+      const [tab, setTab] = useState(() => tabs[0] ?? 'Utentes');
 
       if (!token || !user) {
         window.location.href = '/index.html';
@@ -1724,6 +1728,7 @@
       }
 
       const perfilBadge = { UTENTE: 'badge-green', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-orange' };
+      const tabAtiva = tabs.includes(tab) ? tab : tabs[0];
 
       return (
         <>
@@ -1746,26 +1751,26 @@
             </div>
           </header>
           <nav className="tabs">
-            {TABS.map(t => <div key={t} className={`tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>{t}</div>)}
+            {tabs.map(t => <div key={t} className={`tab${tabAtiva === t ? ' active' : ''}`} onClick={() => setTab(t)}>{t}</div>)}
           </nav>
           <div className="container">
-            {tab === 'Utilizadores'   && <SecaoUtilizadores apiFetch={apiFetch} />}
-            {tab === 'Médicos'        && <SecaoMedicos apiFetch={apiFetch} />}
-            {tab === 'Utentes'        && <SecaoUtentes apiFetch={apiFetch} />}
-            {tab === 'Prescrições'    && <SecaoPrescricoes apiFetch={apiFetch} />}
-            {tab === 'Anamneses'      && <SecaoAnamneses apiFetch={apiFetch} />}
-            {tab === 'Alergias'       && <SecaoAlergias apiFetch={apiFetch} />}
-            {tab === 'Comorbidades'   && <SecaoComorbidades apiFetch={apiFetch} />}
-            {tab === 'Sintomas'       && <SecaoSintomas apiFetch={apiFetch} />}
-            {tab === 'Medicações'     && <SecaoMedicacoes apiFetch={apiFetch} />}
-            {tab === 'Med. Habituais' && <SecaoMedicacoesHabituais apiFetch={apiFetch} />}
-            {tab === 'Exames'         && <SecaoExames apiFetch={apiFetch} />}
-            {tab === 'Alertas'        && <SecaoAlertas apiFetch={apiFetch} />}
-            {tab === 'Regras Alerta'  && <SecaoRegrasAlerta apiFetch={apiFetch} />}
-            {tab === 'Aval. CARAT'    && <SecaoAvaliacoesCarat apiFetch={apiFetch} />}
-            {tab === 'Resp. CARAT'    && <SecaoRespostasCarat apiFetch={apiFetch} />}
-            {tab === 'Planos'         && <SecaoPlanos apiFetch={apiFetch} />}
-            {tab === 'FHIR'           && <SecaoFhir apiFetch={apiFetch} />}
+            {tabAtiva === 'Utilizadores'   && <SecaoUtilizadores apiFetch={apiFetch} />}
+            {tabAtiva === 'Médicos'        && <SecaoMedicos apiFetch={apiFetch} />}
+            {tabAtiva === 'Utentes'        && <SecaoUtentes apiFetch={apiFetch} />}
+            {tabAtiva === 'Prescrições'    && <SecaoPrescricoes apiFetch={apiFetch} />}
+            {tabAtiva === 'Anamneses'      && <SecaoAnamneses apiFetch={apiFetch} />}
+            {tabAtiva === 'Alergias'       && <SecaoAlergias apiFetch={apiFetch} />}
+            {tabAtiva === 'Comorbidades'   && <SecaoComorbidades apiFetch={apiFetch} />}
+            {tabAtiva === 'Sintomas'       && <SecaoSintomas apiFetch={apiFetch} />}
+            {tabAtiva === 'Medicações'     && <SecaoMedicacoes apiFetch={apiFetch} />}
+            {tabAtiva === 'Med. Habituais' && <SecaoMedicacoesHabituais apiFetch={apiFetch} />}
+            {tabAtiva === 'Exames'         && <SecaoExames apiFetch={apiFetch} />}
+            {tabAtiva === 'Alertas'        && <SecaoAlertas apiFetch={apiFetch} />}
+            {tabAtiva === 'Regras Alerta'  && <SecaoRegrasAlerta apiFetch={apiFetch} />}
+            {tabAtiva === 'Aval. CARAT'    && <SecaoAvaliacoesCarat apiFetch={apiFetch} />}
+            {tabAtiva === 'Resp. CARAT'    && <SecaoRespostasCarat apiFetch={apiFetch} />}
+            {tabAtiva === 'Planos'         && <SecaoPlanos apiFetch={apiFetch} />}
+            {tabAtiva === 'FHIR'           && <SecaoFhir apiFetch={apiFetch} />}
           </div>
           <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT &nbsp;&bull;&nbsp; Autenticado como <strong>{user.perfil}</strong></footer>
         </>
