@@ -6,6 +6,6 @@ export interface UtilizadorResponseDto {
     nome: string;
     email: string;
     perfil: PerfilUtilizador;
-    genero?: GeneroUtilizador;
+    genero: GeneroUtilizador;
     deleted_at?: Date;
 }
