@@ -127,6 +127,11 @@ export class UtenteService {
                 return await this.repo.find({ where: { medico_id: utilizador.id } });
             }
 
+            if (utilizador.perfil === PerfilUtilizador.UTENTE) {
+                const utente = await this.repo.findOne({ where: { utilizador_id: utilizador.id } });
+                return utente ? [utente] : [];
+            }
+
             throw new Error('Acesso negado: perfil nao pode listar utentes');
         } catch (error) {
             console.error('Erro ao listar utentes:', error);

@@ -10,7 +10,7 @@ routes.use(autenticar);
 
 // RNF001: Administrador e Medico podem consultar listas de utentes.
 routes.get('/medico/:medicoId', requirePerfil(PerfilUtilizador.ADMINISTRADOR, PerfilUtilizador.MEDICO), controller.listarPorMedico.bind(controller));
-routes.get('/', requirePerfil(PerfilUtilizador.ADMINISTRADOR, PerfilUtilizador.MEDICO), controller.listar.bind(controller));
+routes.get('/', requirePerfil(PerfilUtilizador.ADMINISTRADOR, PerfilUtilizador.MEDICO, PerfilUtilizador.UTENTE), controller.listar.bind(controller));
 
 // RNF001/RNF004: criacao de utente validada no servico.
 routes.post('/', requirePerfil(PerfilUtilizador.ADMINISTRADOR, PerfilUtilizador.MEDICO), controller.criar.bind(controller));

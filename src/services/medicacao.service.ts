@@ -1,6 +1,8 @@
 import { AppDataSource } from '../database/data-source.js';
 import { Medicacao } from '../models/medicacao.entity.js';
+import { MedicacaoHabitual } from '../models/medicacaoHabitual.entity.js';
 import { Prescricao } from '../models/prescricao.entity.js';
+import { Anamnese } from '../models/anamnese.entity.js';
 import { Utente } from '../models/utente.entity.js';
 import type { CreateMedicacaoDto } from '../dtos/medicacao/create-medicacao.dto.js';
 import type { MedicacaoResponseDto } from '../dtos/medicacao/medicacao-response.dto.js';
@@ -76,7 +78,9 @@ export class MedicacaoService {
     }
 
     private get repo() { return AppDataSource.getRepository(Medicacao); }
+    private get medicacaoHabitualRepo() { return AppDataSource.getRepository(MedicacaoHabitual); }
     private get prescricaoRepo() { return AppDataSource.getRepository(Prescricao); }
+    private get anamneseRepo() { return AppDataSource.getRepository(Anamnese); }
     private get utenteRepo() { return AppDataSource.getRepository(Utente); }
 
     private async validarAcessoPrescricao(prescricaoId: number, utilizador: UtilizadorAutenticado): Promise<Prescricao> {
@@ -142,6 +146,45 @@ export class MedicacaoService {
         return valor;
     }
 
+    private async sincronizarMedicacaoHabitual(
+        medicacao: Medicacao,
+        prescricao: Prescricao
+    ): Promise<void> {
+        const anamnese = await this.anamneseRepo.findOne({ where: { utente_id: prescricao.utente_id } });
+        if (!anamnese) {
+            return;
+        }
+
+        const nomeNormalizado = this.normalizarNomeMedicamento(medicacao.nome);
+        const existentes = await this.medicacaoHabitualRepo.find({
+            where: { anamnese_id: anamnese.id }
+        });
+        const existente = existentes.find(
+            (item) => this.normalizarNomeMedicamento(item.nome) === nomeNormalizado
+        );
+
+        if (existente) {
+            await this.medicacaoHabitualRepo.save({
+                ...existente,
+                nome: medicacao.nome,
+                dose: medicacao.dose,
+                duracao: medicacao.duracao,
+                periodicidade: medicacao.periodicidade,
+            });
+            return;
+        }
+
+        const medicacaoHabitual = this.medicacaoHabitualRepo.create({
+            anamnese_id: anamnese.id,
+            nome: medicacao.nome,
+            dose: medicacao.dose,
+            duracao: medicacao.duracao,
+            periodicidade: medicacao.periodicidade,
+        });
+
+        await this.medicacaoHabitualRepo.save(medicacaoHabitual);
+    }
+
     private validarMedicacao(medicacaoData: CreateMedicacaoDto): void {
         if (!medicacaoData.nome || medicacaoData.nome.trim().length === 0) {
             throw new Error('Nome da medicacao e obrigatorio');
@@ -193,10 +236,12 @@ export class MedicacaoService {
         try {
             this.validarMedicacao(medicacaoData);
 
-            await this.validarAcessoPrescricao(medicacaoData.prescricao_id, utilizador);
+            const prescricao = await this.validarAcessoPrescricao(medicacaoData.prescricao_id, utilizador);
 
             const medicacao = this.repo.create(medicacaoData);
             const saved = await this.repo.save(medicacao);
+
+            await this.sincronizarMedicacaoHabitual(saved, prescricao);
 
             this.auditoriaService.registarAuditoria(
                 utilizador.id,

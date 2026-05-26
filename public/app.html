@@ -9,46 +9,66 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #2d3748; }
-    header { background: #2b6cb0; color: white; padding: 1.25rem 2rem; display: flex; align-items: center; gap: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    header h1 { font-size: 1.4rem; font-weight: 600; }
-    header span { font-size: 0.85rem; opacity: 0.8; }
-    .tabs { background: white; border-bottom: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; padding: 0 1rem; }
-    .tab { padding: 0.75rem 1rem; font-size: 0.82rem; cursor: pointer; border-bottom: 3px solid transparent; color: #718096; font-weight: 500; white-space: nowrap; }
-    .tab:hover { color: #2b6cb0; }
-    .tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; }
-    .container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
-    .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 1.5rem; margin-bottom: 1.5rem; }
-    .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #2b6cb0; }
+    :root {
+      --bg-main: #eaf6f7;
+      --bg-soft: #f7fcfc;
+      --surface: #ffffff;
+      --surface-alt: #f3fbfb;
+      --line: #d6ecee;
+      --text-main: #264653;
+      --text-soft: #5f7d86;
+      --brand: #31c8cf;
+      --brand-dark: #20aeb8;
+      --brand-deep: #153b63;
+      --shadow-soft: 0 14px 34px rgba(21, 59, 99, 0.08);
+      --shadow-card: 0 12px 28px rgba(24, 183, 189, 0.08);
+    }
+    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(180deg, #edf7f8 0%, #e6f1f6 100%); color: var(--text-main); }
+    header { background: linear-gradient(135deg, #2b6cb0 0%, #3b82c4 100%); color: white; padding: 1.7rem 2rem 1.3rem; box-shadow: 0 10px 28px rgba(21,59,99,0.16); }
+    header h1 { font-size: 2rem; font-weight: 800; line-height: 1.05; }
+    .header-subtitle { display: block; font-size: 0.98rem; opacity: 0.92; margin-top: 0.55rem; max-width: 700px; }
+    .user-bar { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; max-width: 1180px; margin: 0 auto; }
+    .header-brand { min-width: 280px; }
+    .header-user { display: flex; align-items: center; gap: 0.85rem; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.18); border-radius: 20px; padding: 0.95rem 1rem; backdrop-filter: blur(8px); box-shadow: 0 8px 20px rgba(14,44,73,0.12); }
+    .header-user-info { text-align: right; }
+    .header-user-name { font-size: 1.15rem; font-weight: 700; line-height: 1.1; }
+    .header-user-meta { margin-top: 0.35rem; }
+    .tabs { background: rgba(255,255,255,0.82); border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 0.8rem; padding: 1rem 2rem 1.15rem; justify-content: center; box-shadow: 0 8px 24px rgba(15,23,42,0.04); backdrop-filter: blur(10px); }
+    .tab { padding: 0.82rem 1.3rem; font-size: 0.96rem; cursor: pointer; border: 1px solid var(--line); border-radius: 16px; color: var(--brand-deep); font-weight: 800; white-space: nowrap; background: linear-gradient(180deg, #ffffff 0%, #f4fbfb 100%); box-shadow: 0 6px 16px rgba(21,59,99,0.05); transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; }
+    .tab:hover { color: var(--brand-dark); border-color: #9fe6e7; background: linear-gradient(180deg, #ffffff 0%, #ebfcfc 100%); transform: translateY(-1px); box-shadow: 0 8px 18px rgba(24,183,189,0.12); }
+    .tab.active { color: white; border-color: transparent; background: linear-gradient(135deg, #4a90d9 0%, #2f72b7 52%, #174d86 100%); box-shadow: 0 10px 20px rgba(43,108,176,0.24); }
+    .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,252,252,0.98) 100%); border: 1px solid rgba(214,236,238,0.95); border-radius: 24px; box-shadow: var(--shadow-card); padding: 1.6rem; margin-bottom: 1.5rem; }
+    .card h2 { font-size: 1.08rem; font-weight: 800; margin-bottom: 1rem; color: var(--brand-deep); }
     form { display: flex; flex-direction: column; gap: 8px; max-width: 480px; }
-    input, select, textarea { padding: 8px 10px; font-size: 14px; border: 1px solid #cbd5e0; border-radius: 5px; background: white; font-family: inherit; }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #2b6cb0; box-shadow: 0 0 0 2px rgba(43,108,176,0.15); }
+    input, select, textarea { padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); border-radius: 14px; background: #ffffff; font-family: inherit; color: var(--text-main); box-shadow: inset 0 1px 2px rgba(21,59,99,0.03); }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(24,183,189,0.12); }
     textarea { resize: vertical; min-height: 70px; }
     .row { display: flex; gap: 8px; }
     .row input, .row select { flex: 1; }
-    button { padding: 9px 18px; background: #2b6cb0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 500; align-self: flex-start; }
-    button:hover { background: #2c5282; }
+    button { padding: 0.9rem 1.35rem; background: linear-gradient(135deg, #9cb5c5 0%, #6f8ea3 100%); color: white; border: none; border-radius: 22px; cursor: pointer; font-size: 14px; font-weight: 800; align-self: flex-start; box-shadow: 0 10px 20px rgba(79,104,123,0.16); white-space: nowrap; }
+    button:hover { background: linear-gradient(135deg, #8faabc 0%, #628198 100%); }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
     .erro    { color: #e53e3e; font-size: 0.85rem; margin-top: 4px; }
     .sucesso { color: #276749; font-size: 0.85rem; margin-top: 4px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.875rem; }
-    th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #edf2f7; }
-    th { background: #f7fafc; color: #4a5568; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 8px; font-size: 0.875rem; overflow: hidden; }
+    th, td { text-align: left; padding: 11px 13px; border-bottom: 1px solid #eaf2f4; }
+    th { background: #eefafa; color: var(--brand-deep); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #f7fafc; }
+    tr:hover td { background: #f5fbfb; }
     .badge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
-    .badge-blue   { background: #ebf8ff; color: #2b6cb0; }
-    .badge-green  { background: #f0fff4; color: #276749; }
-    .badge-orange { background: #fffaf0; color: #c05621; }
-    .badge-red    { background: #fff5f5; color: #c53030; }
-    .vazio { color: #a0aec0; font-size: 0.875rem; padding: 1rem 0; }
-    .btn-sec { background: #718096; }
-    .btn-sec:hover { background: #4a5568; }
+    .badge-blue   { background: #e8fbfd; color: var(--brand-dark); }
+    .badge-green  { background: #effdf6; color: #1f8f5f; }
+    .badge-orange { background: #fff6ea; color: #c56a18; }
+    .badge-red    { background: #fff1f1; color: #cf3d3d; }
+    .vazio { color: #8ba6ad; font-size: 0.875rem; padding: 1rem 0; }
+    .btn-sec { background: linear-gradient(135deg, #9cb5c5 0%, #6f8ea3 100%); }
+    .btn-sec:hover { background: linear-gradient(135deg, #8faabc 0%, #628198 100%); }
     .fhir-resource { font-size: 0.7rem; font-weight: 700; font-family: monospace; padding: 2px 7px; border-radius: 4px; background: #e9d8fd; color: #553c9a; }
     .fhir-subtabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 1rem; }
-    .fhir-subtab { padding: 5px 14px; font-size: 0.78rem; cursor: pointer; border-radius: 20px; border: 1px solid #cbd5e0; color: #4a5568; font-weight: 500; background: white; font-family: monospace; }
-    .fhir-subtab:hover { border-color: #553c9a; color: #553c9a; }
-    .fhir-subtab.active { background: #553c9a; color: white; border-color: #553c9a; }
+    .fhir-subtab { padding: 5px 14px; font-size: 0.78rem; cursor: pointer; border-radius: 20px; border: 1px solid var(--line); color: var(--text-soft); font-weight: 600; background: white; font-family: monospace; }
+    .fhir-subtab:hover { border-color: var(--brand); color: var(--brand-dark); }
+    .fhir-subtab.active { background: var(--brand-deep); color: white; border-color: var(--brand-deep); }
     .url-pill { font-family: monospace; font-size: 0.78rem; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 5px 10px; color: #4a5568; word-break: break-all; margin: 8px 0; display: flex; align-items: center; gap: 8px; }
     .url-pill span { color: #276749; font-weight: 700; flex-shrink: 0; }
     .json-box { background: #1a202c; color: #e2e8f0; font-family: monospace; font-size: 0.75rem; border-radius: 6px; padding: 1rem; overflow: auto; max-height: 420px; white-space: pre; margin-top: 8px; }
@@ -58,31 +78,40 @@
     .json-box .bool { color: #f6ad55; }
     .json-box .null { color: #fc8181; }
     .toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .btn-tiny { padding: 4px 10px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e0; background: white; color: #4a5568; font-weight: 500; }
-    .btn-tiny:hover { background: #edf2f7; }
-    .btn-tiny.active { background: #553c9a; color: white; border-color: #553c9a; }
-    .filtro-row { display: flex; gap: 8px; margin-bottom: 10px; max-width: 480px; }
+    .btn-tiny { padding: 4px 10px; font-size: 0.75rem; border-radius: 10px; cursor: pointer; border: 1px solid var(--line); background: white; color: var(--text-soft); font-weight: 600; }
+    .btn-tiny:hover { background: #eefafa; }
+    .btn-tiny.active { background: var(--brand-deep); color: white; border-color: var(--brand-deep); }
+    .filtro-row { display: flex; gap: 8px; margin-bottom: 10px; max-width: 480px; align-items: center; }
     .filtro-row input { flex: 1; }
-    footer { text-align: center; padding: 1.5rem; font-size: 0.8rem; color: #a0aec0; border-top: 1px solid #e2e8f0; background: white; margin-top: 2rem; }
+    footer { text-align: center; padding: 1.5rem; font-size: 0.8rem; color: #7d98a0; border-top: 1px solid var(--line); background: rgba(255,255,255,0.86); margin-top: 2rem; }
 
     /* ───── Login / Registo ───── */
     .login-container { max-width: 480px; margin: 4rem auto; }
-    .login-card { background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 2rem; }
-    .login-card h1 { color: #2b6cb0; font-size: 1.5rem; margin-bottom: 0.25rem; text-align: center; }
-    .login-card .subtitulo { text-align: center; color: #718096; font-size: 0.85rem; margin-bottom: 1.5rem; }
-    .login-card label { font-size: 0.82rem; color: #4a5568; font-weight: 500; }
+    .login-card { background: linear-gradient(180deg, #ffffff 0%, #f8fcfc 100%); border-radius: 28px; box-shadow: var(--shadow-soft); padding: 2rem; border: 1px solid var(--line); }
+    .login-card h1 { color: var(--brand-deep); font-size: 1.7rem; margin-bottom: 0.25rem; text-align: center; font-weight: 800; }
+    .login-card .subtitulo { text-align: center; color: var(--text-soft); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .login-card label { font-size: 0.82rem; color: var(--text-main); font-weight: 600; }
     .login-card form { max-width: 100%; }
     .login-tabs { display: flex; margin-bottom: 1.25rem; border-bottom: 2px solid #edf2f7; }
-    .login-tab { flex: 1; text-align: center; padding: 0.6rem; font-size: 0.82rem; cursor: pointer; color: #718096; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-    .login-tab:hover { color: #2b6cb0; }
-    .login-tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; }
+    .login-tab { flex: 1; text-align: center; padding: 0.7rem; font-size: 0.84rem; cursor: pointer; color: var(--text-soft); font-weight: 700; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .login-tab:hover { color: var(--brand-dark); }
+    .login-tab.active { color: var(--brand-dark); border-bottom-color: var(--brand); }
     .divider { border: none; border-top: 1px solid #e2e8f0; margin: 1.5rem 0; }
-    .registo-box { background: #f7fafc; border-radius: 6px; padding: 1rem; }
-    .registo-box h3 { font-size: 0.9rem; color: #2b6cb0; margin-bottom: 0.75rem; }
-    .logout-btn { background: #e53e3e; }
-    .logout-btn:hover { background: #c53030; }
-    .user-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .token-info { font-family: monospace; font-size: 0.7rem; background: #edf2f7; padding: 4px 8px; border-radius: 4px; color: #4a5568; word-break: break-all; margin-top: 4px; }
+    .registo-box { background: #f4fbfb; border-radius: 18px; padding: 1rem; border: 1px solid var(--line); }
+    .registo-box h3 { font-size: 0.9rem; color: var(--brand-deep); margin-bottom: 0.75rem; font-weight: 800; }
+    .logout-btn { background: linear-gradient(135deg, #ff6b6b 0%, #e53e3e 100%); border-radius: 22px; padding: 0.9rem 1.2rem; font-weight: 800; box-shadow: 0 8px 18px rgba(197,48,48,0.18); }
+    .logout-btn:hover { background: linear-gradient(135deg, #ef5757 0%, #c53030 100%); }
+
+    @media (max-width: 768px) {
+      header { padding: 1.3rem 1rem 1rem; }
+      header h1 { font-size: 1.6rem; }
+      .header-user { width: 100%; justify-content: space-between; }
+      .tabs { justify-content: flex-start; padding: 0.9rem 1rem 1rem; overflow-x: auto; flex-wrap: nowrap; }
+      .tab { flex: 0 0 auto; }
+      .container { padding: 0 1rem; margin-top: 1.3rem; }
+      .card { border-radius: 20px; padding: 1.2rem; }
+      .row { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
@@ -403,12 +432,26 @@
     }
 
     /* ───── Médicos ───── */
-    function SecaoMedicos({ apiFetch }) {
+    function SecaoMedicos({ apiFetch, user }) {
       const [medicos, setMedicos] = useState([]);
       const [utilizadores, setUtilizadores] = useState([]);
       const [form, setForm] = useState({ utilizador_id: '', especialidade: 'PNEUMOLOGIA', contacto: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
+      const [contactoEditavel, setContactoEditavel] = useState('');
+      function normalizarContacto(contacto) {
+        return (contacto || '').replace(/\s+/g, '');
+      }
+      function formatarContacto(contacto) {
+        const normalizado = normalizarContacto(contacto);
+        if (normalizado.startsWith('+351') && normalizado.length === 13) {
+          return `+351 ${normalizado.slice(4)}`;
+        }
+        if (/^[239]\d{8}$/.test(normalizado)) {
+          return `+351 ${normalizado}`;
+        }
+        return contacto || '—';
+      }
       async function buscar() {
         try { const r = await apiFetch('/api/medicos'); if (r.ok) setMedicos(r.data.dados ?? []); } catch {}
       }
@@ -423,6 +466,77 @@
         if (r.ok) { setForm({ utilizador_id: '', especialidade: 'PNEUMOLOGIA', contacto: '' }); setSucesso('Médico registado com sucesso.'); buscar(); }
         else setErro(r.data.erro || 'Erro ao registar médico.');
       }
+      const medicoAutenticado = user?.perfil === 'MEDICO'
+        ? medicos.find(m => m.utilizador_id === user.id) ?? null
+        : null;
+
+      useEffect(() => {
+        if (medicoAutenticado?.contacto) {
+          setContactoEditavel(medicoAutenticado.contacto);
+        }
+      }, [medicoAutenticado?.contacto]);
+
+      async function guardarContactoMedico(e) {
+        e.preventDefault();
+        setErro('');
+        setSucesso('');
+        if (!medicoAutenticado) return;
+
+        const r = await apiFetch(`/api/medicos/${medicoAutenticado.id}`, {
+          method: 'PUT',
+          body: { contacto: contactoEditavel }
+        });
+
+        if (r.ok) {
+          setSucesso('Contacto atualizado com sucesso.');
+          buscar();
+        } else {
+          setErro(r.data.erro || 'Erro ao atualizar contacto.');
+        }
+      }
+
+      if (user?.perfil === 'MEDICO') {
+        return (
+          <>
+            <div className="card">
+              <h2>Dados do Utilizador</h2>
+              {!medicoAutenticado ? (
+                <p className="vazio">Nao foi encontrado um perfil de medico associado ao utilizador autenticado.</p>
+              ) : (
+                <table>
+                  <tbody>
+                    <tr><td><strong>ID</strong></td><td>{medicoAutenticado.id}</td></tr>
+                    <tr><td><strong>Nome</strong></td><td>{user.nome || '—'}</td></tr>
+                    <tr><td><strong>E-mail</strong></td><td>{user.email || '—'}</td></tr>
+                    <tr><td><strong>Perfil</strong></td><td><span className="badge badge-blue">{user.perfil}</span></td></tr>
+                    <tr><td><strong>Especialidade</strong></td><td>{medicoAutenticado.especialidade || '—'}</td></tr>
+                    <tr><td><strong>Contacto</strong></td><td>{formatarContacto(medicoAutenticado.contacto)}</td></tr>
+                  </tbody>
+                </table>
+              )}
+            </div>
+            {medicoAutenticado && (
+              <div className="card">
+                <h2>Atualizar Contacto</h2>
+                <form onSubmit={guardarContactoMedico}>
+                  <label htmlFor="contacto-medico">Número de telefone</label>
+                  <input
+                    id="contacto-medico"
+                    value={contactoEditavel}
+                    onChange={e => setContactoEditavel(e.target.value)}
+                    placeholder="Contacto"
+                    required
+                  />
+                  <button type="submit">Guardar contacto</button>
+                  {erro && <p className="erro">{erro}</p>}
+                  {sucesso && <p className="sucesso">{sucesso}</p>}
+                </form>
+              </div>
+            )}
+          </>
+        );
+      }
+
       return (
         <>
           <div className="card">
@@ -455,7 +569,7 @@
               <table>
                 <thead><tr><th>#</th><th>Especialidade</th><th>Contacto</th><th>Utilizador ID</th></tr></thead>
                 <tbody>{medicos.map(m => (
-                  <tr key={m.id}><td>{m.id}</td><td>{m.especialidade}</td><td>{m.contacto}</td>
+                  <tr key={m.id}><td>{m.id}</td><td>{m.especialidade}</td><td>{formatarContacto(m.contacto)}</td>
                     <td><span className="badge badge-blue">{m.utilizador_id}</span></td>
                   </tr>
                 ))}</tbody>
@@ -467,13 +581,48 @@
     }
 
     /* ───── Utentes ───── */
-    function SecaoUtentes({ apiFetch }) {
+    function SecaoUtentes({ apiFetch, user }) {
       const [utentes, setUtentes] = useState([]);
       const [utilizadores, setUtilizadores] = useState([]);
       const [medicos, setMedicos] = useState([]);
       const [form, setForm] = useState({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
+      const [dadosEditaveis, setDadosEditaveis] = useState({ email: '', morada: '', contacto: '' });
+      function normalizarContacto(contacto) {
+        return (contacto || '').replace(/\s+/g, '');
+      }
+      function validarContacto(contacto) {
+        return /^(\+351)?[239]\d{8}$/.test(normalizarContacto(contacto));
+      }
+      function formatarContacto(contacto) {
+        const normalizado = normalizarContacto(contacto);
+        if (normalizado.startsWith('+351') && normalizado.length === 13) {
+          return `+351 ${normalizado.slice(4)}`;
+        }
+        if (/^[239]\d{8}$/.test(normalizado)) {
+          return `+351 ${normalizado}`;
+        }
+        return contacto || '—';
+      }
+      function calcularIdade(dataNascimento) {
+        if (!dataNascimento) return null;
+        const nascimento = new Date(dataNascimento);
+        if (Number.isNaN(nascimento.getTime())) return null;
+
+        const hoje = new Date();
+        let idade = hoje.getFullYear() - nascimento.getFullYear();
+        const mesAtual = hoje.getMonth();
+        const diaAtual = hoje.getDate();
+        const mesNascimento = nascimento.getMonth();
+        const diaNascimento = nascimento.getDate();
+
+        if (mesAtual < mesNascimento || (mesAtual === mesNascimento && diaAtual < diaNascimento)) {
+          idade -= 1;
+        }
+
+        return idade;
+      }
       async function buscar() {
         try { const r = await apiFetch('/api/utentes'); if (r.ok) setUtentes(r.data.dados ?? []); } catch {}
       }
@@ -493,6 +642,141 @@
         if (r.ok) { setForm({ utilizador_id: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' }); setSucesso('Utente criado com sucesso.'); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar utente.');
       }
+      const utenteAutenticado = user?.perfil === 'UTENTE'
+        ? utentes.find(u => u.utilizador_id === user.id) ?? null
+        : null;
+      useEffect(() => {
+        if (user?.perfil === 'UTENTE' && utenteAutenticado) {
+          setDadosEditaveis({
+            email: user.email || '',
+            morada: utenteAutenticado.morada || '',
+            contacto: utenteAutenticado.contacto || '',
+          });
+        }
+      }, [user?.perfil, user?.email, utenteAutenticado]);
+
+      function setDadosUtilizador(f) {
+        return e => setDadosEditaveis(p => ({ ...p, [f]: e.target.value }));
+      }
+
+      async function atualizarDadosUtente(e) {
+        e.preventDefault();
+        setErro('');
+        setSucesso('');
+        if (!utenteAutenticado || !user) return;
+
+        let houveAlteracoes = false;
+
+        if ((dadosEditaveis.email || '') !== (user.email || '')) {
+          const ru = await apiFetch(`/api/utilizadores/${user.id}`, {
+            method: 'PUT',
+            body: { email: dadosEditaveis.email }
+          });
+          if (!ru.ok) {
+            setErro(ru.data.erro || 'Erro ao atualizar e-mail.');
+            return;
+          }
+
+          const userAtualizado = { ...user, email: dadosEditaveis.email };
+          localStorage.setItem('carat_user', JSON.stringify(userAtualizado));
+          houveAlteracoes = true;
+        }
+
+        if (
+          (dadosEditaveis.morada || '') !== (utenteAutenticado.morada || '') ||
+          (dadosEditaveis.contacto || '') !== (utenteAutenticado.contacto || '')
+        ) {
+          if (!validarContacto(dadosEditaveis.contacto)) {
+            setErro('Número de telefone inválido. Use 9 dígitos válidos, com ou sem +351.');
+            return;
+          }
+
+          const rt = await apiFetch(`/api/utentes/${utenteAutenticado.id}`, {
+            method: 'PUT',
+            body: {
+              morada: dadosEditaveis.morada,
+              contacto: normalizarContacto(dadosEditaveis.contacto)
+            }
+          });
+          if (!rt.ok) {
+            setErro(rt.data.erro || 'Erro ao atualizar dados do utente.');
+            return;
+          }
+          houveAlteracoes = true;
+        }
+
+        if (!houveAlteracoes) {
+          setSucesso('Nao houve alteracoes para guardar.');
+          return;
+        }
+
+        setSucesso('Dados atualizados com sucesso.');
+        await buscar();
+        setTimeout(() => window.location.reload(), 500);
+      }
+
+      if (user?.perfil === 'UTENTE') {
+        return (
+          <>
+            <div className="card">
+              <h2>Dados do Utilizador</h2>
+              {!utenteAutenticado ? (
+                <p className="vazio">Nao foi encontrado um perfil de utente associado ao utilizador autenticado.</p>
+              ) : (
+                <table>
+                  <tbody>
+                    <tr><td><strong>ID</strong></td><td>{utenteAutenticado.id}</td></tr>
+                    <tr><td><strong>Nome</strong></td><td>{user.nome || '—'}</td></tr>
+                    <tr><td><strong>E-mail</strong></td><td>{user.email || '—'}</td></tr>
+                    <tr><td><strong>Perfil</strong></td><td><span className="badge badge-green">{user.perfil}</span></td></tr>
+                    <tr><td><strong>Nº Utente</strong></td><td>{utenteAutenticado.nr_utente || '—'}</td></tr>
+                    <tr><td><strong>Data Nascimento</strong></td><td>{utenteAutenticado.data_nascimento ? new Date(utenteAutenticado.data_nascimento).toLocaleDateString('pt-PT') : '—'}</td></tr>
+                    <tr><td><strong>Morada</strong></td><td>{utenteAutenticado.morada || '—'}</td></tr>
+                    <tr><td><strong>Contacto</strong></td><td>{formatarContacto(utenteAutenticado.contacto)}</td></tr>
+                    <tr><td><strong>Nº Faturacao</strong></td><td>{utenteAutenticado.nr_faturacao || '—'}</td></tr>
+                    <tr><td><strong>ID do Medico</strong></td><td>{utenteAutenticado.medico_id || '—'}</td></tr>
+                  </tbody>
+                </table>
+              )}
+            </div>
+            {utenteAutenticado && (
+              <div className="card">
+                <h2>Atualizar Dados</h2>
+                <form onSubmit={atualizarDadosUtente}>
+                  <input value={dadosEditaveis.email} onChange={setDadosUtilizador('email')} placeholder="E-mail" required />
+                  <input value={dadosEditaveis.morada} onChange={setDadosUtilizador('morada')} placeholder="Morada" required />
+                  <input value={dadosEditaveis.contacto} onChange={setDadosUtilizador('contacto')} placeholder="Número de telefone (ex: +351 913000001)" required />
+                  <button type="submit">Guardar alterações</button>
+                  {erro && <p className="erro">{erro}</p>}
+                  {sucesso && <p className="sucesso">{sucesso}</p>}
+                </form>
+              </div>
+            )}
+          </>
+        );
+      }
+
+      if (user?.perfil === 'MEDICO') {
+        return (
+          <>
+            <div className="card">
+              <h2>Utentes Registados</h2>
+              {utentes.length === 0 ? <p className="vazio">Nenhum utente associado a este medico.</p> : (
+                <table>
+                  <thead><tr><th>#</th><th>Nº Utente</th><th>Data Nasc.</th><th>Médico ID</th></tr></thead>
+                  <tbody>{utentes.map(u => (
+                    <tr key={u.id}><td>{u.id}</td><td>{u.nr_utente}</td>
+                      <td>{u.data_nascimento ? `${new Date(u.data_nascimento).toLocaleDateString('pt-PT')} (${calcularIdade(u.data_nascimento)} anos)` : '—'}</td>
+                      <td><span className="badge badge-blue">{u.medico_id}</span></td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              )}
+            </div>
+          </>
+        );
+      }
+
       return (
         <>
           <div className="card">
@@ -541,17 +825,39 @@
     }
 
     /* ───── Prescrições ───── */
-    function SecaoPrescricoes({ apiFetch }) {
+    function SecaoPrescricoes({ apiFetch, user }) {
       const [prescricoes, setPrescricoes] = useState([]);
       const [medicos, setMedicos] = useState([]);
       const [utentes, setUtentes] = useState([]);
+      const [utenteSelecionado, setUtenteSelecionado] = useState('');
+      const [tipoFiltro, setTipoFiltro] = useState('');
       const [form, setForm] = useState({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', assinatura: '' });
       const [formMed, setFormMed] = useState({ nome: '', dose: '', duracao: '', periodicidade: '', validade: '' });
-      const [nomeOpcaoMed, setNomeOpcaoMed] = useState('');
       const [periodicidadeOpcao, setPeriodicidadeOpcao] = useState('');
       const [formExame, setFormExame] = useState({ tipo_exame: 'ESPIROMETRIA', data: '', consentimento: 'true' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
+      const medicamentosSugeridos = [
+        'Salbutamol', 'Terbutalina', 'Formoterol', 'Salmeterol', 'Indacaterol',
+        'Tiotropio', 'Umeclidinio', 'Ipratropio', 'Budesonida', 'Beclometasona',
+        'Fluticasona', 'Ciclesonida', 'Mometasona', 'Prednisolona', 'Metilprednisolona',
+        'Dexametasona', 'Montelucaste', 'Cetirizina', 'Loratadina', 'Desloratadina',
+        'Levocetirizina', 'Bilastina', 'Rupatadina', 'Fexofenadina', 'Ebastina',
+        'Omalizumab', 'Mepolizumab', 'Benralizumab', 'Dupilumab', 'Acetilcisteína',
+        'Ambroxol', 'Amoxicilina', 'Amoxicilina/Clavulanato', 'Azitromicina',
+        'Claritromicina', 'Levofloxacina', 'Doxiciclina'
+      ];
+      const examesSugeridos = [
+        'ESPIROMETRIA', 'PICO FLUXO', 'PLETISMOGRAFIA', 'PRESSOES RESPIRATORIAS MAXIMAS',
+        'TESTE BRONCODILATADOR', 'TESTE BRONCOPROVOCACAO', 'TESTE DE ESFORCO',
+        'OXIMETRIA DE PULSO', 'OXIMETRIA NOTURNA', 'GASOMETRIA ARTERIAL',
+        'RADIOGRAFIA TORACICA', 'TAC TORACICA', 'ECOGRAFIA TORACICA', 'BRONCOSCOPIA',
+        'LAVAGEM BRONCOALVEOLAR', 'BIOPSIA BRONQUICA', 'INTRADERMORREACAO',
+        'TESTE DE PROVOCACAO ORAL', 'TESTE DE PROVOCACAO NASAL',
+        'TESTE DE PROVOCACAO BRONQUICA COM ALERGENO', 'IGE SERICA', 'IGE ESPECIFICA',
+        'TRIPTASE SERICA', 'HISTAMINA SERICA', 'HEMOGRAMA', 'ANALISES DE SANGUE',
+        'CITOLOGIA NASAL', 'RINOSCOPIA', 'NASOFIBROSCOPIA', 'AUDIOGRAMA'
+      ];
       async function buscar() {
         try { const r = await apiFetch('/api/prescricoes'); if (r.ok) setPrescricoes(r.data.dados ?? []); } catch {}
       }
@@ -563,15 +869,17 @@
         } catch {}
       }
       useEffect(() => { buscar(); buscarDeps(); }, []);
+      const medicoAutenticado = user?.perfil === 'MEDICO'
+        ? medicos.find(m => m.utilizador_id === user.id) ?? null
+        : null;
+      useEffect(() => {
+        if (user?.perfil === 'MEDICO' && medicoAutenticado) {
+          setForm(p => ({ ...p, medico_id: String(medicoAutenticado.id) }));
+        }
+      }, [user?.perfil, medicoAutenticado]);
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       function setMed(f) { return e => setFormMed(p => ({ ...p, [f]: e.target.value })); }
       function setEx(f) { return e => setFormExame(p => ({ ...p, [f]: e.target.value })); }
-      function handleNomeOpcao(e) {
-        const val = e.target.value;
-        setNomeOpcaoMed(val);
-        if (val !== '__outro__') setFormMed(p => ({ ...p, nome: val }));
-        else setFormMed(p => ({ ...p, nome: '' }));
-      }
       function handlePeriodicidadeOpcao(e) {
         const val = e.target.value;
         setPeriodicidadeOpcao(val);
@@ -580,7 +888,10 @@
       }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const rp = await apiFetch('/api/prescricoes', { method: 'POST', body: { medico_id: Number(form.medico_id), utente_id: Number(form.utente_id), tipo: form.tipo, data_emissao: form.data_emissao, data_validade: form.data_validade, estado: 'ATIVA', assinatura: form.assinatura } });
+        const medicoIdPrescricao = user?.perfil === 'MEDICO'
+          ? Number(medicoAutenticado?.id ?? user.id)
+          : Number(form.medico_id);
+        const rp = await apiFetch('/api/prescricoes', { method: 'POST', body: { medico_id: medicoIdPrescricao, utente_id: Number(form.utente_id), tipo: form.tipo, data_emissao: form.data_emissao, data_validade: form.data_validade, estado: 'ATIVA', assinatura: form.assinatura } });
         if (!rp.ok) { setErro(rp.data.erro || 'Erro ao criar prescrição.'); return; }
         const prescricaoId = rp.data.dados?.id;
         if (form.tipo === 'MEDICACAO') {
@@ -590,24 +901,76 @@
           const re = await apiFetch('/api/exames', { method: 'POST', body: { prescricao_id: prescricaoId, tipo_exame: formExame.tipo_exame, data: formExame.data, consentimento: formExame.consentimento === 'true', estado: 'PENDENTE' } });
           if (!re.ok) { setErro(re.data.erro || 'Prescrição criada mas erro ao registar exame.'); buscar(); return; }
         }
-        setForm({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', assinatura: '' });
+        setForm({ medico_id: user?.perfil === 'MEDICO' ? String(medicoAutenticado?.id ?? user.id) : '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', assinatura: '' });
         setFormMed({ nome: '', dose: '', duracao: '', periodicidade: '', validade: '' });
-        setNomeOpcaoMed('');
         setPeriodicidadeOpcao('');
         setFormExame({ tipo_exame: 'ESPIROMETRIA', data: '', consentimento: 'true' });
         setSucesso('Prescrição criada com sucesso.'); buscar();
       }
       const estadoBadge = { ATIVA: 'badge-green', DISPENSADA: 'badge-orange', CANCELADA: 'badge-red' };
+      const prescricoesFiltradas = prescricoes.filter(p => {
+        const matchUtente = !utenteSelecionado || String(p.utente_id) === String(utenteSelecionado);
+        const matchTipo = !tipoFiltro || p.tipo === tipoFiltro;
+        return matchUtente && matchTipo;
+      });
+      const utenteAutenticado = user?.perfil === 'UTENTE'
+        ? utentes.find(u => u.utilizador_id === user.id) ?? null
+        : null;
+
+      if (user?.perfil === 'UTENTE') {
+        const prescricoesDoUtente = utenteAutenticado
+          ? prescricoes.filter(p => p.utente_id === utenteAutenticado.id)
+          : [];
+        const prescricoesDoUtenteFiltradas = tipoFiltro
+          ? prescricoesDoUtente.filter(p => p.tipo === tipoFiltro)
+          : prescricoesDoUtente;
+
+        return (
+          <>
+            <div className="card">
+              <h2>Prescrições Registadas</h2>
+              <div className="filtro-row" style={{maxWidth:'260px', marginTop:'0.5rem'}}>
+                <select value={tipoFiltro} onChange={e => setTipoFiltro(e.target.value)}>
+                  <option value="">Todos os tipos</option>
+                  <option value="EXAME">Só Exames</option>
+                  <option value="MEDICACAO">Só Medicação</option>
+                </select>
+              </div>
+              {prescricoesDoUtenteFiltradas.length === 0 ? <p className="vazio">{tipoFiltro ? 'Nenhuma prescrição encontrada para o tipo selecionado.' : 'Nenhuma prescrição registada para este utente.'}</p> : (
+                <table>
+                  <thead><tr><th>#</th><th>Tipo</th><th>Estado</th><th>Emissão</th><th>Validade</th><th>Médico</th></tr></thead>
+                  <tbody>{prescricoesDoUtenteFiltradas.map(p => (
+                    <tr key={p.id}><td>{p.id}</td><td>{p.tipo}</td>
+                      <td><span className={`badge ${estadoBadge[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
+                      <td>{p.data_emissao ? new Date(p.data_emissao).toLocaleDateString('pt-PT') : '—'}</td>
+                      <td>{p.data_validade ? new Date(p.data_validade).toLocaleDateString('pt-PT') : '—'}</td>
+                      <td><span className="badge badge-blue">{p.medico_id}</span></td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              )}
+            </div>
+          </>
+        );
+      }
+
       return (
         <>
           <div className="card">
             <h2>Nova Prescrição</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                <select value={form.medico_id} onChange={set('medico_id')} required>
-                  <option value="">-- Seleccionar médico --</option>
-                  {medicos.map(m => <option key={m.id} value={m.id}>Médico #{m.id} — {m.especialidade}</option>)}
-                </select>
+                {user?.perfil === 'MEDICO' ? (
+                  <input
+                    value={medicoAutenticado ? `Médico #${medicoAutenticado.id} — ${medicoAutenticado.especialidade}` : 'Médico autenticado'}
+                    readOnly
+                  />
+                ) : (
+                  <select value={form.medico_id} onChange={set('medico_id')} required>
+                    <option value="">-- Seleccionar médico --</option>
+                    {medicos.map(m => <option key={m.id} value={m.id}>Médico #{m.id} — {m.especialidade}</option>)}
+                  </select>
+                )}
                 <select value={form.utente_id} onChange={set('utente_id')} required>
                   <option value="">-- Seleccionar utente --</option>
                   {utentes.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
@@ -626,72 +989,18 @@
               <input value={form.assinatura} onChange={set('assinatura')} placeholder="Assinatura do médico" required />
               {form.tipo === 'MEDICACAO' && (<>
                 <hr style={{margin:'12px 0', border:'none', borderTop:'1px solid #e2e8f0'}} />
-                <select value={nomeOpcaoMed} onChange={handleNomeOpcao} required>
-                  <option value="">-- Selecionar medicamento --</option>
-                  <optgroup label="SABA (broncodilatadores de curta duração)">
-                    <option value="Salbutamol">Salbutamol</option>
-                    <option value="Terbutalina">Terbutalina</option>
-                  </optgroup>
-                  <optgroup label="LABA (broncodilatadores de longa duração)">
-                    <option value="Formoterol">Formoterol</option>
-                    <option value="Salmeterol">Salmeterol</option>
-                    <option value="Indacaterol">Indacaterol</option>
-                  </optgroup>
-                  <optgroup label="LAMA (anticolinérgicos de longa duração)">
-                    <option value="Tiotropio">Tiotropio</option>
-                    <option value="Umeclidinio">Umeclidínio</option>
-                    <option value="Ipratropio">Ipratrópio</option>
-                  </optgroup>
-                  <optgroup label="Corticosteroides inalados (ICS)">
-                    <option value="Budesonida">Budesonida</option>
-                    <option value="Beclometasona">Beclometasona</option>
-                    <option value="Fluticasona">Fluticasona</option>
-                    <option value="Ciclesonida">Ciclesonida</option>
-                    <option value="Mometasona">Mometasona</option>
-                  </optgroup>
-                  <optgroup label="Corticosteroides sistémicos">
-                    <option value="Prednisolona">Prednisolona</option>
-                    <option value="Metilprednisolona">Metilprednisolona</option>
-                    <option value="Dexametasona">Dexametasona</option>
-                  </optgroup>
-                  <optgroup label="Anti-leucotrienos">
-                    <option value="Montelucaste">Montelucaste</option>
-                  </optgroup>
-                  <optgroup label="Anti-histamínicos">
-                    <option value="Cetirizina">Cetirizina</option>
-                    <option value="Loratadina">Loratadina</option>
-                    <option value="Desloratadina">Desloratadina</option>
-                    <option value="Levocetirizina">Levocetirizina</option>
-                    <option value="Bilastina">Bilastina</option>
-                    <option value="Rupatadina">Rupatadina</option>
-                    <option value="Fexofenadina">Fexofenadina</option>
-                    <option value="Ebastina">Ebastina</option>
-                  </optgroup>
-                  <optgroup label="Biológicos">
-                    <option value="Omalizumab">Omalizumab</option>
-                    <option value="Mepolizumab">Mepolizumab</option>
-                    <option value="Benralizumab">Benralizumab</option>
-                    <option value="Dupilumab">Dupilumab</option>
-                  </optgroup>
-                  <optgroup label="Mucolíticos">
-                    <option value="Acetilcisteína">Acetilcisteína</option>
-                    <option value="Ambroxol">Ambroxol</option>
-                  </optgroup>
-                  <optgroup label="Antibióticos">
-                    <option value="Amoxicilina">Amoxicilina</option>
-                    <option value="Amoxicilina/Clavulanato">Amoxicilina/Clavulanato</option>
-                    <option value="Azitromicina">Azitromicina</option>
-                    <option value="Claritromicina">Claritromicina</option>
-                    <option value="Levofloxacina">Levofloxacina</option>
-                    <option value="Doxiciclina">Doxiciclina</option>
-                  </optgroup>
-                  <optgroup label="Outro">
-                    <option value="__outro__">Outro (não listado)</option>
-                  </optgroup>
-                </select>
-                {nomeOpcaoMed === '__outro__' && (
-                  <input value={formMed.nome} onChange={setMed('nome')} placeholder="Nome do medicamento" required />
-                )}
+                <input
+                  list="sugestoes-medicamentos"
+                  value={formMed.nome}
+                  onChange={setMed('nome')}
+                  placeholder="Nome do medicamento"
+                  required
+                />
+                <datalist id="sugestoes-medicamentos">
+                  {medicamentosSugeridos.map(medicamento => (
+                    <option key={medicamento} value={medicamento} />
+                  ))}
+                </datalist>
                 <div className="row">
                   <input value={formMed.dose} onChange={setMed('dose')} placeholder="Dose (ex: 500 mg)" required />
                   <select value={periodicidadeOpcao} onChange={handlePeriodicidadeOpcao} required>
@@ -732,50 +1041,18 @@
               </>)}
               {form.tipo === 'EXAME' && (<>
                 <hr style={{margin:'12px 0', border:'none', borderTop:'1px solid #e2e8f0'}} />
-                <select value={formExame.tipo_exame} onChange={setEx('tipo_exame')} required>
-                  <optgroup label="Função Respiratória">
-                    <option value="ESPIROMETRIA">Espirometria</option>
-                    <option value="PICO FLUXO">Pico Fluxo</option>
-                    <option value="PLETISMOGRAFIA">Pletismografia</option>
-                    <option value="PRESSOES RESPIRATORIAS MAXIMAS">Pressões Respiratórias Máximas</option>
-                    <option value="TESTE BRONCODILATADOR">Teste Broncodilatador</option>
-                    <option value="TESTE BRONCOPROVOCACAO">Teste de Broncoprovocação</option>
-                    <option value="TESTE DE ESFORCO">Teste de Esforço</option>
-                    <option value="OXIMETRIA DE PULSO">Oximetria de Pulso</option>
-                    <option value="OXIMETRIA NOTURNA">Oximetria Noturna</option>
-                    <option value="GASOMETRIA ARTERIAL">Gasometria Arterial</option>
-                  </optgroup>
-                  <optgroup label="Imagiologia">
-                    <option value="RADIOGRAFIA TORACICA">Radiografia Torácica</option>
-                    <option value="TAC TORACICA">TAC Torácica</option>
-                    <option value="ECOGRAFIA TORACICA">Ecografia Torácica</option>
-                  </optgroup>
-                  <optgroup label="Procedimentos Invasivos">
-                    <option value="BRONCOSCOPIA">Broncoscopia</option>
-                    <option value="LAVAGEM BRONCOALVEOLAR">Lavagem Broncoalveolar</option>
-                    <option value="BIOPSIA BRONQUICA">Biópsia Brônquica</option>
-                  </optgroup>
-                  <optgroup label="Alergia / Imunologia">
-                    <option value="INTRADERMORREACAO">Intradermorreação</option>
-                    <option value="TESTE DE PROVOCACAO ORAL">Teste de Provocação Oral</option>
-                    <option value="TESTE DE PROVOCACAO NASAL">Teste de Provocação Nasal</option>
-                    <option value="TESTE DE PROVOCACAO BRONQUICA COM ALERGENO">Teste de Provocação Brônquica c/ Alergeno</option>
-                    <option value="IGE SERICA">IgE Sérica Total</option>
-                    <option value="IGE ESPECIFICA">IgE Específica</option>
-                    <option value="TRIPTASE SERICA">Triptase Sérica</option>
-                    <option value="HISTAMINA SERICA">Histamina Sérica</option>
-                  </optgroup>
-                  <optgroup label="Análises Laboratoriais">
-                    <option value="HEMOGRAMA">Hemograma</option>
-                    <option value="ANALISES DE SANGUE">Análises de Sangue</option>
-                  </optgroup>
-                  <optgroup label="ORL / Nasal">
-                    <option value="CITOLOGIA NASAL">Citologia Nasal</option>
-                    <option value="RINOSCOPIA">Rinoscopia</option>
-                    <option value="NASOFIBROSCOPIA">Nasofibroscopia</option>
-                    <option value="AUDIOGRAMA">Audiograma</option>
-                  </optgroup>
-                </select>
+                <input
+                  list="sugestoes-exames"
+                  value={formExame.tipo_exame}
+                  onChange={setEx('tipo_exame')}
+                  placeholder="Tipo de exame"
+                  required
+                />
+                <datalist id="sugestoes-exames">
+                  {examesSugeridos.map(exame => (
+                    <option key={exame} value={exame} />
+                  ))}
+                </datalist>
                 <div className="row">
                   <input type="datetime-local" value={formExame.data} onChange={setEx('data')} required />
                   <select value={formExame.consentimento} onChange={setEx('consentimento')}>
@@ -791,10 +1068,25 @@
           </div>
           <div className="card">
             <h2>Prescrições Registadas</h2>
-            {prescricoes.length === 0 ? <p className="vazio">Nenhuma prescrição registada.</p> : (
+            <div className="filtro-row" style={{maxWidth:'640px', marginTop:'0.5rem'}}>
+              <select value={utenteSelecionado} onChange={e => setUtenteSelecionado(e.target.value)}>
+                <option value="">Todos os doentes</option>
+                {utentes.map(u => (
+                  <option key={u.id} value={u.id}>
+                    Doente #{u.id} - Nº {u.nr_utente}
+                  </option>
+                ))}
+              </select>
+              <select value={tipoFiltro} onChange={e => setTipoFiltro(e.target.value)}>
+                <option value="">Todos os tipos</option>
+                <option value="EXAME">Só Exames</option>
+                <option value="MEDICACAO">Só Medicação</option>
+              </select>
+            </div>
+            {prescricoesFiltradas.length === 0 ? <p className="vazio">{utenteSelecionado || tipoFiltro ? 'Nenhuma prescrição encontrada para os filtros selecionados.' : 'Nenhuma prescrição registada.'}</p> : (
               <table>
                 <thead><tr><th>#</th><th>Tipo</th><th>Estado</th><th>Emissão</th><th>Validade</th><th>Utente</th><th>Médico</th></tr></thead>
-                <tbody>{prescricoes.map(p => (
+                <tbody>{prescricoesFiltradas.map(p => (
                   <tr key={p.id}><td>{p.id}</td><td>{p.tipo}</td>
                     <td><span className={`badge ${estadoBadge[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
                     <td>{p.data_emissao ? new Date(p.data_emissao).toLocaleDateString('pt-PT') : '—'}</td>
@@ -815,6 +1107,8 @@
       const [anamneses, setAnamneses] = useState([]);
       const [utentes, setUtentes] = useState([]);
       const [form, setForm] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' });
+      const [anamneseEdicaoId, setAnamneseEdicaoId] = useState('');
+      const [formEdicao, setFormEdicao] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
@@ -825,6 +1119,7 @@
       }
       useEffect(() => { buscar(); buscarUtentes(); }, []);
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
+      function setEdicao(f) { return e => setFormEdicao(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
         if (!form.sexo) { setErro('Sexo é obrigatório.'); return; }
@@ -833,6 +1128,32 @@
         if (r.ok) { setForm({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' }); setSucesso(`Anamnese criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar anamnese.');
       }
+      function iniciarEdicao(anamnese) {
+        setErro('');
+        setSucesso('');
+        setAnamneseEdicaoId(String(anamnese.id));
+        setFormEdicao({
+          utente_id: String(anamnese.utente_id || ''),
+          historico_familiar: anamnese.historico_familiar || '',
+          tabagismo: anamnese.tabagismo || 'NAO FUMADOR',
+          sexo: anamnese.sexo || '',
+        });
+      }
+      async function guardarEdicao(e) {
+        e.preventDefault(); setErro(''); setSucesso('');
+        if (!formEdicao.sexo) { setErro('Sexo é obrigatório.'); return; }
+        const body = { utente_id: Number(formEdicao.utente_id), historico_familiar: formEdicao.historico_familiar, tabagismo: formEdicao.tabagismo, sexo: formEdicao.sexo };
+        const r = await apiFetch(`/api/anamneses/${anamneseEdicaoId}`, { method: 'PUT', body });
+        if (r.ok) {
+          setAnamneseEdicaoId('');
+          setFormEdicao({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' });
+          setSucesso('Anamnese atualizada com sucesso.');
+          buscar();
+        } else {
+          setErro(r.data.erro || 'Erro ao atualizar anamnese.');
+        }
+      }
+      const utentesSemAnamnese = utentes.filter(u => !anamneses.some(a => a.utente_id === u.id));
       return (
         <>
           <div className="card">
@@ -840,7 +1161,7 @@
             <form onSubmit={handleSubmit}>
               <select value={form.utente_id} onChange={set('utente_id')} required>
                 <option value="">-- Seleccionar utente --</option>
-                {utentes.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
+                {utentesSemAnamnese.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
               </select>
               <textarea value={form.historico_familiar} onChange={set('historico_familiar')} placeholder="Histórico familiar" required />
               <select value={form.tabagismo} onChange={set('tabagismo')}>
@@ -862,17 +1183,50 @@
               {sucesso && <p className="sucesso">{sucesso}</p>}
             </form>
           </div>
+          {anamneseEdicaoId && (
+            <div className="card">
+              <h2>Editar Anamnese</h2>
+              <form onSubmit={guardarEdicao}>
+                <select value={formEdicao.utente_id} onChange={setEdicao('utente_id')} required>
+                  <option value="">-- Seleccionar utente --</option>
+                  {utentes.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
+                </select>
+                <textarea value={formEdicao.historico_familiar} onChange={setEdicao('historico_familiar')} placeholder="Histórico familiar" required />
+                <select value={formEdicao.tabagismo} onChange={setEdicao('tabagismo')}>
+                  <option value="NAO FUMADOR">Não Fumador</option>
+                  <option value="EX-FUMADOR">Ex-Fumador</option>
+                  <option value="EXPOSICAO PASSIVA">Exposição Passiva</option>
+                  <option value="OCASIONAL">Ocasional</option>
+                  <option value="MENOS DE 10 CIGARROS/DIA">Menos de 10 cigarros/dia</option>
+                  <option value="10 A 20 CIGARROS/DIA">10 a 20 cigarros/dia</option>
+                  <option value="MAIS DE 20 CIGARROS/DIA">Mais de 20 cigarros/dia</option>
+                </select>
+                <select value={formEdicao.sexo} onChange={setEdicao('sexo')} required>
+                  <option value="">-- Seleccionar sexo --</option>
+                  <option value="MASCULINO">Masculino</option>
+                  <option value="FEMININO">Feminino</option>
+                </select>
+                <div className="row">
+                  <button type="submit">Guardar alterações</button>
+                  <button type="button" className="btn-sec" onClick={() => { setAnamneseEdicaoId(''); setFormEdicao({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' }); }}>
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
           <div className="card">
             <h2>Anamneses Registadas</h2>
             {anamneses.length === 0 ? <p className="vazio">Nenhuma anamnese registada.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Utente ID</th><th>Sexo</th><th>Tabagismo</th><th>Histórico Familiar</th></tr></thead>
+                <thead><tr><th>#</th><th>Utente ID</th><th>Sexo</th><th>Tabagismo</th><th>Histórico Familiar</th><th>Ações</th></tr></thead>
                 <tbody>{anamneses.map(a => (
                   <tr key={a.id}><td>{a.id}</td>
                     <td><span className="badge badge-green">{a.utente_id}</span></td>
                     <td>{a.sexo || '—'}</td>
                     <td><span className="badge badge-orange">{a.tabagismo}</span></td>
                     <td style={{maxWidth:'300px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.historico_familiar}</td>
+                    <td><button type="button" className="btn-sec" onClick={() => iniciarEdicao(a)}>Editar</button></td>
                   </tr>
                 ))}</tbody>
               </table>
@@ -885,14 +1239,33 @@
     /* ───── Alergias ───── */
     function SecaoAlergias({ apiFetch }) {
       const [alergias, setAlergias] = useState([]);
+      const [anamneses, setAnamneses] = useState([]);
       const [filtro, setFiltro] = useState('');
       const [form, setForm] = useState({ anamnese_id: '', descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
+      const alergiasPrincipais = [
+        'Ácaros do pó doméstico',
+        'Pólen de gramíneas',
+        'Pólen de oliveira',
+        'Pólen de árvores',
+        'Pelos de gato',
+        'Pelos de cão',
+        'Bolores ambientais',
+        'Poeiras domésticas',
+        'Fumo do tabaco',
+        'Perfumes intensos',
+      ];
       async function buscar(id) {
         try { const r = await apiFetch(id ? `/api/alergias/anamnese/${id}` : '/api/alergias'); if (r.ok) setAlergias(r.data.dados ?? []); } catch {}
       }
-      useEffect(() => { buscar(''); }, []);
+      async function buscarAnamneses() {
+        try {
+          const r = await apiFetch('/api/anamneses');
+          if (r.ok) setAnamneses(r.data.dados ?? []);
+        } catch {}
+      }
+      useEffect(() => { buscar(''); buscarAnamneses(); }, []);
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
@@ -906,8 +1279,24 @@
           <div className="card">
             <h2>Nova Alergia</h2>
             <form onSubmit={handleSubmit}>
-              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" min="1" required />
-              <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição da alergia" required />
+              <select value={form.anamnese_id} onChange={set('anamnese_id')} required>
+                <option value="">-- Seleccionar ID da anamnese --</option>
+                {anamneses.map(anamnese => (
+                  <option key={anamnese.id} value={anamnese.id}>{anamnese.id}</option>
+                ))}
+              </select>
+              <input
+                list="sugestoes-alergias"
+                value={form.descricao}
+                onChange={set('descricao')}
+                placeholder="Descrição da alergia"
+                required
+              />
+              <datalist id="sugestoes-alergias">
+                {alergiasPrincipais.map(alergia => (
+                  <option key={alergia} value={alergia} />
+                ))}
+              </datalist>
               <div className="row">
                 <select value={form.intensidade_crise} onChange={set('intensidade_crise')}>
                   <option value="LEVE">Leve</option>
@@ -924,7 +1313,12 @@
           <div className="card">
             <h2>Alergias</h2>
             <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de anamnese" />
+              <select value={filtro} onChange={e => setFiltro(e.target.value)}>
+                <option value="">-- Seleccionar ID de anamnese --</option>
+                {anamneses.map(anamnese => (
+                  <option key={anamnese.id} value={anamnese.id}>{anamnese.id}</option>
+                ))}
+              </select>
               <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
               <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todas</button>
             </div>
@@ -949,15 +1343,39 @@
     /* ───── Comorbidades ───── */
     function SecaoComorbidades({ apiFetch }) {
       const [comorbidades, setComorbidades] = useState([]);
+      const [anamneses, setAnamneses] = useState([]);
       const [filtro, setFiltro] = useState('');
       const [form, setForm] = useState({ anamnese_id: '', descricao: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
+      const comorbidadesPrincipais = [
+        'Rinite alérgica persistente',
+        'Sinusite crónica',
+        'Bronquite crónica',
+        'DPOC',
+        'Enfisema pulmonar',
+        'Refluxo gastroesofágico',
+        'Apneia obstrutiva do sono',
+        'Conjuntivite alérgica',
+        'Dermatite atópica',
+        'Polipose nasal',
+      ];
       async function buscar(id) {
         try { const r = await apiFetch(id ? `/api/comorbidades/anamnese/${id}` : '/api/comorbidades'); if (r.ok) setComorbidades(r.data.dados ?? []); } catch {}
       }
-      useEffect(() => { buscar(''); }, []);
+      async function buscarAnamneses() {
+        try {
+          const r = await apiFetch('/api/anamneses');
+          if (r.ok) setAnamneses(r.data.dados ?? []);
+        } catch {}
+      }
+      useEffect(() => { buscar(''); buscarAnamneses(); }, []);
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
+      function handleFiltroAnamnese(e) {
+        const valor = e.target.value;
+        setFiltro(valor);
+        buscar(valor);
+      }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
         const r = await apiFetch('/api/comorbidades', { method: 'POST', body: { anamnese_id: Number(form.anamnese_id), descricao: form.descricao } });
@@ -969,8 +1387,24 @@
           <div className="card">
             <h2>Nova Comorbidade</h2>
             <form onSubmit={handleSubmit}>
-              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" min="1" required />
-              <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição" required />
+              <select value={form.anamnese_id} onChange={set('anamnese_id')} required>
+                <option value="">-- Seleccionar ID da anamnese --</option>
+                {anamneses.map(anamnese => (
+                  <option key={anamnese.id} value={anamnese.id}>{anamnese.id}</option>
+                ))}
+              </select>
+              <input
+                list="sugestoes-comorbidades"
+                value={form.descricao}
+                onChange={set('descricao')}
+                placeholder="Descrição da comorbidade"
+                required
+              />
+              <datalist id="sugestoes-comorbidades">
+                {comorbidadesPrincipais.map(comorbidade => (
+                  <option key={comorbidade} value={comorbidade} />
+                ))}
+              </datalist>
               <button type="submit">Registar comorbidade</button>
               {erro && <p className="erro">{erro}</p>}
               {sucesso && <p className="sucesso">{sucesso}</p>}
@@ -979,7 +1413,12 @@
           <div className="card">
             <h2>Comorbidades</h2>
             <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de anamnese" />
+              <select value={filtro} onChange={handleFiltroAnamnese}>
+                <option value="">-- Seleccionar ID de anamnese --</option>
+                {anamneses.map(anamnese => (
+                  <option key={anamnese.id} value={anamnese.id}>{anamnese.id}</option>
+                ))}
+              </select>
               <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
               <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todas</button>
             </div>
@@ -1000,13 +1439,37 @@
     }
 
     /* ───── Sintomas ───── */
-    function SecaoSintomas({ apiFetch }) {
+    function SecaoSintomas({ apiFetch, user }) {
       const [sintomas, setSintomas] = useState([]);
       const [utentes, setUtentes] = useState([]);
       const [filtro, setFiltro] = useState('');
+      const [filtroIntensidade, setFiltroIntensidade] = useState('');
+      const [mostrarPrevalencia, setMostrarPrevalencia] = useState(false);
       const [form, setForm] = useState({ utente_id: '', descricao: '', intensidade: 'LIGEIRA', duracao: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
+      const sintomasSugeridos = [
+        'Dispneia',
+        'Dispneia ao esforço',
+        'Dispneia noturna',
+        'Tosse seca persistente',
+        'Tosse produtiva',
+        'Tosse irritativa',
+        'Pieira',
+        'Pieira noturna',
+        'Aperto torácico',
+        'Falta de ar',
+        'Fadiga respiratória',
+        'Despertares noturnos por falta de ar',
+        'Expetoração persistente',
+        'Congestão torácica',
+        'Sensação de peito preso',
+        'Cansaço ao esforço',
+        'Tosse após exercício',
+        'Pieira após exposição a pólen',
+        'Dispneia ao frio',
+        'Chiadeira no peito',
+      ];
       async function buscar(id) {
         try { const r = await apiFetch(id ? `/api/sintomas/utente/${id}` : '/api/sintomas'); if (r.ok) setSintomas(r.data.dados ?? []); } catch {}
       }
@@ -1017,11 +1480,127 @@
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const r = await apiFetch('/api/sintomas', { method: 'POST', body: { utente_id: Number(form.utente_id), descricao: form.descricao, intensidade: form.intensidade, duracao: form.duracao } });
+        const utenteDoUtilizador = user?.perfil === 'UTENTE'
+          ? utentes.find(u => u.utilizador_id === user.id)
+          : null;
+        const utenteId = user?.perfil === 'UTENTE'
+          ? Number(utenteDoUtilizador?.id)
+          : Number(form.utente_id);
+        const r = await apiFetch('/api/sintomas', { method: 'POST', body: { utente_id: utenteId, descricao: form.descricao, intensidade: form.intensidade, duracao: form.duracao } });
         if (r.ok) { setForm({ utente_id: '', descricao: '', intensidade: 'LIGEIRA', duracao: '' }); setSucesso(`Sintoma registado com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
         else setErro(r.data.erro || 'Erro ao registar sintoma.');
       }
       const ib = { LIGEIRA: 'badge-green', MODERADA: 'badge-orange', GRAVE: 'badge-red' };
+      function estimarDuracaoDias(duracao) {
+        const texto = (duracao || '').toLowerCase().trim();
+        const match = texto.match(/(\d+)/);
+        if (!match) return 0;
+        const valor = Number(match[1]);
+        if (texto.includes('mes')) return valor * 30;
+        if (texto.includes('semana')) return valor * 7;
+        return valor;
+      }
+      const sintomasFiltrados = sintomas.filter(s => {
+        const matchIntensidade = !filtroIntensidade || s.intensidade === filtroIntensidade;
+        return matchIntensidade;
+      });
+      const sintomasAgrupados = [...sintomasFiltrados]
+        .reduce((acc, sintoma) => {
+          const descricao = (sintoma.descricao || '').trim();
+          if (!descricao) return acc;
+          if (!acc[descricao]) {
+            acc[descricao] = { ocorrencias: 0, duracaoTotalDias: 0 };
+          }
+          acc[descricao].ocorrencias += 1;
+          acc[descricao].duracaoTotalDias += estimarDuracaoDias(sintoma.duracao);
+          return acc;
+        }, {})
+      ;
+      const topMaisOcorrentes = Object.entries(sintomasAgrupados)
+        .sort((a, b) => b[1].ocorrencias - a[1].ocorrencias || b[1].duracaoTotalDias - a[1].duracaoTotalDias || a[0].localeCompare(b[0]))
+        .slice(0, 5);
+      const topMaisDuradouros = Object.entries(sintomasAgrupados)
+        .sort((a, b) => b[1].duracaoTotalDias - a[1].duracaoTotalDias || b[1].ocorrencias - a[1].ocorrencias || a[0].localeCompare(b[0]))
+        .slice(0, 5);
+      if (user?.perfil === 'UTENTE') {
+        return (
+          <>
+            <div className="card">
+              <h2>Novo Sintoma</h2>
+              <form onSubmit={handleSubmit}>
+                <input list="sugestoes-sintomas" value={form.descricao} onChange={set('descricao')} placeholder="Descrição do sintoma" required />
+                <datalist id="sugestoes-sintomas">
+                  {sintomasSugeridos.map(sintoma => (
+                    <option key={sintoma} value={sintoma} />
+                  ))}
+                </datalist>
+                <div className="row">
+                  <select value={form.intensidade} onChange={set('intensidade')}>
+                    <option value="LIGEIRA">Ligeira</option>
+                    <option value="MODERADA">Moderada</option>
+                    <option value="GRAVE">Grave</option>
+                  </select>
+                  <input value={form.duracao} onChange={set('duracao')} placeholder="Duração (ex: 3 dias)" required />
+                </div>
+                <button type="submit">Registar sintoma</button>
+                {erro && <p className="erro">{erro}</p>}
+                {sucesso && <p className="sucesso">{sucesso}</p>}
+              </form>
+            </div>
+            <div className="card">
+              <h2>Sintomas</h2>
+              <div className="filtro-row" style={{maxWidth:'640px', flexWrap:'wrap'}}>
+                <select value={filtroIntensidade} onChange={e => setFiltroIntensidade(e.target.value)}>
+                  <option value="">Todas as intensidades</option>
+                  <option value="LIGEIRA">Ligeira</option>
+                  <option value="MODERADA">Moderada</option>
+                  <option value="GRAVE">Grave</option>
+                </select>
+                <button type="button" onClick={() => setMostrarPrevalencia(p => !p)}>
+                  {mostrarPrevalencia ? 'Ocultar prevalência' : 'Ver mais prevalentes'}
+                </button>
+                <button type="button" className="btn-sec" onClick={() => { setFiltroIntensidade(''); setMostrarPrevalencia(false); buscar(''); }}>Listar todos</button>
+              </div>
+              {mostrarPrevalencia && (
+                <div style={{margin:'0.75rem 0 1rem', display:'grid', gap:'1rem'}}>
+                  <div>
+                    <h3 style={{fontSize:'0.95rem', marginBottom:'0.55rem', color:'var(--brand-deep)'}}>Mais ocorrentes</h3>
+                    <table>
+                      <thead><tr><th>Sintoma</th><th>Ocorrências</th><th>Duração total</th></tr></thead>
+                      <tbody>{topMaisOcorrentes.map(([descricao, dados]) => (
+                        <tr key={`oc-${descricao}`}><td>{descricao}</td><td>{dados.ocorrencias}</td><td>{dados.duracaoTotalDias} dias</td></tr>
+                      ))}</tbody>
+                    </table>
+                  </div>
+                  <div>
+                    <h3 style={{fontSize:'0.95rem', marginBottom:'0.55rem', color:'var(--brand-deep)'}}>Mais duradouros</h3>
+                    <table>
+                      <thead><tr><th>Sintoma</th><th>Duração total</th><th>Ocorrências</th></tr></thead>
+                      <tbody>{topMaisDuradouros.map(([descricao, dados]) => (
+                        <tr key={`du-${descricao}`}><td>{descricao}</td><td>{dados.duracaoTotalDias} dias</td><td>{dados.ocorrencias}</td></tr>
+                      ))}</tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              {sintomasFiltrados.length === 0 ? <p className="vazio">Nenhum sintoma encontrado para os filtros selecionados.</p> : (
+                <table>
+                  <thead><tr><th>#</th><th>Descrição</th><th>Intensidade</th><th>Duração</th><th>Data</th></tr></thead>
+                  <tbody>{sintomasFiltrados.map(s => (
+                    <tr key={s.id}><td>{s.id}</td>
+                      <td>{s.descricao}</td>
+                      <td><span className={`badge ${ib[s.intensidade] || 'badge-blue'}`}>{s.intensidade}</span></td>
+                      <td>{s.duracao}</td>
+                      <td>{s.data_registo ? new Date(s.data_registo).toLocaleDateString('pt-PT') : '—'}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              )}
+            </div>
+          </>
+        );
+      }
+
       return (
         <>
           <div className="card">
@@ -1031,7 +1610,12 @@
                 <option value="">-- Seleccionar utente --</option>
                 {utentes.map(u => <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>)}
               </select>
-              <input value={form.descricao} onChange={set('descricao')} placeholder="Descrição do sintoma" required />
+              <input list="sugestoes-sintomas-profissional" value={form.descricao} onChange={set('descricao')} placeholder="Descrição do sintoma" required />
+              <datalist id="sugestoes-sintomas-profissional">
+                {sintomasSugeridos.map(sintoma => (
+                  <option key={sintoma} value={sintoma} />
+                ))}
+              </datalist>
               <div className="row">
                 <select value={form.intensidade} onChange={set('intensidade')}>
                   <option value="LIGEIRA">Ligeira</option>
@@ -1047,15 +1631,51 @@
           </div>
           <div className="card">
             <h2>Sintomas</h2>
-            <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de utente" />
+            <div className="filtro-row" style={{maxWidth:'980px', flexWrap:'wrap'}}>
+              <select value={filtro} onChange={e => setFiltro(e.target.value)}>
+                <option value="">-- Seleccionar utente --</option>
+                {utentes.map(u => (
+                  <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>
+                ))}
+              </select>
               <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
-              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todos</button>
+              <select value={filtroIntensidade} onChange={e => setFiltroIntensidade(e.target.value)}>
+                <option value="">Todas as intensidades</option>
+                <option value="LIGEIRA">Ligeira</option>
+                <option value="MODERADA">Moderada</option>
+                <option value="GRAVE">Grave</option>
+              </select>
+              <button type="button" onClick={() => setMostrarPrevalencia(p => !p)}>
+                {mostrarPrevalencia ? 'Ocultar prevalência' : 'Ver mais prevalentes'}
+              </button>
+              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); setFiltroIntensidade(''); setMostrarPrevalencia(false); buscar(''); }}>Listar todos</button>
             </div>
-            {sintomas.length === 0 ? <p className="vazio">Nenhum sintoma encontrado.</p> : (
+            {mostrarPrevalencia && (
+              <div style={{margin:'0.75rem 0 1rem', display:'grid', gap:'1rem'}}>
+                <div>
+                  <h3 style={{fontSize:'0.95rem', marginBottom:'0.55rem', color:'var(--brand-deep)'}}>Mais ocorrentes</h3>
+                  <table>
+                    <thead><tr><th>Sintoma</th><th>Ocorrências</th><th>Duração total</th></tr></thead>
+                    <tbody>{topMaisOcorrentes.map(([descricao, dados]) => (
+                      <tr key={`oc-${descricao}`}><td>{descricao}</td><td>{dados.ocorrencias}</td><td>{dados.duracaoTotalDias} dias</td></tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+                <div>
+                  <h3 style={{fontSize:'0.95rem', marginBottom:'0.55rem', color:'var(--brand-deep)'}}>Mais duradouros</h3>
+                  <table>
+                    <thead><tr><th>Sintoma</th><th>Duração total</th><th>Ocorrências</th></tr></thead>
+                    <tbody>{topMaisDuradouros.map(([descricao, dados]) => (
+                      <tr key={`du-${descricao}`}><td>{descricao}</td><td>{dados.duracaoTotalDias} dias</td><td>{dados.ocorrencias}</td></tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            {sintomasFiltrados.length === 0 ? <p className="vazio">Nenhum sintoma encontrado para os filtros selecionados.</p> : (
               <table>
                 <thead><tr><th>#</th><th>Utente</th><th>Descrição</th><th>Intensidade</th><th>Duração</th><th>Data</th></tr></thead>
-                <tbody>{sintomas.map(s => (
+                <tbody>{sintomasFiltrados.map(s => (
                   <tr key={s.id}><td>{s.id}</td>
                     <td><span className="badge badge-green">{s.utente_id}</span></td>
                     <td>{s.descricao}</td>
@@ -1136,42 +1756,29 @@
     /* ───── Medicações Habituais ───── */
     function SecaoMedicacoesHabituais({ apiFetch }) {
       const [medicacoes, setMedicacoes] = useState([]);
+      const [anamneses, setAnamneses] = useState([]);
       const [filtro, setFiltro] = useState('');
-      const [form, setForm] = useState({ anamnese_id: '', nome: '', dose: '', duracao: '', periodicidade: '' });
-      const [erro, setErro] = useState('');
-      const [sucesso, setSucesso] = useState('');
       async function buscar(id) {
         try { const r = await apiFetch(id ? `/api/medicacoes-habituais/anamnese/${id}` : '/api/medicacoes-habituais'); if (r.ok) setMedicacoes(r.data.dados ?? []); } catch {}
       }
-      useEffect(() => { buscar(''); }, []);
-      function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
-      async function handleSubmit(e) {
-        e.preventDefault(); setErro(''); setSucesso('');
-        const r = await apiFetch('/api/medicacoes-habituais', { method: 'POST', body: { anamnese_id: Number(form.anamnese_id), nome: form.nome, dose: form.dose, duracao: form.duracao, periodicidade: form.periodicidade } });
-        if (r.ok) { setForm({ anamnese_id: '', nome: '', dose: '', duracao: '', periodicidade: '' }); setSucesso(`Medicação habitual criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
-        else setErro(r.data.erro || 'Erro ao criar medicação habitual.');
+      async function buscarAnamneses() {
+        try {
+          const r = await apiFetch('/api/anamneses');
+          if (r.ok) setAnamneses(r.data.dados ?? []);
+        } catch {}
       }
+      useEffect(() => { buscar(''); buscarAnamneses(); }, []);
       return (
         <>
           <div className="card">
-            <h2>Nova Medicação Habitual</h2>
-            <form onSubmit={handleSubmit}>
-              <input type="number" value={form.anamnese_id} onChange={set('anamnese_id')} placeholder="ID da anamnese" min="1" required />
-              <input value={form.nome} onChange={set('nome')} placeholder="Nome do medicamento" required />
-              <div className="row">
-                <input value={form.dose} onChange={set('dose')} placeholder="Dose (ex: 500mg)" required />
-                <input value={form.periodicidade} onChange={set('periodicidade')} placeholder="Periodicidade (ex: diário)" required />
-              </div>
-              <input value={form.duracao} onChange={set('duracao')} placeholder="Duração (ex: uso contínuo)" required />
-              <button type="submit">Registar medicação habitual</button>
-              {erro && <p className="erro">{erro}</p>}
-              {sucesso && <p className="sucesso">{sucesso}</p>}
-            </form>
-          </div>
-          <div className="card">
             <h2>Medicações Habituais</h2>
             <div className="filtro-row">
-              <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de anamnese" />
+              <select value={filtro} onChange={e => setFiltro(e.target.value)}>
+                <option value="">-- Seleccionar ID de anamnese --</option>
+                {anamneses.map(anamnese => (
+                  <option key={anamnese.id} value={anamnese.id}>{anamnese.id}</option>
+                ))}
+              </select>
               <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
               <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todas</button>
             </div>
@@ -1267,20 +1874,40 @@
     }
 
     /* ───── Alertas ───── */
-    function SecaoAlertas({ apiFetch }) {
+    function SecaoAlertas({ apiFetch, user }) {
       const [alertas, setAlertas] = useState([]);
+      const [utentes, setUtentes] = useState([]);
+      const [medicos, setMedicos] = useState([]);
       const [form, setForm] = useState({ utente_id: '', medico_id: '', regra_id: '', tipo: 'SCORE BAIXO', estado: 'NOVO', prioridade: 'MEDIA', notas: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
         try { const r = await apiFetch('/api/alertas'); if (r.ok) setAlertas(r.data.dados ?? []); } catch {}
       }
-      useEffect(() => { buscar(); }, []);
+      async function buscarDeps() {
+        try {
+          const [ru, rm] = await Promise.all([apiFetch('/api/utentes'), apiFetch('/api/medicos')]);
+          if (ru.ok) setUtentes(ru.data.dados ?? []);
+          if (rm.ok) setMedicos(rm.data.dados ?? []);
+        } catch {}
+      }
+      useEffect(() => { buscar(); buscarDeps(); }, []);
+      const medicoAutenticado = user?.perfil === 'MEDICO'
+        ? medicos.find(m => m.utilizador_id === user.id) ?? null
+        : null;
+      useEffect(() => {
+        if (user?.perfil === 'MEDICO' && medicoAutenticado) {
+          setForm(p => ({ ...p, medico_id: String(medicoAutenticado.id) }));
+        }
+      }, [user?.perfil, medicoAutenticado]);
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const r = await apiFetch('/api/alertas', { method: 'POST', body: { utente_id: Number(form.utente_id), medico_id: Number(form.medico_id), regra_id: Number(form.regra_id), tipo: form.tipo, estado: form.estado, prioridade: form.prioridade, notas: form.notas || undefined, data_atualizacao_estado: new Date().toISOString() } });
-        if (r.ok) { setForm({ utente_id: '', medico_id: '', regra_id: '', tipo: 'SCORE BAIXO', estado: 'NOVO', prioridade: 'MEDIA', notas: '' }); setSucesso(`Alerta criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
+        const medicoIdAlerta = user?.perfil === 'MEDICO'
+          ? Number(medicoAutenticado?.id ?? user.id)
+          : Number(form.medico_id);
+        const r = await apiFetch('/api/alertas', { method: 'POST', body: { utente_id: Number(form.utente_id), medico_id: medicoIdAlerta, regra_id: Number(form.regra_id), tipo: form.tipo, estado: form.estado, prioridade: form.prioridade, notas: form.notas || undefined, data_atualizacao_estado: new Date().toISOString() } });
+        if (r.ok) { setForm({ utente_id: '', medico_id: user?.perfil === 'MEDICO' ? String(medicoAutenticado?.id ?? user.id) : '', regra_id: '', tipo: 'SCORE BAIXO', estado: 'NOVO', prioridade: 'MEDIA', notas: '' }); setSucesso(`Alerta criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar alerta.');
       }
       const eb = { NOVO: 'badge-red', VISTO: 'badge-orange', 'EM SEGUIMENTO': 'badge-blue', FECHADO: 'badge-green' };
@@ -1291,8 +1918,20 @@
             <h2>Novo Alerta</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                <input type="number" min="1" value={form.utente_id} onChange={set('utente_id')} placeholder="ID do utente" required />
-                <input type="number" min="1" value={form.medico_id} onChange={set('medico_id')} placeholder="ID do médico" required />
+                <select value={form.utente_id} onChange={set('utente_id')} required>
+                  <option value="">-- Seleccionar utente --</option>
+                  {utentes.map(u => (
+                    <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>
+                  ))}
+                </select>
+                {user?.perfil === 'MEDICO' ? (
+                  <input
+                    value={medicoAutenticado ? `Médico #${medicoAutenticado.id}` : 'Médico autenticado'}
+                    readOnly
+                  />
+                ) : (
+                  <input type="number" min="1" value={form.medico_id} onChange={set('medico_id')} placeholder="ID do médico" required />
+                )}
                 <input type="number" min="1" value={form.regra_id}  onChange={set('regra_id')}  placeholder="ID da regra" required />
               </div>
               <div className="row">
@@ -1301,12 +1940,7 @@
                   <option value="DETERIORACAO">Deterioração</option>
                   <option value="EXAME NECESSARIO">Exame Necessário</option>
                 </select>
-                <select value={form.estado} onChange={set('estado')}>
-                  <option value="NOVO">Novo</option>
-                  <option value="VISTO">Visto</option>
-                  <option value="EM SEGUIMENTO">Em Seguimento</option>
-                  <option value="FECHADO">Fechado</option>
-                </select>
+                <input value="Novo" readOnly />
               </div>
               <select value={form.prioridade} onChange={set('prioridade')}>
                 <option value="BAIXA">Baixa</option>
@@ -1514,9 +2148,10 @@
     }
 
     /* ───── Respostas CARAT ───── */
-    function SecaoRespostasCarat({ apiFetch }) {
+    function SecaoRespostasCarat({ apiFetch, user }) {
       const [respostas, setRespostas] = useState([]);
       const [filtro, setFiltro] = useState('');
+      const [filtroIntensidade, setFiltroIntensidade] = useState('');
       const R1_9 = [{v:'0',l:'Nunca'},{v:'1',l:'Até 2 dias por semana'},{v:'2',l:'Mais de 2 dias por semana'},{v:'3',l:'Quase todos os dias'}];
       const R10  = [{v:'0',l:'Não estou a tomar medicamentos'},{v:'1',l:'Nunca'},{v:'2',l:'Menos de 7 dias'},{v:'3',l:'7 ou mais dias'}];
       const PERGUNTAS_1_9 = [
@@ -1548,6 +2183,76 @@
         else setErro(r.data.erro || 'Erro ao submeter resposta CARAT.');
       }
       const scoreBadge = s => s < 16 ? 'badge-red' : s < 21 ? 'badge-orange' : 'badge-green';
+      const respostasFiltradas = respostas.filter(r => {
+        if (!filtroIntensidade) return true;
+        if (filtroIntensidade === 'BEM_CONTROLADA') return r.score_total >= 21;
+        if (filtroIntensidade === 'PARCIALMENTE_CONTROLADA') return r.score_total >= 16 && r.score_total < 21;
+        if (filtroIntensidade === 'MAL_CONTROLADA') return r.score_total < 16;
+        return true;
+      });
+
+      if (user?.perfil === 'UTENTE') {
+        return (
+          <>
+            <div className="card">
+              <h2>Nova Resposta CARAT</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="row">
+                  <input type="number" value={form.avaliacao_id} onChange={set('avaliacao_id')} placeholder="ID da avaliação CARAT" min="1" required />
+                  <input type="number" value={form.utente_id} onChange={set('utente_id')} placeholder="ID do utente" min="1" required />
+                </div>
+                <input type="datetime-local" value={form.data_avaliacao} onChange={set('data_avaliacao')} required />
+                <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Respostas às perguntas 1–9 (nas últimas 4 semanas):</p>
+                <div style={{display:'flex',flexDirection:'column',gap:'6px',maxWidth:'480px'}}>
+                  {[1,2,3,4,5,6,7,8,9].map(n => (
+                    <div key={n}>
+                      <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>{n}. {PERGUNTAS_1_9[n-1]}</label>
+                      <select value={form[`r${n}`]} onChange={set(`r${n}`)} style={{width:'100%'}}>
+                        {R1_9.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+                <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Pergunta 10 — Utilização de medicamentos (nas últimas 4 semanas):</p>
+                <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>10. Aumentar a utilização dos seus medicamentos por causa das suas doenças alérgicas respiratórias (asma/rinite/alergia)?</label>
+                <select value={form.r10} onChange={set('r10')} style={{maxWidth:'480px'}}>
+                  {R10.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+                </select>
+                <button type="submit">Submeter resposta</button>
+                {erro && <p className="erro">{erro}</p>}
+                {sucesso && <p className="sucesso">{sucesso}</p>}
+              </form>
+            </div>
+            <div className="card">
+              <h2>Respostas CARAT</h2>
+              <div className="filtro-row" style={{maxWidth:'420px', flexWrap:'wrap'}}>
+                <select value={filtroIntensidade} onChange={e => setFiltroIntensidade(e.target.value)}>
+                  <option value="">Todos os níveis de controlo</option>
+                  <option value="BEM_CONTROLADA">Bem controlada</option>
+                  <option value="PARCIALMENTE_CONTROLADA">Parcialmente controlada</option>
+                  <option value="MAL_CONTROLADA">Mal controlada</option>
+                </select>
+                <button type="button" className="btn-sec" onClick={() => { setFiltroIntensidade(''); buscar(''); }}>Listar todas</button>
+              </div>
+              {respostasFiltradas.length === 0 ? <p className="vazio">Nenhuma resposta encontrada para os filtros selecionados.</p> : (
+                <table>
+                  <thead><tr><th>#</th><th>Avaliação</th><th>Score</th><th>Interpretação</th><th>Recomendação</th><th>Data</th></tr></thead>
+                  <tbody>{respostasFiltradas.map(r => (
+                    <tr key={r.id}><td>{r.id}</td>
+                      <td><span className="badge badge-blue">{r.avaliacao_id}</span></td>
+                      <td><span className={`badge ${scoreBadge(r.score_total)}`}>{r.score_total}/30</span></td>
+                      <td>{r.interpretacao}</td>
+                      <td style={{maxWidth:'260px',fontSize:'0.85em',color:'#555'}}>{r.recomendacao_automatica || '—'}</td>
+                      <td>{r.data_avaliacao ? new Date(r.data_avaliacao).toLocaleDateString('pt-PT') : '—'}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              )}
+            </div>
+          </>
+        );
+      }
+
       return (
         <>
           <div className="card">
@@ -1581,15 +2286,21 @@
           </div>
           <div className="card">
             <h2>Respostas CARAT</h2>
-            <div className="filtro-row">
+            <div className="filtro-row" style={{maxWidth:'760px', flexWrap:'wrap'}}>
               <input type="number" value={filtro} onChange={e => setFiltro(e.target.value)} placeholder="Filtrar por ID de utente" />
               <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
-              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); buscar(''); }}>Listar todas</button>
+              <select value={filtroIntensidade} onChange={e => setFiltroIntensidade(e.target.value)}>
+                <option value="">Todos os níveis de controlo</option>
+                <option value="BEM_CONTROLADA">Bem controlada</option>
+                <option value="PARCIALMENTE_CONTROLADA">Parcialmente controlada</option>
+                <option value="MAL_CONTROLADA">Mal controlada</option>
+              </select>
+              <button type="button" className="btn-sec" onClick={() => { setFiltro(''); setFiltroIntensidade(''); buscar(''); }}>Listar todas</button>
             </div>
-            {respostas.length === 0 ? <p className="vazio">Nenhuma resposta encontrada.</p> : (
+            {respostasFiltradas.length === 0 ? <p className="vazio">Nenhuma resposta encontrada para os filtros selecionados.</p> : (
               <table>
                 <thead><tr><th>#</th><th>Utente</th><th>Avaliação</th><th>Score</th><th>Interpretação</th><th>Recomendação</th><th>Data</th></tr></thead>
-                <tbody>{respostas.map(r => (
+                <tbody>{respostasFiltradas.map(r => (
                   <tr key={r.id}><td>{r.id}</td>
                     <td><span className="badge badge-green">{r.utente_id}</span></td>
                     <td><span className="badge badge-blue">{r.avaliacao_id}</span></td>
@@ -1607,7 +2318,7 @@
     }
 
     /* ───── Planos de Acompanhamento ───── */
-    function SecaoPlanos({ apiFetch }) {
+    function SecaoPlanos({ apiFetch, user }) {
       const [planos, setPlanos] = useState([]);
       const [medicos, setMedicos] = useState([]);
       const [utentes, setUtentes] = useState([]);
@@ -1633,6 +2344,38 @@
         else setErro(r.data.erro || 'Erro ao criar plano.');
       }
       const eb = { ATIVO: 'badge-green', CONCLUIDO: 'badge-blue', SUSPENSO: 'badge-orange', CANCELADO: 'badge-red' };
+      const utenteAutenticado = user?.perfil === 'UTENTE'
+        ? utentes.find(u => u.utilizador_id === user.id) ?? null
+        : null;
+
+      if (user?.perfil === 'UTENTE') {
+        const planosDoUtente = utenteAutenticado
+          ? planos.filter(p => p.utente_id === utenteAutenticado.id)
+          : [];
+
+        return (
+          <>
+            <div className="card">
+              <h2>Planos de Acompanhamento</h2>
+              {planosDoUtente.length === 0 ? <p className="vazio">Nenhum plano registado para este utente.</p> : (
+                <table>
+                  <thead><tr><th>#</th><th>Médico</th><th>Frequência</th><th>Estado</th><th>Início</th><th>Fim</th></tr></thead>
+                  <tbody>{planosDoUtente.map(p => (
+                    <tr key={p.id}><td>{p.id}</td>
+                      <td><span className="badge badge-blue">{p.medico_id}</span></td>
+                      <td>{p.frequencia_avaliacao}</td>
+                      <td><span className={`badge ${eb[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
+                      <td>{p.data_inicio ? new Date(p.data_inicio).toLocaleDateString('pt-PT') : '—'}</td>
+                      <td>{p.data_fim ? new Date(p.data_fim).toLocaleDateString('pt-PT') : '—'}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              )}
+            </div>
+          </>
+        );
+      }
+
       return (
         <>
           <div className="card">
@@ -1899,8 +2642,8 @@
     const TODAS_TABS = ['Utilizadores','Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Med. Habituais','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
     const TABS_POR_PERFIL = {
       ADMINISTRADOR: TODAS_TABS,
-      MEDICO: ['Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Med. Habituais','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'],
-      UTENTE: ['Utentes','Prescrições','Sintomas','Aval. CARAT','Resp. CARAT','Planos','FHIR'],
+      MEDICO: ['Utilizador','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Med. Habituais','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos'],
+      UTENTE: ['Utilizador','Prescrições','Sintomas','Aval. CARAT','Resp. CARAT','Planos'],
     };
 
     function App() {
@@ -1919,20 +2662,19 @@
       return (
         <>
           <header>
-            <div style={{flex:1}}>
-              <div className="user-bar">
-                <div>
-                  <h1 style={{margin:0}}>Sistema CARAT</h1>
-                  <span>Controlo e Acompanhamento Respiratório e Alergológico em Tratamento</span>
-                </div>
-                <div style={{textAlign:'right'}}>
-                  <div style={{fontWeight:600}}>{user.nome || `Utilizador #${user.id}`}</div>
-                  <span className={`badge ${perfilBadge[user.perfil] || 'badge-blue'}`} style={{fontSize:'0.72rem'}}>{user.perfil}</span>
-                  <button className="logout-btn" style={{marginLeft:'12px', fontSize:'0.78rem', padding:'5px 12px'}} onClick={() => { logout(); window.location.href = '/index.html'; }}>Sair</button>
-                  <div className="token-info" style={{maxWidth:'200px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', marginTop:'4px'}}>
-                    Token: {token.substring(0, 20)}...
+            <div className="user-bar">
+              <div className="header-brand">
+                <h1 style={{margin:0}}>Sistema CARAT</h1>
+                <span className="header-subtitle">Controlo e Acompanhamento Respiratório e Alergológico em Tratamento</span>
+              </div>
+              <div className="header-user">
+                <div className="header-user-info">
+                  <div className="header-user-name">{user.nome || `Utilizador #${user.id}`}</div>
+                  <div className="header-user-meta">
+                    <span className={`badge ${perfilBadge[user.perfil] || 'badge-blue'}`} style={{fontSize:'0.78rem'}}>{user.perfil}</span>
                   </div>
                 </div>
+                <button className="logout-btn" onClick={() => { logout(); window.location.href = '/index.html'; }}>Sair</button>
               </div>
             </div>
           </header>
@@ -1941,19 +2683,22 @@
           </nav>
           <div className="container">
             {tabAtiva === 'Utilizadores'   && <SecaoUtilizadores apiFetch={apiFetch} />}
-            {tabAtiva === 'Médicos'        && <SecaoMedicos apiFetch={apiFetch} />}
-            {tabAtiva === 'Utentes'        && <SecaoUtentes apiFetch={apiFetch} />}
-            {tabAtiva === 'Prescrições'    && <SecaoPrescricoes apiFetch={apiFetch} />}
+            {tabAtiva === 'Médicos'        && <SecaoMedicos apiFetch={apiFetch} user={user} />}
+            {tabAtiva === 'Utilizador'     && (user?.perfil === 'UTENTE'
+              ? <SecaoUtentes apiFetch={apiFetch} user={user} />
+              : <SecaoMedicos apiFetch={apiFetch} user={user} />)}
+            {tabAtiva === 'Utentes'        && <SecaoUtentes apiFetch={apiFetch} user={user} />}
+            {tabAtiva === 'Prescrições'    && <SecaoPrescricoes apiFetch={apiFetch} user={user} />}
             {tabAtiva === 'Anamneses'      && <SecaoAnamneses apiFetch={apiFetch} />}
             {tabAtiva === 'Alergias'       && <SecaoAlergias apiFetch={apiFetch} />}
             {tabAtiva === 'Comorbidades'   && <SecaoComorbidades apiFetch={apiFetch} />}
-            {tabAtiva === 'Sintomas'       && <SecaoSintomas apiFetch={apiFetch} />}
+            {tabAtiva === 'Sintomas'       && <SecaoSintomas apiFetch={apiFetch} user={user} />}
             {tabAtiva === 'Med. Habituais' && <SecaoMedicacoesHabituais apiFetch={apiFetch} />}
-            {tabAtiva === 'Alertas'        && <SecaoAlertas apiFetch={apiFetch} />}
+            {tabAtiva === 'Alertas'        && <SecaoAlertas apiFetch={apiFetch} user={user} />}
             {tabAtiva === 'Regras Alerta'  && <SecaoRegrasAlerta apiFetch={apiFetch} />}
             {tabAtiva === 'Aval. CARAT'    && <SecaoAvaliacoesCarat apiFetch={apiFetch} />}
-            {tabAtiva === 'Resp. CARAT'    && <SecaoRespostasCarat apiFetch={apiFetch} />}
-            {tabAtiva === 'Planos'         && <SecaoPlanos apiFetch={apiFetch} />}
+            {tabAtiva === 'Resp. CARAT'    && <SecaoRespostasCarat apiFetch={apiFetch} user={user} />}
+            {tabAtiva === 'Planos'         && <SecaoPlanos apiFetch={apiFetch} user={user} />}
             {tabAtiva === 'FHIR'           && <SecaoFhir apiFetch={apiFetch} />}
           </div>
           <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT &nbsp;&bull;&nbsp; Autenticado como <strong>{user.perfil}</strong></footer>

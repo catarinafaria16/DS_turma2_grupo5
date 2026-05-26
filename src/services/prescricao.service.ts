@@ -30,6 +30,13 @@ export class PrescricaoService {
             return utente;
         }
 
+        if (utilizador.perfil === PerfilUtilizador.UTENTE) {
+            if (utente.utilizador_id !== utilizador.id) {
+                throw new Error('Acesso negado: nao pode consultar prescricoes de outro utente');
+            }
+            return utente;
+        }
+
         throw new Error('Acesso negado: perfil sem permissao para prescricoes');
     }
 
@@ -88,6 +95,11 @@ export class PrescricaoService {
         try {
             if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) {
                 return await this.repo.find() as PrescricaoResponseDto[];
+            }
+            if (utilizador.perfil === PerfilUtilizador.UTENTE) {
+                const utente = await this.utenteRepo.findOne({ where: { utilizador_id: utilizador.id } });
+                if (!utente) return [];
+                return await this.repo.find({ where: { utente_id: utente.id } }) as PrescricaoResponseDto[];
             }
             return await this.repo.find({ where: { medico_id: utilizador.id } }) as PrescricaoResponseDto[];
         } catch (error) {

@@ -30,8 +30,17 @@ import { Medico } from './models/medico.entity.js';
 import { Utente } from './models/utente.entity.js';
 import { Administrador } from './models/administrador.entity.js';
 import { AvaliacaoCarat } from './models/avaliacaoCarat.entity.js';
+import { Anamnese } from './models/anamnese.entity.js';
+import { Alergia } from './models/alergia.entity.js';
+import { Alerta } from './models/alerta.entity.js';
+import { Comorbidade } from './models/comorbidade.entity.js';
+import { Prescricao } from './models/prescricao.entity.js';
+import { Medicacao } from './models/medicacao.entity.js';
+import { MedicacaoHabitual } from './models/medicacaoHabitual.entity.js';
+import { Exame } from './models/exame.entity.js';
+import { Sintoma } from './models/sintoma.entity.js';
 import { PerfilUtilizador } from './enums/PerfilUtilizador.enum.js';
-import { testeUtilizadores, testeAdministradores, testeMedicos, testeUtentes } from './data/dadosTeste.js';
+import { testeUtilizadores, testeAdministradores, testeMedicos, testeUtentes, testePrescricoes, testeMedicacoes, testeExames, testeSintomas, testeAnamneses, testeAlergias, testeComorbidades, testeMedicacoesHabituais, testeAlertas } from './data/dadosTeste.js';
 
 const OPTS_1_9 = { 0: 'Nunca', 1: 'Até 2 dias por semana', 2: 'Mais de 2 dias por semana', 3: 'Quase todos os dias' };
 const OPTS_10  = { 0: 'Não estou a tomar medicamentos', 1: 'Nunca', 2: 'Menos de 7 dias', 3: '7 ou mais dias' };
@@ -157,6 +166,15 @@ async function seedTestData() {
     const medicoRepo = AppDataSource.getRepository(Medico);
     const utenteRepo = AppDataSource.getRepository(Utente);
     const avaliacaoCaratRepo = AppDataSource.getRepository(AvaliacaoCarat);
+    const anamneseRepo = AppDataSource.getRepository(Anamnese);
+    const alergiaRepo = AppDataSource.getRepository(Alergia);
+    const alertaRepo = AppDataSource.getRepository(Alerta);
+    const comorbidadeRepo = AppDataSource.getRepository(Comorbidade);
+    const prescricaoRepo = AppDataSource.getRepository(Prescricao);
+    const medicacaoRepo = AppDataSource.getRepository(Medicacao);
+    const medicacaoHabitualRepo = AppDataSource.getRepository(MedicacaoHabitual);
+    const exameRepo = AppDataSource.getRepository(Exame);
+    const sintomaRepo = AppDataSource.getRepository(Sintoma);
 
     for (const utilizador of testeUtilizadores) {
         const existente = await utilizadorRepo.findOneBy({ id: utilizador.id });
@@ -183,6 +201,69 @@ async function seedTestData() {
         const existente = await utenteRepo.findOneBy({ id: utente.id });
         if (!existente) {
             await utenteRepo.save(utente);
+        }
+    }
+
+    for (const anamnese of testeAnamneses) {
+        const existente = await anamneseRepo.findOneBy({ id: anamnese.id });
+        if (!existente) {
+            await anamneseRepo.save(anamnese);
+        }
+    }
+
+    for (const alergia of testeAlergias) {
+        const existente = await alergiaRepo.findOneBy({ id: alergia.id });
+        if (!existente) {
+            await alergiaRepo.save(alergia);
+        }
+    }
+
+    for (const comorbidade of testeComorbidades) {
+        const existente = await comorbidadeRepo.findOneBy({ id: comorbidade.id });
+        if (!existente) {
+            await comorbidadeRepo.save(comorbidade);
+        }
+    }
+
+    for (const alerta of testeAlertas) {
+        const existente = await alertaRepo.findOneBy({ id: alerta.id });
+        if (!existente) {
+            await alertaRepo.save(alerta);
+        }
+    }
+
+    for (const prescricao of testePrescricoes) {
+        const existente = await prescricaoRepo.findOneBy({ id: prescricao.id });
+        if (!existente) {
+            await prescricaoRepo.save(prescricao);
+        }
+    }
+
+    for (const medicacao of testeMedicacoes) {
+        const existente = await medicacaoRepo.findOneBy({ id: medicacao.id });
+        if (!existente) {
+            await medicacaoRepo.save(medicacao);
+        }
+    }
+
+    for (const medicacaoHabitual of testeMedicacoesHabituais) {
+        const existente = await medicacaoHabitualRepo.findOneBy({ id: medicacaoHabitual.id });
+        if (!existente) {
+            await medicacaoHabitualRepo.save(medicacaoHabitual);
+        }
+    }
+
+    for (const exame of testeExames) {
+        const existente = await exameRepo.findOneBy({ id: exame.id });
+        if (!existente) {
+            await exameRepo.save(exame);
+        }
+    }
+
+    for (const sintoma of testeSintomas) {
+        const existente = await sintomaRepo.findOneBy({ id: sintoma.id });
+        if (!existente) {
+            await sintomaRepo.save(sintoma);
         }
     }
 

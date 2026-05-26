@@ -40,6 +40,13 @@ export class PlanoAcompanhamentoService {
             return utente;
         }
 
+        if (utilizador.perfil === PerfilUtilizador.UTENTE) {
+            if (utente.utilizador_id !== utilizador.id) {
+                throw new Error('Acesso negado: nao pode consultar planos de outro utente');
+            }
+            return utente;
+        }
+
         throw new Error('Acesso negado: perfil sem permissao para planos de acompanhamento');
     }
 
@@ -107,6 +114,12 @@ export class PlanoAcompanhamentoService {
         try {
             if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) {
                 return await this.repo.find() as PlanoAcompanhamentoResponseDto[];
+            }
+
+            if (utilizador.perfil === PerfilUtilizador.UTENTE) {
+                const utente = await this.utenteRepo.findOne({ where: { utilizador_id: utilizador.id } });
+                if (!utente) return [];
+                return await this.repo.find({ where: { utente_id: utente.id } }) as PlanoAcompanhamentoResponseDto[];
             }
 
             return await this.repo.find({ where: { medico_id: utilizador.id } }) as PlanoAcompanhamentoResponseDto[];
