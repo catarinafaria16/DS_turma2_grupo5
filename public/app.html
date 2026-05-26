@@ -545,7 +545,11 @@
       const [prescricoes, setPrescricoes] = useState([]);
       const [medicos, setMedicos] = useState([]);
       const [utentes, setUtentes] = useState([]);
-      const [form, setForm] = useState({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' });
+      const [form, setForm] = useState({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', assinatura: '' });
+      const [formMed, setFormMed] = useState({ nome: '', dose: '', duracao: '', periodicidade: '', validade: '' });
+      const [nomeOpcaoMed, setNomeOpcaoMed] = useState('');
+      const [periodicidadeOpcao, setPeriodicidadeOpcao] = useState('');
+      const [formExame, setFormExame] = useState({ tipo_exame: 'ESPIROMETRIA', data: '', consentimento: 'true' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
@@ -560,11 +564,38 @@
       }
       useEffect(() => { buscar(); buscarDeps(); }, []);
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
+      function setMed(f) { return e => setFormMed(p => ({ ...p, [f]: e.target.value })); }
+      function setEx(f) { return e => setFormExame(p => ({ ...p, [f]: e.target.value })); }
+      function handleNomeOpcao(e) {
+        const val = e.target.value;
+        setNomeOpcaoMed(val);
+        if (val !== '__outro__') setFormMed(p => ({ ...p, nome: val }));
+        else setFormMed(p => ({ ...p, nome: '' }));
+      }
+      function handlePeriodicidadeOpcao(e) {
+        const val = e.target.value;
+        setPeriodicidadeOpcao(val);
+        if (val !== '__outro__') setFormMed(p => ({ ...p, periodicidade: val }));
+        else setFormMed(p => ({ ...p, periodicidade: '' }));
+      }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const r = await apiFetch('/api/prescricoes', { method: 'POST', body: { medico_id: Number(form.medico_id), utente_id: Number(form.utente_id), tipo: form.tipo, data_emissao: form.data_emissao, data_validade: form.data_validade, estado: form.estado, assinatura: form.assinatura } });
-        if (r.ok) { setForm({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', estado: 'ATIVA', assinatura: '' }); setSucesso('Prescrição criada com sucesso.'); buscar(); }
-        else setErro(r.data.erro || 'Erro ao criar prescrição.');
+        const rp = await apiFetch('/api/prescricoes', { method: 'POST', body: { medico_id: Number(form.medico_id), utente_id: Number(form.utente_id), tipo: form.tipo, data_emissao: form.data_emissao, data_validade: form.data_validade, estado: 'ATIVA', assinatura: form.assinatura } });
+        if (!rp.ok) { setErro(rp.data.erro || 'Erro ao criar prescrição.'); return; }
+        const prescricaoId = rp.data.dados?.id;
+        if (form.tipo === 'MEDICACAO') {
+          const rm = await apiFetch('/api/medicacoes', { method: 'POST', body: { prescricao_id: prescricaoId, nome: formMed.nome, dose: formMed.dose, duracao: formMed.duracao, periodicidade: formMed.periodicidade, validade: formMed.validade } });
+          if (!rm.ok) { setErro(rm.data.erro || 'Prescrição criada mas erro ao registar medicação.'); buscar(); return; }
+        } else {
+          const re = await apiFetch('/api/exames', { method: 'POST', body: { prescricao_id: prescricaoId, tipo_exame: formExame.tipo_exame, data: formExame.data, consentimento: formExame.consentimento === 'true', estado: 'PENDENTE' } });
+          if (!re.ok) { setErro(re.data.erro || 'Prescrição criada mas erro ao registar exame.'); buscar(); return; }
+        }
+        setForm({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_emissao: '', data_validade: '', assinatura: '' });
+        setFormMed({ nome: '', dose: '', duracao: '', periodicidade: '', validade: '' });
+        setNomeOpcaoMed('');
+        setPeriodicidadeOpcao('');
+        setFormExame({ tipo_exame: 'ESPIROMETRIA', data: '', consentimento: 'true' });
+        setSucesso('Prescrição criada com sucesso.'); buscar();
       }
       const estadoBadge = { ATIVA: 'badge-green', DISPENSADA: 'badge-orange', CANCELADA: 'badge-red' };
       return (
@@ -587,17 +618,172 @@
                   <option value="MEDICACAO">Medicação</option>
                   <option value="EXAME">Exame</option>
                 </select>
-                <select value={form.estado} onChange={set('estado')}>
-                  <option value="ATIVA">Ativa</option>
-                  <option value="DISPENSADA">Dispensada</option>
-                  <option value="CANCELADA">Cancelada</option>
-                </select>
               </div>
               <div className="row">
-                <input type="date" value={form.data_emissao} onChange={set('data_emissao')} required />
-                <input type="date" value={form.data_validade} onChange={set('data_validade')} required />
+                <input type="date" value={form.data_emissao} onChange={set('data_emissao')} placeholder="Data de emissão" required />
+                <input type="date" value={form.data_validade} onChange={set('data_validade')} placeholder="Data de validade" required />
               </div>
               <input value={form.assinatura} onChange={set('assinatura')} placeholder="Assinatura do médico" required />
+              {form.tipo === 'MEDICACAO' && (<>
+                <hr style={{margin:'12px 0', border:'none', borderTop:'1px solid #e2e8f0'}} />
+                <select value={nomeOpcaoMed} onChange={handleNomeOpcao} required>
+                  <option value="">-- Selecionar medicamento --</option>
+                  <optgroup label="SABA (broncodilatadores de curta duração)">
+                    <option value="Salbutamol">Salbutamol</option>
+                    <option value="Terbutalina">Terbutalina</option>
+                  </optgroup>
+                  <optgroup label="LABA (broncodilatadores de longa duração)">
+                    <option value="Formoterol">Formoterol</option>
+                    <option value="Salmeterol">Salmeterol</option>
+                    <option value="Indacaterol">Indacaterol</option>
+                  </optgroup>
+                  <optgroup label="LAMA (anticolinérgicos de longa duração)">
+                    <option value="Tiotropio">Tiotropio</option>
+                    <option value="Umeclidinio">Umeclidínio</option>
+                    <option value="Ipratropio">Ipratrópio</option>
+                  </optgroup>
+                  <optgroup label="Corticosteroides inalados (ICS)">
+                    <option value="Budesonida">Budesonida</option>
+                    <option value="Beclometasona">Beclometasona</option>
+                    <option value="Fluticasona">Fluticasona</option>
+                    <option value="Ciclesonida">Ciclesonida</option>
+                    <option value="Mometasona">Mometasona</option>
+                  </optgroup>
+                  <optgroup label="Corticosteroides sistémicos">
+                    <option value="Prednisolona">Prednisolona</option>
+                    <option value="Metilprednisolona">Metilprednisolona</option>
+                    <option value="Dexametasona">Dexametasona</option>
+                  </optgroup>
+                  <optgroup label="Anti-leucotrienos">
+                    <option value="Montelucaste">Montelucaste</option>
+                  </optgroup>
+                  <optgroup label="Anti-histamínicos">
+                    <option value="Cetirizina">Cetirizina</option>
+                    <option value="Loratadina">Loratadina</option>
+                    <option value="Desloratadina">Desloratadina</option>
+                    <option value="Levocetirizina">Levocetirizina</option>
+                    <option value="Bilastina">Bilastina</option>
+                    <option value="Rupatadina">Rupatadina</option>
+                    <option value="Fexofenadina">Fexofenadina</option>
+                    <option value="Ebastina">Ebastina</option>
+                  </optgroup>
+                  <optgroup label="Biológicos">
+                    <option value="Omalizumab">Omalizumab</option>
+                    <option value="Mepolizumab">Mepolizumab</option>
+                    <option value="Benralizumab">Benralizumab</option>
+                    <option value="Dupilumab">Dupilumab</option>
+                  </optgroup>
+                  <optgroup label="Mucolíticos">
+                    <option value="Acetilcisteína">Acetilcisteína</option>
+                    <option value="Ambroxol">Ambroxol</option>
+                  </optgroup>
+                  <optgroup label="Antibióticos">
+                    <option value="Amoxicilina">Amoxicilina</option>
+                    <option value="Amoxicilina/Clavulanato">Amoxicilina/Clavulanato</option>
+                    <option value="Azitromicina">Azitromicina</option>
+                    <option value="Claritromicina">Claritromicina</option>
+                    <option value="Levofloxacina">Levofloxacina</option>
+                    <option value="Doxiciclina">Doxiciclina</option>
+                  </optgroup>
+                  <optgroup label="Outro">
+                    <option value="__outro__">Outro (não listado)</option>
+                  </optgroup>
+                </select>
+                {nomeOpcaoMed === '__outro__' && (
+                  <input value={formMed.nome} onChange={setMed('nome')} placeholder="Nome do medicamento" required />
+                )}
+                <div className="row">
+                  <input value={formMed.dose} onChange={setMed('dose')} placeholder="Dose (ex: 500 mg)" required />
+                  <select value={periodicidadeOpcao} onChange={handlePeriodicidadeOpcao} required>
+                    <option value="">-- Periodicidade --</option>
+                    <optgroup label="Diária">
+                      <option value="1x/dia">1x/dia</option>
+                      <option value="2x/dia">2x/dia</option>
+                      <option value="3x/dia">3x/dia</option>
+                      <option value="4x/dia">4x/dia</option>
+                    </optgroup>
+                    <optgroup label="Por horas">
+                      <option value="6/6h">6/6h</option>
+                      <option value="8/8h">8/8h</option>
+                      <option value="12/12h">12/12h</option>
+                    </optgroup>
+                    <optgroup label="Conforme necessário">
+                      <option value="Em SOS">Em SOS (quando necessário)</option>
+                    </optgroup>
+                    <optgroup label="Semanal / Mensal">
+                      <option value="1x/semana">1x/semana</option>
+                      <option value="De 2 em 2 semanas">De 2 em 2 semanas</option>
+                      <option value="Mensalmente">Mensalmente</option>
+                      <option value="De 2 em 2 meses">De 2 em 2 meses</option>
+                      <option value="De 4 em 4 meses">De 4 em 4 meses</option>
+                    </optgroup>
+                    <optgroup label="Outro">
+                      <option value="__outro__">Outro (não listado)</option>
+                    </optgroup>
+                  </select>
+                </div>
+                {periodicidadeOpcao === '__outro__' && (
+                  <input value={formMed.periodicidade} onChange={setMed('periodicidade')} placeholder="Periodicidade" required />
+                )}
+                <div className="row">
+                  <input value={formMed.duracao} onChange={setMed('duracao')} placeholder="Duração (ex: 7 dias)" required />
+                  <input type="date" value={formMed.validade} onChange={setMed('validade')} placeholder="Validade do medicamento" required />
+                </div>
+              </>)}
+              {form.tipo === 'EXAME' && (<>
+                <hr style={{margin:'12px 0', border:'none', borderTop:'1px solid #e2e8f0'}} />
+                <select value={formExame.tipo_exame} onChange={setEx('tipo_exame')} required>
+                  <optgroup label="Função Respiratória">
+                    <option value="ESPIROMETRIA">Espirometria</option>
+                    <option value="PICO FLUXO">Pico Fluxo</option>
+                    <option value="PLETISMOGRAFIA">Pletismografia</option>
+                    <option value="PRESSOES RESPIRATORIAS MAXIMAS">Pressões Respiratórias Máximas</option>
+                    <option value="TESTE BRONCODILATADOR">Teste Broncodilatador</option>
+                    <option value="TESTE BRONCOPROVOCACAO">Teste de Broncoprovocação</option>
+                    <option value="TESTE DE ESFORCO">Teste de Esforço</option>
+                    <option value="OXIMETRIA DE PULSO">Oximetria de Pulso</option>
+                    <option value="OXIMETRIA NOTURNA">Oximetria Noturna</option>
+                    <option value="GASOMETRIA ARTERIAL">Gasometria Arterial</option>
+                  </optgroup>
+                  <optgroup label="Imagiologia">
+                    <option value="RADIOGRAFIA TORACICA">Radiografia Torácica</option>
+                    <option value="TAC TORACICA">TAC Torácica</option>
+                    <option value="ECOGRAFIA TORACICA">Ecografia Torácica</option>
+                  </optgroup>
+                  <optgroup label="Procedimentos Invasivos">
+                    <option value="BRONCOSCOPIA">Broncoscopia</option>
+                    <option value="LAVAGEM BRONCOALVEOLAR">Lavagem Broncoalveolar</option>
+                    <option value="BIOPSIA BRONQUICA">Biópsia Brônquica</option>
+                  </optgroup>
+                  <optgroup label="Alergia / Imunologia">
+                    <option value="INTRADERMORREACAO">Intradermorreação</option>
+                    <option value="TESTE DE PROVOCACAO ORAL">Teste de Provocação Oral</option>
+                    <option value="TESTE DE PROVOCACAO NASAL">Teste de Provocação Nasal</option>
+                    <option value="TESTE DE PROVOCACAO BRONQUICA COM ALERGENO">Teste de Provocação Brônquica c/ Alergeno</option>
+                    <option value="IGE SERICA">IgE Sérica Total</option>
+                    <option value="IGE ESPECIFICA">IgE Específica</option>
+                    <option value="TRIPTASE SERICA">Triptase Sérica</option>
+                    <option value="HISTAMINA SERICA">Histamina Sérica</option>
+                  </optgroup>
+                  <optgroup label="Análises Laboratoriais">
+                    <option value="HEMOGRAMA">Hemograma</option>
+                    <option value="ANALISES DE SANGUE">Análises de Sangue</option>
+                  </optgroup>
+                  <optgroup label="ORL / Nasal">
+                    <option value="CITOLOGIA NASAL">Citologia Nasal</option>
+                    <option value="RINOSCOPIA">Rinoscopia</option>
+                    <option value="NASOFIBROSCOPIA">Nasofibroscopia</option>
+                    <option value="AUDIOGRAMA">Audiograma</option>
+                  </optgroup>
+                </select>
+                <div className="row">
+                  <input type="datetime-local" value={formExame.data} onChange={setEx('data')} required />
+                  <select value={formExame.consentimento} onChange={setEx('consentimento')}>
+                    <option value="true">Consentimento: Sim</option>
+                    <option value="false">Consentimento: Não</option>
+                  </select>
+                </div>
+              </>)}
               <button type="submit">Criar prescrição</button>
               {erro && <p className="erro">{erro}</p>}
               {sucesso && <p className="sucesso">{sucesso}</p>}
@@ -1710,11 +1896,11 @@
     /* ══════════════════════════════════════════════════════════════════════════
        APP PRINCIPAL
        ══════════════════════════════════════════════════════════════════════ */
-    const TODAS_TABS = ['Utilizadores','Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Medicações','Med. Habituais','Exames','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
+    const TODAS_TABS = ['Utilizadores','Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Med. Habituais','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
     const TABS_POR_PERFIL = {
       ADMINISTRADOR: TODAS_TABS,
-      MEDICO: ['Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Medicações','Med. Habituais','Exames','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'],
-      UTENTE: ['Utentes','Prescrições','Sintomas','Medicações','Exames','Aval. CARAT','Resp. CARAT','Planos','FHIR'],
+      MEDICO: ['Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Med. Habituais','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'],
+      UTENTE: ['Utentes','Prescrições','Sintomas','Aval. CARAT','Resp. CARAT','Planos','FHIR'],
     };
 
     function App() {
@@ -1762,9 +1948,7 @@
             {tabAtiva === 'Alergias'       && <SecaoAlergias apiFetch={apiFetch} />}
             {tabAtiva === 'Comorbidades'   && <SecaoComorbidades apiFetch={apiFetch} />}
             {tabAtiva === 'Sintomas'       && <SecaoSintomas apiFetch={apiFetch} />}
-            {tabAtiva === 'Medicações'     && <SecaoMedicacoes apiFetch={apiFetch} />}
             {tabAtiva === 'Med. Habituais' && <SecaoMedicacoesHabituais apiFetch={apiFetch} />}
-            {tabAtiva === 'Exames'         && <SecaoExames apiFetch={apiFetch} />}
             {tabAtiva === 'Alertas'        && <SecaoAlertas apiFetch={apiFetch} />}
             {tabAtiva === 'Regras Alerta'  && <SecaoRegrasAlerta apiFetch={apiFetch} />}
             {tabAtiva === 'Aval. CARAT'    && <SecaoAvaliacoesCarat apiFetch={apiFetch} />}

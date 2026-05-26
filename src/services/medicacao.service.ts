@@ -12,31 +12,63 @@ import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 export class MedicacaoService {
     private auditoriaService: AuditoriaService;
     private static readonly catalogoMedicamentos: Record<string, { minMg: number; maxMg: number; unidades: string[] }> = {
+        // Analgésicos / Anti-inflamatórios
         paracetamol: { minMg: 125, maxMg: 1000, unidades: ['mg', 'g'] },
         ibuprofeno: { minMg: 100, maxMg: 800, unidades: ['mg'] },
-        amoxicilina: { minMg: 250, maxMg: 1000, unidades: ['mg', 'g'] },
-        azitromicina: { minMg: 250, maxMg: 500, unidades: ['mg'] },
-        claritromicina: { minMg: 250, maxMg: 500, unidades: ['mg'] },
+        // Corticosteroides sistémicos
         prednisolona: { minMg: 5, maxMg: 60, unidades: ['mg'] },
         metilprednisolona: { minMg: 4, maxMg: 64, unidades: ['mg'] },
+        dexametasona: { minMg: 0.5, maxMg: 20, unidades: ['mg'] },
+        // Corticosteroides inalados (ICS)
+        budesonida: { minMg: 0.05, maxMg: 1.6, unidades: ['mg', 'mcg'] },
+        beclometasona: { minMg: 0.05, maxMg: 1.5, unidades: ['mg', 'mcg'] },
+        fluticasona: { minMg: 0.05, maxMg: 1, unidades: ['mg', 'mcg'] },
+        ciclesonida: { minMg: 0.08, maxMg: 0.64, unidades: ['mg', 'mcg'] },
+        mometasona: { minMg: 0.1, maxMg: 0.8, unidades: ['mg', 'mcg'] },
+        // LABA
+        formoterol: { minMg: 0.0045, maxMg: 0.024, unidades: ['mg', 'mcg'] },
+        salmeterol: { minMg: 0.025, maxMg: 0.05, unidades: ['mg', 'mcg'] },
+        indacaterol: { minMg: 0.075, maxMg: 0.3, unidades: ['mg', 'mcg'] },
+        // LAMA
+        tiotropio: { minMg: 0.0025, maxMg: 0.018, unidades: ['mg', 'mcg'] },
+        umeclidinio: { minMg: 0.0625, maxMg: 0.125, unidades: ['mg', 'mcg'] },
+        // SAMA
+        ipratropio: { minMg: 0.02, maxMg: 2, unidades: ['mg', 'mcg'] },
+        // SABA
+        salbutamol: { minMg: 0.05, maxMg: 8, unidades: ['mg', 'mcg'] },
+        terbutalina: { minMg: 0.25, maxMg: 10, unidades: ['mg', 'mcg'] },
+        // Anti-leucotrienos
+        montelucaste: { minMg: 4, maxMg: 10, unidades: ['mg'] },
+        // Anti-histamínicos
         cetirizina: { minMg: 5, maxMg: 20, unidades: ['mg'] },
         loratadina: { minMg: 5, maxMg: 10, unidades: ['mg'] },
         desloratadina: { minMg: 2.5, maxMg: 5, unidades: ['mg'] },
         rupatadina: { minMg: 10, maxMg: 20, unidades: ['mg'] },
-        montelucaste: { minMg: 4, maxMg: 10, unidades: ['mg'] },
-        bilastina: { minMg: 20, maxMg: 20, unidades: ['mg'] },
-        levocetirizina: { minMg: 5, maxMg: 5, unidades: ['mg'] },
-        budesonida: { minMg: 0.05, maxMg: 2, unidades: ['mg', 'mcg'] },
-        beclometasona: { minMg: 0.05, maxMg: 2, unidades: ['mg', 'mcg'] },
-        fluticasona: { minMg: 0.05, maxMg: 1, unidades: ['mg', 'mcg'] },
-        formoterol: { minMg: 0.0045, maxMg: 0.024, unidades: ['mg', 'mcg'] },
-        salmeterol: { minMg: 0.025, maxMg: 0.05, unidades: ['mg', 'mcg'] },
-        tiotropio: { minMg: 0.0025, maxMg: 0.018, unidades: ['mg', 'mcg'] },
-        salbutamol: { minMg: 0.05, maxMg: 8, unidades: ['mg', 'mcg'] },
+        bilastina: { minMg: 20, maxMg: 40, unidades: ['mg'] },
+        levocetirizina: { minMg: 2.5, maxMg: 10, unidades: ['mg'] },
+        fexofenadina: { minMg: 60, maxMg: 180, unidades: ['mg'] },
+        ebastina: { minMg: 10, maxMg: 20, unidades: ['mg'] },
+        // Biológicos
+        omalizumab: { minMg: 75, maxMg: 600, unidades: ['mg'] },
+        mepolizumab: { minMg: 100, maxMg: 100, unidades: ['mg'] },
+        benralizumab: { minMg: 30, maxMg: 30, unidades: ['mg'] },
+        dupilumab: { minMg: 200, maxMg: 300, unidades: ['mg'] },
+        // Mucolíticos
+        acetilcisteina: { minMg: 100, maxMg: 600, unidades: ['mg'] },
+        ambroxol: { minMg: 15, maxMg: 90, unidades: ['mg'] },
+        // Xantinas
+        teofilina: { minMg: 100, maxMg: 600, unidades: ['mg'] },
+        // Antibióticos
+        amoxicilina: { minMg: 250, maxMg: 1000, unidades: ['mg', 'g'] },
+        azitromicina: { minMg: 250, maxMg: 500, unidades: ['mg'] },
+        claritromicina: { minMg: 250, maxMg: 500, unidades: ['mg'] },
+        levofloxacina: { minMg: 250, maxMg: 750, unidades: ['mg'] },
+        doxiciclina: { minMg: 50, maxMg: 200, unidades: ['mg'] },
+        // Outros
         omeprazol: { minMg: 10, maxMg: 40, unidades: ['mg'] },
         amlodipina: { minMg: 2.5, maxMg: 10, unidades: ['mg'] },
         losartan: { minMg: 25, maxMg: 100, unidades: ['mg'] },
-        metformina: { minMg: 500, maxMg: 1000, unidades: ['mg', 'g'] }
+        metformina: { minMg: 500, maxMg: 1000, unidades: ['mg', 'g'] },
     };
 
     constructor() {
@@ -124,36 +156,28 @@ export class MedicacaoService {
             throw new Error('Periodicidade da medicacao e obrigatoria');
         }
 
-        const nomeNormalizado = this.normalizarNomeMedicamento(medicacaoData.nome);
-        const medicamento = MedicacaoService.catalogoMedicamentos[nomeNormalizado];
-        if (!medicamento) {
-            throw new Error('Medicamento nao encontrado no catalogo local de validacao');
-        }
-
         const doseNormalizada = medicacaoData.dose.trim().toLowerCase().replace(',', '.');
         const doseMatch = doseNormalizada.match(/^(\d+(?:\.\d+)?)\s*(mg|g|mcg)$/);
         if (!doseMatch) {
             throw new Error('Dose invalida: use um formato como 500 mg, 1 g ou 200 mcg');
         }
 
-        const valorTexto = doseMatch[1];
-        const unidadeTexto = doseMatch[2];
-        if (!valorTexto || !unidadeTexto) {
-            throw new Error('Dose invalida: formato incompleto');
-        }
-
-        const valor = Number(valorTexto);
-        const unidade = unidadeTexto;
+        const valor = Number(doseMatch[1]);
+        const unidade = doseMatch[2]!;
         if (!Number.isFinite(valor) || valor <= 0) {
             throw new Error('Dose invalida: o valor deve ser numerico e maior que zero');
         }
-        if (!medicamento.unidades.includes(unidade)) {
-            throw new Error(`Dose invalida para ${medicacaoData.nome}: unidade nao suportada`);
-        }
 
-        const doseMg = this.converterDoseParaMg(valor, unidade);
-        if (doseMg < medicamento.minMg || doseMg > medicamento.maxMg) {
-            throw new Error(`Dose clinicamente implausivel para ${medicacaoData.nome}`);
+        const nomeNormalizado = this.normalizarNomeMedicamento(medicacaoData.nome);
+        const medicamento = MedicacaoService.catalogoMedicamentos[nomeNormalizado];
+        if (medicamento) {
+            if (!medicamento.unidades.includes(unidade)) {
+                throw new Error(`Dose invalida para ${medicacaoData.nome}: unidade nao suportada`);
+            }
+            const doseMg = this.converterDoseParaMg(valor, unidade);
+            if (doseMg < medicamento.minMg || doseMg > medicamento.maxMg) {
+                throw new Error(`Dose clinicamente implausivel para ${medicacaoData.nome}`);
+            }
         }
 
         const validade = new Date(medicacaoData.validade);
