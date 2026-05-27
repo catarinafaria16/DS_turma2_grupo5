@@ -80,7 +80,10 @@ export class PlanoAcompanhamentoService {
                 throw new Error('Acesso negado: medico so pode criar planos para os seus utentes');
             }
 
-            const plano = this.repo.create(planoData);
+            const plano = this.repo.create({
+                ...planoData,
+                estado: planoData.estado ?? EstadoPlanoAcompanhamento.ATIVO
+            });
             const saved = await this.repo.save(plano);
 
             this.auditoriaService.registarAuditoria(

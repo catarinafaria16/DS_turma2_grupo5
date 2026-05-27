@@ -39,8 +39,9 @@ import { Medicacao } from './models/medicacao.entity.js';
 import { MedicacaoHabitual } from './models/medicacaoHabitual.entity.js';
 import { Exame } from './models/exame.entity.js';
 import { Sintoma } from './models/sintoma.entity.js';
+import { PlanoAcompanhamento } from './models/planoAcompanhamento.entity.js';
 import { PerfilUtilizador } from './enums/PerfilUtilizador.enum.js';
-import { testeUtilizadores, testeAdministradores, testeMedicos, testeUtentes, testePrescricoes, testeMedicacoes, testeExames, testeSintomas, testeAnamneses, testeAlergias, testeComorbidades, testeMedicacoesHabituais, testeAlertas } from './data/dadosTeste.js';
+import { testeUtilizadores, testeAdministradores, testeMedicos, testeUtentes, testePrescricoes, testeMedicacoes, testeExames, testeSintomas, testeAnamneses, testeAlergias, testeComorbidades, testeMedicacoesHabituais, testeAlertas, testePlanosAcompanhamento } from './data/dadosTeste.js';
 
 const OPTS_1_9 = { 0: 'Nunca', 1: 'Até 2 dias por semana', 2: 'Mais de 2 dias por semana', 3: 'Quase todos os dias' };
 const OPTS_10  = { 0: 'Não estou a tomar medicamentos', 1: 'Nunca', 2: 'Menos de 7 dias', 3: '7 ou mais dias' };
@@ -175,6 +176,7 @@ async function seedTestData() {
     const medicacaoHabitualRepo = AppDataSource.getRepository(MedicacaoHabitual);
     const exameRepo = AppDataSource.getRepository(Exame);
     const sintomaRepo = AppDataSource.getRepository(Sintoma);
+    const planoAcompanhamentoRepo = AppDataSource.getRepository(PlanoAcompanhamento);
 
     for (const utilizador of testeUtilizadores) {
         const existente = await utilizadorRepo.findOneBy({ id: utilizador.id });
@@ -264,6 +266,13 @@ async function seedTestData() {
         const existente = await sintomaRepo.findOneBy({ id: sintoma.id });
         if (!existente) {
             await sintomaRepo.save(sintoma);
+        }
+    }
+
+    for (const plano of testePlanosAcompanhamento) {
+        const existente = await planoAcompanhamentoRepo.findOneBy({ id: plano.id });
+        if (!existente) {
+            await planoAcompanhamentoRepo.save(plano);
         }
     }
 

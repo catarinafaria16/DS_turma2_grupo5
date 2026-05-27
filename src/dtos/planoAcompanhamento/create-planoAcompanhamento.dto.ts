@@ -6,6 +6,6 @@ export interface CreatePlanoAcompanhamentoDto {
     frequencia_avaliacao: string;
     data_inicio: Date;
     data_fim: Date;
-    estado: EstadoPlanoAcompanhamento;
+    estado?: EstadoPlanoAcompanhamento;
     recomendacao_medica: string;
 }

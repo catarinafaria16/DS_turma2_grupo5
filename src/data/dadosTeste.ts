@@ -11,6 +11,7 @@ import { IntensidadeCriseAlergia } from '../enums/IntensidadeCriseAlergia.enum.j
 import { TipoAlerta } from '../enums/TipoAlerta.enum.js';
 import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
+import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum.js';
 
 export const testeUtilizadores = [
     {
@@ -1249,4 +1250,29 @@ export const testeAlertas = [
     { id: 9908, utente_id: 3016, medico_id: 2004, tipo: TipoAlerta.SCORE_BAIXO, estado: EstadoAlerta.VISTO, prioridade: PrioridadeRegraAlerta.MEDIA, notas: 'CARAT com descida ligeira face à avaliação anterior.', data_atualizacao_estado: new Date('2026-05-19T12:35:00') },
     { id: 9909, utente_id: 3020, medico_id: 2004, tipo: TipoAlerta.EXAME_NECESSARIO, estado: EstadoAlerta.NOVO, prioridade: PrioridadeRegraAlerta.MEDIA, notas: 'Reavaliar com oximetria noturna.', data_atualizacao_estado: new Date('2026-05-25T09:55:00') },
     { id: 9910, utente_id: 3023, medico_id: 2005, tipo: TipoAlerta.DETERIORACAO, estado: EstadoAlerta.NOVO, prioridade: PrioridadeRegraAlerta.ALTA, notas: 'Despertares noturnos com pieira recorrente.', data_atualizacao_estado: new Date('2026-05-25T18:05:00') },
+    { id: 9911, utente_id: 3001, medico_id: 2001, tipo: TipoAlerta.DETERIORACAO, estado: EstadoAlerta.EM_SEGUIMENTO, prioridade: PrioridadeRegraAlerta.ALTA, notas: 'Aumento de dispneia aos pequenos esforcos.', data_atualizacao_estado: new Date('2026-05-26T09:10:00') },
+    { id: 9912, utente_id: 3001, medico_id: 2001, tipo: TipoAlerta.EXAME_NECESSARIO, estado: EstadoAlerta.NOVO, prioridade: PrioridadeRegraAlerta.MEDIA, notas: 'Considerar espirometria apos agravamento recente.', data_atualizacao_estado: new Date('2026-05-26T11:25:00') },
+    { id: 9913, utente_id: 3006, medico_id: 2001, tipo: TipoAlerta.SCORE_BAIXO, estado: EstadoAlerta.NOVO, prioridade: PrioridadeRegraAlerta.ALTA, notas: 'Score CARAT manteve-se baixo em avaliacao repetida.', data_atualizacao_estado: new Date('2026-05-26T14:40:00') },
+    { id: 9914, utente_id: 3007, medico_id: 2002, tipo: TipoAlerta.DETERIORACAO, estado: EstadoAlerta.VISTO, prioridade: PrioridadeRegraAlerta.ALTA, notas: 'Pieira noturna mais frequente na ultima semana.', data_atualizacao_estado: new Date('2026-05-26T16:15:00') },
+    { id: 9915, utente_id: 3010, medico_id: 2002, tipo: TipoAlerta.EXAME_NECESSARIO, estado: EstadoAlerta.NOVO, prioridade: PrioridadeRegraAlerta.MEDIA, notas: 'Rever necessidade de analise alergologica.', data_atualizacao_estado: new Date('2026-05-27T08:20:00') },
+    { id: 9916, utente_id: 3011, medico_id: 2003, tipo: TipoAlerta.SCORE_BAIXO, estado: EstadoAlerta.EM_SEGUIMENTO, prioridade: PrioridadeRegraAlerta.MUITO_ALTA, notas: 'Score muito baixo com sintomas persistentes.', data_atualizacao_estado: new Date('2026-05-27T09:05:00') },
+    { id: 9917, utente_id: 3013, medico_id: 2003, tipo: TipoAlerta.EXAME_NECESSARIO, estado: EstadoAlerta.VISTO, prioridade: PrioridadeRegraAlerta.MEDIA, notas: 'Programar avaliacao de controlo apos exposicao a polen.', data_atualizacao_estado: new Date('2026-05-27T10:35:00') },
+    { id: 9918, utente_id: 3016, medico_id: 2004, tipo: TipoAlerta.DETERIORACAO, estado: EstadoAlerta.NOVO, prioridade: PrioridadeRegraAlerta.ALTA, notas: 'Dispneia matinal reportada com maior frequencia.', data_atualizacao_estado: new Date('2026-05-27T12:10:00') },
+    { id: 9919, utente_id: 3020, medico_id: 2004, tipo: TipoAlerta.SCORE_BAIXO, estado: EstadoAlerta.NOVO, prioridade: PrioridadeRegraAlerta.ALTA, notas: 'CARAT abaixo do limiar definido para acompanhamento.', data_atualizacao_estado: new Date('2026-05-27T13:45:00') },
+    { id: 9920, utente_id: 3023, medico_id: 2005, tipo: TipoAlerta.EXAME_NECESSARIO, estado: EstadoAlerta.EM_SEGUIMENTO, prioridade: PrioridadeRegraAlerta.MEDIA, notas: 'Avaliar necessidade de exame funcional respiratorio.', data_atualizacao_estado: new Date('2026-05-27T15:30:00') },
+    { id: 9921, utente_id: 3025, medico_id: 2005, tipo: TipoAlerta.SCORE_BAIXO, estado: EstadoAlerta.NOVO, prioridade: PrioridadeRegraAlerta.ALTA, notas: 'Score baixo associado a aperto toracico apos exposicao a fumos.', data_atualizacao_estado: new Date('2026-05-27T16:50:00') },
+    { id: 9922, utente_id: 3025, medico_id: 2005, tipo: TipoAlerta.DETERIORACAO, estado: EstadoAlerta.VISTO, prioridade: PrioridadeRegraAlerta.MEDIA, notas: 'Tosse seca persistente com agravamento gradual.', data_atualizacao_estado: new Date('2026-05-27T17:20:00') },
+];
+
+export const testePlanosAcompanhamento = [
+    { id: 10101, medico_id: 2001, utente_id: 3001, frequencia_avaliacao: 'Mensal', data_inicio: new Date('2026-05-01'), data_fim: new Date('2026-11-01'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Monitorizar sintomas respiratorios e repetir CARAT mensalmente.' },
+    { id: 10102, medico_id: 2001, utente_id: 3006, frequencia_avaliacao: 'Quinzenal', data_inicio: new Date('2026-05-10'), data_fim: new Date('2026-08-10'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Rever controlo da tosse e adesao a medicacao habitual.' },
+    { id: 10103, medico_id: 2002, utente_id: 3007, frequencia_avaliacao: 'Semanal', data_inicio: new Date('2026-05-15'), data_fim: new Date('2026-07-15'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Acompanhar agravamento sazonal e registar sintomas diariamente.' },
+    { id: 10104, medico_id: 2002, utente_id: 3010, frequencia_avaliacao: 'Mensal', data_inicio: new Date('2026-04-20'), data_fim: new Date('2026-10-20'), estado: EstadoPlanoAcompanhamento.CONCLUIDO, recomendacao_medica: 'Plano encerrado apos estabilizacao clinica.' },
+    { id: 10105, medico_id: 2003, utente_id: 3011, frequencia_avaliacao: 'Mensal', data_inicio: new Date('2026-05-05'), data_fim: new Date('2026-12-05'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Avaliar resposta a controlo alergologico e necessidade de exames.' },
+    { id: 10106, medico_id: 2003, utente_id: 3013, frequencia_avaliacao: 'Quinzenal', data_inicio: new Date('2026-05-12'), data_fim: new Date('2026-09-12'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Evitar exposicao a polen e atualizar sintomas apos atividade exterior.' },
+    { id: 10107, medico_id: 2004, utente_id: 3016, frequencia_avaliacao: 'Mensal', data_inicio: new Date('2026-05-03'), data_fim: new Date('2026-11-03'), estado: EstadoPlanoAcompanhamento.SUSPENSO, recomendacao_medica: 'Suspenso temporariamente ate conclusao de exames complementares.' },
+    { id: 10108, medico_id: 2004, utente_id: 3020, frequencia_avaliacao: 'Semanal', data_inicio: new Date('2026-05-18'), data_fim: new Date('2026-07-18'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Acompanhar dispneia ao deitar e qualidade do sono.' },
+    { id: 10109, medico_id: 2005, utente_id: 3023, frequencia_avaliacao: 'Quinzenal', data_inicio: new Date('2026-05-08'), data_fim: new Date('2026-09-08'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Registar despertares noturnos e resposta ao plano terapeutico.' },
+    { id: 10110, medico_id: 2005, utente_id: 3025, frequencia_avaliacao: 'Mensal', data_inicio: new Date('2026-05-22'), data_fim: new Date('2026-12-22'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Reforcar evitamento de fumos e acompanhar aperto toracico.' },
 ];
