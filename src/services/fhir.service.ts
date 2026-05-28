@@ -9,7 +9,7 @@ import { Sintoma } from '../models/sintoma.entity.js';
 import { mapToPatient } from '../fhir/mappers/patient.mapper.js';
 import { mapToAllergyIntolerance } from '../fhir/mappers/allergyIntolerance.mapper.js';
 import { mapToMedicationRequest } from '../fhir/mappers/medicationRequest.mapper.js';
-import { mapToObservation } from '../fhir/mappers/observation.mapper.js';
+import { mapToExternalObservation, mapToObservation } from '../fhir/mappers/observation.mapper.js';
 import type { FhirPatientDto } from '../dtos/fhir/patient/patient-fhir.dto.js';
 import type { FhirAllergyIntoleranceDto } from '../dtos/fhir/allergyIntolerance/allergyIntolerance-fhir.dto.js';
 import type { FhirMedicationRequestDto } from '../dtos/fhir/medicationRequest/medicationRequest-fhir.dto.js';
@@ -75,5 +75,20 @@ export class FhirService {
     async listarObservations(utenteId: number): Promise<FhirBundle<FhirObservationDto>> {
         const sintomas = await this.sintomaRepo.find({ where: { utente_id: utenteId } });
         return toBundle(sintomas.map(mapToObservation));
+    }
+
+    async listarObservacoesExternas(code?: string, patient?: string): Promise<FhirBundle<FhirObservationDto>> {
+        const FHIR_EXTERNO_URL = 'https://fhir.hl7.pt/r5/fhir';
+        const params: string[] = [];
+        if (code) params.push(`code=${encodeURIComponent(code)}`);
+        if (patient) params.push(`subject=Patient/${patient}`);
+        const url = `${FHIR_EXTERNO_URL}/Observation${params.length ? '?' + params.join('&') : ''}`;
+
+        const resposta = await fetch(url);
+        if (!resposta.ok) throw new Error(`Erro servidor FHIR externo: ${resposta.status}`);
+
+        const bundle = await resposta.json();
+        const resources = (bundle.entry ?? []).map((e: any) => mapToExternalObservation(e.resource));
+        return toBundle(resources);
     }
 }

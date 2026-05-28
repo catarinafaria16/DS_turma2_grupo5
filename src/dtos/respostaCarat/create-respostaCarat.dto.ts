@@ -4,7 +4,6 @@ import { RespostaCarat10 } from '../../enums/RespostaCarat10.enum.js';
 export interface CreateRespostaCaratDto {
     avaliacao_id: number;
     utente_id: number;
-    data_avaliacao: Date;
     r1: RespostaCarat1a9;
     r2: RespostaCarat1a9;
     r3: RespostaCarat1a9;

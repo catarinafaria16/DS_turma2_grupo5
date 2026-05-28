@@ -48,6 +48,13 @@ export interface FhirPeriod {
   end?: string;
 }
 
+export interface FhirQuantity {
+  value?: number;
+  unit?: string;
+  system?: string;
+  code?: string;
+}
+
 export interface FhirBundleEntry<T> {
   resource: T;
 }

@@ -6,5 +6,4 @@ export interface MedicacaoResponseDto {
     dose: string;
     duracao: string;
     periodicidade: string;
-    validade: Date;
 }

@@ -8,11 +8,11 @@ export class RegraAlerta {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column('int')
-    medico_id!: number;
+    @Column({ type: 'int', nullable: true })
+    medico_id?: number;
 
-    @Column('int')
-    administrador_id!: number;
+    @Column({ type: 'int', nullable: true })
+    administrador_id?: number;
 
     @Column({ type: 'int', nullable: true })
     utente_id?: number;
@@ -20,11 +20,11 @@ export class RegraAlerta {
     @Column({ type: 'simple-enum', enum: CategoriaRegraAlerta })
     categoria!: CategoriaRegraAlerta;
 
-    @Column('int')
-    limiar_score!: number;
+    @Column({ type: 'int', nullable: true })
+    limiar_score?: number;
 
-    @Column('int')
-    valor_deterioracao!: number;
+    @Column({ type: 'int', nullable: true })
+    valor_deterioracao?: number;
 
     @Column({ type: 'simple-enum', enum: PrioridadeRegraAlerta })
     prioridade!: PrioridadeRegraAlerta;

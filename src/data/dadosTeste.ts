@@ -689,7 +689,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-10'),
         data_validade: new Date('2026-08-10'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Marta Silva - controlo de asma persistente',
     },
     {
         id: 5002,
@@ -699,7 +698,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-11'),
         data_validade: new Date('2026-07-31'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Marta Silva - avaliacao funcional respiratoria',
     },
     {
         id: 5003,
@@ -709,7 +707,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-12'),
         data_validade: new Date('2026-08-12'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dr. Pedro Costa - rinite e asma alergica',
     },
     {
         id: 5004,
@@ -719,7 +716,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-13'),
         data_validade: new Date('2026-08-01'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dr. Pedro Costa - estudo de alergia respiratoria',
     },
     {
         id: 5005,
@@ -729,7 +725,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-14'),
         data_validade: new Date('2026-08-14'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Ines Almeida - controlo de broncospasmo recorrente',
     },
     {
         id: 5006,
@@ -739,7 +734,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-15'),
         data_validade: new Date('2026-08-05'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Ines Almeida - confirmacao de hiperreatividade brônquica',
     },
     {
         id: 5007,
@@ -749,7 +743,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-16'),
         data_validade: new Date('2026-08-16'),
         estado: EstadoPrescricao.DISPENSADA,
-        assinatura: 'Dr. Tiago Ferreira - DPOC com sintomas diarios',
     },
     {
         id: 5008,
@@ -759,7 +752,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-17'),
         data_validade: new Date('2026-08-08'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dr. Tiago Ferreira - seguimento de doenca pulmonar cronica',
     },
     {
         id: 5009,
@@ -769,7 +761,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-18'),
         data_validade: new Date('2026-08-18'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Sofia Ribeiro - asma pediatrica persistente',
     },
     {
         id: 5010,
@@ -779,7 +770,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-19'),
         data_validade: new Date('2026-08-09'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Sofia Ribeiro - avaliacao de controlo e inflamacao',
     },
     {
         id: 5011,
@@ -789,7 +779,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-20'),
         data_validade: new Date('2026-08-20'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Marta Silva - pieira e dispneia de esforco',
     },
     {
         id: 5012,
@@ -799,7 +788,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-21'),
         data_validade: new Date('2026-08-21'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dr. Pedro Costa - rinossinusite alergica com tosse cronica',
     },
     {
         id: 5013,
@@ -809,7 +797,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-22'),
         data_validade: new Date('2026-08-11'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Ines Almeida - investigacao de dessaturacao',
     },
     {
         id: 5014,
@@ -819,7 +806,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-23'),
         data_validade: new Date('2026-08-23'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dr. Tiago Ferreira - exacerbacao moderada de DPOC',
     },
     {
         id: 5015,
@@ -829,7 +815,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-24'),
         data_validade: new Date('2026-08-13'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Sofia Ribeiro - seguimento de asma infantil',
     },
     {
         id: 5016,
@@ -839,7 +824,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-25'),
         data_validade: new Date('2026-08-15'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dr. Pedro Costa - avaliacao complementar da asma alergica',
     },
     {
         id: 5017,
@@ -849,7 +833,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-26'),
         data_validade: new Date('2026-08-26'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dr. Pedro Costa - reforco do controlo anti-inflamatorio',
     },
     {
         id: 5018,
@@ -859,7 +842,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-27'),
         data_validade: new Date('2026-08-17'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Marta Silva - monitorizacao de funcao pulmonar',
     },
     {
         id: 5019,
@@ -869,7 +851,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-28'),
         data_validade: new Date('2026-08-18'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dr. Tiago Ferreira - seguimento imagiologico de DPOC',
     },
     {
         id: 5020,
@@ -879,7 +860,6 @@ export const testePrescricoes = [
         data_emissao: new Date('2026-05-29'),
         data_validade: new Date('2026-08-29'),
         estado: EstadoPrescricao.ATIVA,
-        assinatura: 'Dra. Sofia Ribeiro - ajuste da terapêutica de manutenção',
     },
 ];
 
@@ -891,7 +871,6 @@ export const testeMedicacoes = [
         dose: '200 mcg',
         duracao: '90 dias',
         periodicidade: '2x por dia',
-        validade: new Date('2026-08-10'),
     },
     {
         id: 6002,
@@ -900,7 +879,6 @@ export const testeMedicacoes = [
         dose: '10 mg',
         duracao: '60 dias',
         periodicidade: '1x por dia a noite',
-        validade: new Date('2026-08-12'),
     },
     {
         id: 6003,
@@ -909,7 +887,6 @@ export const testeMedicacoes = [
         dose: '200 mcg',
         duracao: '30 dias',
         periodicidade: 'SOS ate 4x por dia',
-        validade: new Date('2026-08-14'),
     },
     {
         id: 6004,
@@ -918,7 +895,6 @@ export const testeMedicacoes = [
         dose: '18 mcg',
         duracao: '90 dias',
         periodicidade: '1x por dia',
-        validade: new Date('2026-08-16'),
     },
     {
         id: 6005,
@@ -927,7 +903,6 @@ export const testeMedicacoes = [
         dose: '250 mcg',
         duracao: '60 dias',
         periodicidade: '2x por dia',
-        validade: new Date('2026-08-18'),
     },
     {
         id: 6006,
@@ -936,7 +911,6 @@ export const testeMedicacoes = [
         dose: '12 mcg',
         duracao: '60 dias',
         periodicidade: '2x por dia',
-        validade: new Date('2026-08-20'),
     },
     {
         id: 6007,
@@ -945,7 +919,6 @@ export const testeMedicacoes = [
         dose: '10 mg',
         duracao: '30 dias',
         periodicidade: '1x por dia',
-        validade: new Date('2026-08-21'),
     },
     {
         id: 6008,
@@ -954,7 +927,6 @@ export const testeMedicacoes = [
         dose: '20 mg',
         duracao: '7 dias',
         periodicidade: '1x por dia',
-        validade: new Date('2026-08-23'),
     },
     {
         id: 6009,
@@ -963,7 +935,6 @@ export const testeMedicacoes = [
         dose: '400 mcg',
         duracao: '90 dias',
         periodicidade: '2x por dia',
-        validade: new Date('2026-08-26'),
     },
     {
         id: 6010,
@@ -972,7 +943,6 @@ export const testeMedicacoes = [
         dose: '10 mg',
         duracao: '90 dias',
         periodicidade: '1x por dia',
-        validade: new Date('2026-08-29'),
     },
 ];
 
@@ -981,7 +951,6 @@ export const testeExames = [
         id: 7001,
         prescricao_id: 5002,
         tipo_exame: TipoExame.ESPIROMETRIA,
-        data: new Date('2026-06-02T09:00:00'),
         consentimento: true,
         estado: EstadoExame.PENDENTE,
     },
@@ -989,7 +958,6 @@ export const testeExames = [
         id: 7002,
         prescricao_id: 5004,
         tipo_exame: TipoExame.IGE_ESPECIFICA,
-        data: new Date('2026-06-04T08:30:00'),
         consentimento: true,
         estado: EstadoExame.PENDENTE,
     },
@@ -997,7 +965,6 @@ export const testeExames = [
         id: 7003,
         prescricao_id: 5006,
         tipo_exame: TipoExame.TESTE_BRONCODILATADOR,
-        data: new Date('2026-06-05T10:15:00'),
         consentimento: true,
         estado: EstadoExame.PENDENTE,
     },
@@ -1005,7 +972,6 @@ export const testeExames = [
         id: 7004,
         prescricao_id: 5008,
         tipo_exame: TipoExame.RADIOGRAFIA_TORACICA,
-        data: new Date('2026-06-07T11:00:00'),
         consentimento: true,
         estado: EstadoExame.REALIZADO,
     },
@@ -1013,7 +979,6 @@ export const testeExames = [
         id: 7005,
         prescricao_id: 5010,
         tipo_exame: TipoExame.PICO_FLUXO,
-        data: new Date('2026-06-08T09:30:00'),
         consentimento: true,
         estado: EstadoExame.PENDENTE,
     },
@@ -1021,7 +986,6 @@ export const testeExames = [
         id: 7006,
         prescricao_id: 5013,
         tipo_exame: TipoExame.OXIMETRIA_NOTURNA,
-        data: new Date('2026-06-10T21:00:00'),
         consentimento: true,
         estado: EstadoExame.ANALISADO,
     },
@@ -1029,7 +993,6 @@ export const testeExames = [
         id: 7007,
         prescricao_id: 5015,
         tipo_exame: TipoExame.TESTE_ESFORCO,
-        data: new Date('2026-06-12T10:45:00'),
         consentimento: true,
         estado: EstadoExame.PENDENTE,
     },
@@ -1037,7 +1000,6 @@ export const testeExames = [
         id: 7008,
         prescricao_id: 5016,
         tipo_exame: TipoExame.ESPIROMETRIA,
-        data: new Date('2026-06-13T09:15:00'),
         consentimento: true,
         estado: EstadoExame.PENDENTE,
     },
@@ -1045,7 +1007,6 @@ export const testeExames = [
         id: 7009,
         prescricao_id: 5018,
         tipo_exame: TipoExame.PICO_FLUXO,
-        data: new Date('2026-06-14T08:45:00'),
         consentimento: true,
         estado: EstadoExame.REALIZADO,
     },
@@ -1053,7 +1014,6 @@ export const testeExames = [
         id: 7010,
         prescricao_id: 5019,
         tipo_exame: TipoExame.TAC_TORACICA,
-        data: new Date('2026-06-16T11:30:00'),
         consentimento: true,
         estado: EstadoExame.PENDENTE,
     },

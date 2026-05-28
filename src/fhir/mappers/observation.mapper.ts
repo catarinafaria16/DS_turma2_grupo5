@@ -1,6 +1,20 @@
 import { Sintoma } from '../../models/sintoma.entity.js';
 import type { FhirObservationDto } from '../../dtos/fhir/observation/observationDTO.js';
 
+export function mapToExternalObservation(resource: any): FhirObservationDto {
+    return {
+        resourceType: 'Observation',
+        id: resource.id,
+        status: resource.status,
+        code: resource.code ?? { coding: [] },
+        subject: resource.subject ?? { reference: '' },
+        effectiveDateTime: resource.effectiveDateTime,
+        valueQuantity: resource.valueQuantity,
+        valueString: resource.valueString,
+        valueCodeableConcept: resource.valueCodeableConcept,
+    };
+}
+
 export function mapToObservation(sintoma: Sintoma): FhirObservationDto {
     return {
         resourceType: 'Observation',

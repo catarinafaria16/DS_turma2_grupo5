@@ -5,5 +5,4 @@ export interface CreateMedicacaoDto {
     dose: string;
     duracao: string;
     periodicidade: string;
-    validade: Date;
 }

@@ -111,7 +111,7 @@ export class RespostaCaratService {
 
         // Regras custom criadas pelo médico
         const todasRegras = await this.regraAlertaRepo.find({
-            where: { medico_id: utente.medico_id, categoria: CategoriaRegraAlerta.SCORE }
+            where: { medico_id: utente.medico_id, categoria: CategoriaRegraAlerta.LIMIAR_SCORE }
         });
         // Aplica regras sem utente específico (globais do médico) OU específicas deste utente
         const regrasAplicaveis = todasRegras.filter(

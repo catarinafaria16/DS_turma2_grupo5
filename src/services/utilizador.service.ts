@@ -31,7 +31,7 @@ export class UtilizadorService {
             }
             this.validarPerfil(utilizadorData.perfil);
             if (!utilizadorData.genero) {
-                throw new Error('Genero do utilizador e obrigatorio');
+                throw new Error('Género do utilizador e obrigatorio');
             }
 
             const emailExistente = await this.repo.findOne({ where: { email: utilizadorData.email } });

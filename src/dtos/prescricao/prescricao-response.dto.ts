@@ -9,5 +9,4 @@ export interface PrescricaoResponseDto {
     data_emissao: Date;
     data_validade: Date;
     estado: EstadoPrescricao;
-    assinatura: string;
 }

@@ -26,4 +26,7 @@ routes.get('/MedicationRequest', controller.listarMedicationRequests.bind(contro
 // Observation         — GET /fhir/Observation?patient=<id>
 routes.get('/Observation', controller.listarObservations.bind(controller));
 
+// ObservacaoExterna   — GET /fhir/ObservacaoExterna?code=<code>&patient=<id>
+routes.get('/ObservacaoExterna', controller.listarObservacoesExternas.bind(controller));
+
 export default routes;

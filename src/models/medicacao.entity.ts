@@ -21,6 +21,4 @@ export class Medicacao {
     @Column('text')
     periodicidade!: string;
 
-    @Column({ type: 'date' })
-    validade!: Date;
 }

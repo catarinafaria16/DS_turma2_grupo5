@@ -31,8 +31,5 @@ export function mapToMedicationRequest(
         requester: { reference: `Practitioner/${prescricao.medico_id}` },
         authoredOn: toFhirDate(prescricao.data_emissao),
         dosageInstruction: [{ text: `${medicacao.dose} — ${medicacao.periodicidade} — ${medicacao.duracao}` }],
-        dispenseRequest: {
-            validityPeriod: { end: toFhirDate(medicacao.validade) },
-        },
     };
 }

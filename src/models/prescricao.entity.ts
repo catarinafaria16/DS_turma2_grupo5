@@ -25,7 +25,4 @@ export class Prescricao {
 
     @Column({ type: 'simple-enum', enum: EstadoPrescricao })
     estado!: EstadoPrescricao;
-
-    @Column('text')
-    assinatura!: string;
 }

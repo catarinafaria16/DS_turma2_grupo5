@@ -65,6 +65,17 @@ export class FhirController {
         }
     }
 
+    async listarObservacoesExternas(req: Request, res: Response) {
+        try {
+            const code = typeof req.query['code'] === 'string' ? req.query['code'] : undefined;
+            const patient = typeof req.query['patient'] === 'string' ? req.query['patient'] : undefined;
+            const bundle = await this.service.listarObservacoesExternas(code, patient);
+            return res.status(200).json(bundle);
+        } catch (error: any) {
+            return res.status(500).json(operationOutcomeError(error.message));
+        }
+    }
+
     async listarObservations(req: Request, res: Response) {
         try {
             const utenteId = Number(req.query['patient']);

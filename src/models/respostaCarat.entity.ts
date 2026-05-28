@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 import { RespostaCarat1a9 } from '../enums/RespostaCarat1a9.enum.js';
 import { RespostaCarat10 } from '../enums/RespostaCarat10.enum.js';
 
@@ -14,7 +14,7 @@ export class RespostaCarat {
     @Column('int')
     utente_id!: number;
 
-    @Column({ type: 'datetime' })
+    @CreateDateColumn()
     data_avaliacao!: Date;
 
     @Column({ type: 'simple-enum', enum: RespostaCarat1a9 })

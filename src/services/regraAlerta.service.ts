@@ -4,6 +4,7 @@ import type { CreateRegraAlertaDto } from '../dtos/regraAlerta/create-regraAlert
 import type { RegraAlertaResponseDto } from '../dtos/regraAlerta/regraAlerta-response.dto.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
+import { CategoriaRegraAlerta } from '../enums/CategoriaRegraAlerta.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
@@ -16,11 +17,9 @@ export class RegraAlertaService {
 
     private get repo() { return AppDataSource.getRepository(RegraAlerta); }
 
-    private validarAcessoMedico(medicoId: number, utilizador: UtilizadorAutenticado): void {
-        if (medicoId <= 0) {
-            throw new Error('ID do medico invalido');
-        }
-
+    private validarAcessoMedico(medicoId: number | undefined, utilizador: UtilizadorAutenticado): void {
+        if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) return;
+        if (!medicoId || medicoId <= 0) throw new Error('Acesso negado');
         if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== utilizador.id) {
             throw new Error('Acesso negado: nao pode gerir regras de outro medico');
         }
@@ -41,11 +40,21 @@ export class RegraAlertaService {
 
     async criar(regraData: CreateRegraAlertaDto, utilizador: UtilizadorAutenticado): Promise<RegraAlertaResponseDto> {
         try {
-            if (regraData.medico_id <= 0 || regraData.administrador_id <= 0) {
-                throw new Error('IDs de medico e administrador devem ser validos');
+            if (utilizador.perfil === PerfilUtilizador.MEDICO && (!regraData.medico_id || regraData.medico_id <= 0)) {
+                throw new Error('ID do medico invalido');
+            }
+            if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR && (!regraData.administrador_id || regraData.administrador_id <= 0)) {
+                throw new Error('ID do administrador invalido');
             }
 
             this.validarAcessoMedico(regraData.medico_id, utilizador);
+
+            if (regraData.categoria === CategoriaRegraAlerta.LIMIAR_SCORE && (regraData.limiar_score === undefined || regraData.limiar_score === null)) {
+                throw new Error('limiar_score e obrigatorio para a categoria LIMIAR_SCORE');
+            }
+            if (regraData.categoria === CategoriaRegraAlerta.DETERIORACAO && (regraData.valor_deterioracao === undefined || regraData.valor_deterioracao === null)) {
+                throw new Error('valor_deterioracao e obrigatorio para a categoria DETERIORACAO');
+            }
 
             const regra = this.repo.create(regraData);
             const saved = await this.repo.save(regra);

@@ -14,8 +14,6 @@ export class Exame {
     @Column({ type: 'simple-enum', enum: TipoExame })
     tipo_exame!: TipoExame;
 
-    @Column({ type: 'datetime' })
-    data!: Date;
 
     @Column('boolean')
     consentimento!: boolean;

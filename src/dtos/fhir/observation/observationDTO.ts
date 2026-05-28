@@ -1,4 +1,4 @@
-import type { FhirCodeableConcept, FhirReference } from '../shared/fhir-types.dto.js';
+import type { FhirCodeableConcept, FhirQuantity, FhirReference } from '../shared/fhir-types.dto.js';
 
 export type ObservationStatus =
   | 'registered'
@@ -17,6 +17,7 @@ export interface FhirObservationDto {
   code: FhirCodeableConcept;
   subject: FhirReference;
   effectiveDateTime?: string;
+  valueQuantity?: FhirQuantity;
   valueString?: string;
   valueCodeableConcept?: FhirCodeableConcept;
 }

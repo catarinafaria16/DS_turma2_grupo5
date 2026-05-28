@@ -223,13 +223,6 @@ export class MedicacaoService {
             }
         }
 
-        const validade = new Date(medicacaoData.validade);
-        if (Number.isNaN(validade.getTime())) {
-            throw new Error('Validade da medicacao invalida');
-        }
-        if (validade < new Date(new Date().toDateString())) {
-            throw new Error('Validade da medicacao deve ser atual ou futura');
-        }
     }
 
     async criar(medicacaoData: CreateMedicacaoDto, utilizador: UtilizadorAutenticado): Promise<MedicacaoResponseDto> {
