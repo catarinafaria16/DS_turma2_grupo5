@@ -164,6 +164,7 @@ export class RespostaCaratService {
 
             const resposta = this.repo.create({
                 ...respostaData,
+                data_avaliacao: new Date(),
                 score_total,
                 interpretacao,
                 recomendacao_automatica

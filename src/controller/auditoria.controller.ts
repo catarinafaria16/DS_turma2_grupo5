@@ -4,9 +4,10 @@ import { AuditoriaService } from '../services/auditoria.service.js';
 export class AuditoriaController {
     private service = new AuditoriaService();
 
-    async listar(_req: Request, res: Response) {
+    async listar(req: Request, res: Response) {
         try {
-            const resultado = await this.service.listar();
+            const limite = Math.min(Number(req.query['limite']) || 20, 100);
+            const resultado = await this.service.listar(1, limite);
             return res.status(200).json({ dados: resultado.auditorias, total: resultado.total });
         } catch (error: any) {
             return res.status(400).json({ erro: error.message || 'Erro ao listar auditorias' });

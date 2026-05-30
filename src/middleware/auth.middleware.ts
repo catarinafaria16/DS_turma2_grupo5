@@ -4,7 +4,6 @@ import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 
 export interface UtilizadorAutenticado {
     id: number;
-    email: string;
     perfil: PerfilUtilizador;
 }
 
@@ -31,13 +30,12 @@ export function autenticar(req: Request, res: Response, next: NextFunction): voi
     try {
         const payload = jwt.verify(token, JWT_SECRET) as UtilizadorAutenticado;
 
-        if (!payload.id || !payload.email || !payload.perfil) {
+        if (!payload.id || !payload.perfil) {
             throw new Error('Payload invalido');
         }
 
         req.utilizador = {
             id: payload.id,
-            email: payload.email,
             perfil: payload.perfil
         };
         next();

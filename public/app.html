@@ -1506,6 +1506,17 @@
       const [formEdicao, setFormEdicao] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
+      // Ficha (detalhe) de anamnese com alergias, comorbidades e medicação habitual
+      const [fichaId, setFichaId] = useState('');
+      const [alergiasFicha, setAlergiasFicha] = useState([]);
+      const [comorbidadesFicha, setComorbidadesFicha] = useState([]);
+      const [medicacoesFicha, setMedicacoesFicha] = useState([]);
+      const [formAlergia, setFormAlergia] = useState({ descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' });
+      const [formComorbidade, setFormComorbidade] = useState({ descricao: '' });
+      const [formMedicacao, setFormMedicacao] = useState({ nome: '', dose: '', duracao: '', periodicidade: '' });
+      const [erroFicha, setErroFicha] = useState('');
+      const [sucessoFicha, setSucessoFicha] = useState('');
+
       async function buscar() {
         try { const r = await apiFetch('/api/anamneses'); if (r.ok) setAnamneses(r.data.dados ?? []); } catch {}
       }
@@ -1524,8 +1535,7 @@
         else setErro(r.data.erro || 'Erro ao criar anamnese.');
       }
       function iniciarEdicao(anamnese) {
-        setErro('');
-        setSucesso('');
+        setErro(''); setSucesso('');
         setAnamneseEdicaoId(String(anamnese.id));
         setFormEdicao({
           utente_id: String(anamnese.utente_id || ''),
@@ -1548,6 +1558,39 @@
           setErro(r.data.erro || 'Erro ao atualizar anamnese.');
         }
       }
+      async function abrirFicha(anamneseId) {
+        const id = String(anamneseId);
+        setFichaId(id); setErroFicha(''); setSucessoFicha('');
+        try {
+          const [ra, rc, rm] = await Promise.all([
+            apiFetch(`/api/alergias/anamnese/${id}`),
+            apiFetch(`/api/comorbidades/anamnese/${id}`),
+            apiFetch(`/api/medicacoes-habituais/anamnese/${id}`)
+          ]);
+          if (ra.ok) setAlergiasFicha(ra.data.dados ?? []);
+          if (rc.ok) setComorbidadesFicha(rc.data.dados ?? []);
+          if (rm.ok) setMedicacoesFicha(rm.data.dados ?? []);
+        } catch {}
+      }
+      async function adicionarAlergia(e) {
+        e.preventDefault(); setErroFicha(''); setSucessoFicha('');
+        const r = await apiFetch('/api/alergias', { method: 'POST', body: { anamnese_id: Number(fichaId), descricao: formAlergia.descricao, intensidade_crise: formAlergia.intensidade_crise, frequencia_crise: formAlergia.frequencia_crise } });
+        if (r.ok) { setFormAlergia({ descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' }); setSucessoFicha('Alergia adicionada.'); abrirFicha(fichaId); }
+        else setErroFicha(r.data.erro || 'Erro ao adicionar alergia.');
+      }
+      async function adicionarComorbidade(e) {
+        e.preventDefault(); setErroFicha(''); setSucessoFicha('');
+        const r = await apiFetch('/api/comorbidades', { method: 'POST', body: { anamnese_id: Number(fichaId), descricao: formComorbidade.descricao } });
+        if (r.ok) { setFormComorbidade({ descricao: '' }); setSucessoFicha('Comorbidade adicionada.'); abrirFicha(fichaId); }
+        else setErroFicha(r.data.erro || 'Erro ao adicionar comorbidade.');
+      }
+      async function adicionarMedicacao(e) {
+        e.preventDefault(); setErroFicha(''); setSucessoFicha('');
+        const r = await apiFetch('/api/medicacoes-habituais', { method: 'POST', body: { anamnese_id: Number(fichaId), nome: formMedicacao.nome, dose: formMedicacao.dose, duracao: formMedicacao.duracao, periodicidade: formMedicacao.periodicidade } });
+        if (r.ok) { setFormMedicacao({ nome: '', dose: '', duracao: '', periodicidade: '' }); setSucessoFicha('Medicação habitual adicionada.'); abrirFicha(fichaId); }
+        else setErroFicha(r.data.erro || 'Erro ao adicionar medicação habitual.');
+      }
+      const ib = { LEVE: 'badge-green', MODERADA: 'badge-orange', GRAVE: 'badge-red' };
       const utentesSemAnamnese = utentes.filter(u => !anamneses.some(a => a.utente_id === u.id));
       return (
         <>
@@ -1612,6 +1655,126 @@
               </form>
             </div>
           )}
+          {fichaId && (
+            <div className="card" style={{borderLeft:'3px solid #2b6cb0'}}>
+              <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem'}}>
+                <h2 style={{margin:0}}>Ficha de Anamnese #{fichaId}</h2>
+                <button type="button" className="btn-sec" style={{fontSize:'0.78rem', padding:'5px 12px'}} onClick={() => { setFichaId(''); setAlergiasFicha([]); setComorbidadesFicha([]); setMedicacoesFicha([]); }}>Fechar</button>
+              </div>
+
+              <div style={{marginBottom:'1.25rem'}}>
+                <h3 style={{fontSize:'0.9rem', color:'#c05621', marginBottom:'0.5rem', display:'flex', alignItems:'center', gap:'6px'}}>
+                  Alergias <span className="badge badge-orange">{alergiasFicha.length}</span>
+                </h3>
+                {alergiasFicha.length === 0
+                  ? <p className="vazio">Sem alergias registadas nesta anamnese.</p>
+                  : (
+                    <table>
+                      <thead><tr><th>#</th><th>Descrição</th><th>Intensidade</th><th>Frequência</th></tr></thead>
+                      <tbody>{alergiasFicha.map(a => (
+                        <tr key={a.id}>
+                          <td>{a.id}</td><td>{a.descricao}</td>
+                          <td><span className={`badge ${ib[a.intensidade_crise] || 'badge-blue'}`}>{a.intensidade_crise}</span></td>
+                          <td>{a.frequencia_crise}</td>
+                        </tr>
+                      ))}</tbody>
+                    </table>
+                  )
+                }
+                {user?.perfil !== 'ADMINISTRADOR' && (
+                  <form onSubmit={adicionarAlergia} style={{marginTop:'0.75rem'}}>
+                    <div className="row" style={{flexWrap:'wrap'}}>
+                      <input list="sugestoes-alg-ficha" value={formAlergia.descricao} onChange={e => setFormAlergia(p => ({...p, descricao: e.target.value}))} placeholder="Nova alergia" required />
+                      <select value={formAlergia.intensidade_crise} onChange={e => setFormAlergia(p => ({...p, intensidade_crise: e.target.value}))}>
+                        <option value="LEVE">Leve</option>
+                        <option value="MODERADA">Moderada</option>
+                        <option value="GRAVE">Grave</option>
+                      </select>
+                      <input list="sugestoes-freq-ficha" value={formAlergia.frequencia_crise} onChange={e => setFormAlergia(p => ({...p, frequencia_crise: e.target.value}))} placeholder="Frequência de crise" required />
+                      <button type="submit">+ Alergia</button>
+                    </div>
+                    <datalist id="sugestoes-alg-ficha">
+                      {['Ácaros do pó doméstico','Pólen de gramíneas','Pólen de oliveira','Pólen de árvores','Pelos de gato','Pelos de cão','Bolores ambientais','Poeiras domésticas','Fumo do tabaco','Perfumes intensos'].map(a => <option key={a} value={a} />)}
+                    </datalist>
+                    <datalist id="sugestoes-freq-ficha">
+                      {['Raramente (menos de 1x/mês)','1 vez por mês','2 a 3 vezes por mês','Semanalmente','Várias vezes por semana','Diariamente','Sazonal (primavera/verão)','Sazonal (outono/inverno)','Por exposição a alergénio'].map(f => <option key={f} value={f} />)}
+                    </datalist>
+                  </form>
+                )}
+              </div>
+
+              <hr style={{border:'none', borderTop:'1px solid #e2e8f0', margin:'0 0 1.25rem 0'}} />
+
+              <div>
+                <h3 style={{fontSize:'0.9rem', color:'#553c9a', marginBottom:'0.5rem', display:'flex', alignItems:'center', gap:'6px'}}>
+                  Comorbidades <span className="badge" style={{background:'#e9d8fd', color:'#553c9a'}}>{comorbidadesFicha.length}</span>
+                </h3>
+                {comorbidadesFicha.length === 0
+                  ? <p className="vazio">Sem comorbidades registadas nesta anamnese.</p>
+                  : (
+                    <table>
+                      <thead><tr><th>#</th><th>Descrição</th></tr></thead>
+                      <tbody>{comorbidadesFicha.map(c => (
+                        <tr key={c.id}><td>{c.id}</td><td>{c.descricao}</td></tr>
+                      ))}</tbody>
+                    </table>
+                  )
+                }
+                {user?.perfil !== 'ADMINISTRADOR' && (
+                  <form onSubmit={adicionarComorbidade} style={{marginTop:'0.75rem'}}>
+                    <div className="row">
+                      <input list="sugestoes-comrb-ficha" value={formComorbidade.descricao} onChange={e => setFormComorbidade(p => ({...p, descricao: e.target.value}))} placeholder="Nova comorbidade" required />
+                      <button type="submit">+ Comorbidade</button>
+                    </div>
+                    <datalist id="sugestoes-comrb-ficha">
+                      {['Rinite alérgica persistente','Sinusite crónica','Bronquite crónica','DPOC','Enfisema pulmonar','Refluxo gastroesofágico','Apneia obstrutiva do sono','Conjuntivite alérgica','Dermatite atópica','Polipose nasal'].map(c => <option key={c} value={c} />)}
+                    </datalist>
+                  </form>
+                )}
+              </div>
+
+              <hr style={{border:'none', borderTop:'1px solid #e2e8f0', margin:'0 0 1.25rem 0'}} />
+
+              <div>
+                <h3 style={{fontSize:'0.9rem', color:'#276749', marginBottom:'0.5rem', display:'flex', alignItems:'center', gap:'6px'}}>
+                  Medicação Habitual <span className="badge badge-green">{medicacoesFicha.length}</span>
+                </h3>
+                {medicacoesFicha.length === 0
+                  ? <p className="vazio">Sem medicação habitual registada nesta anamnese.</p>
+                  : (
+                    <table>
+                      <thead><tr><th>#</th><th>Nome</th><th>Dose</th><th>Periodicidade</th><th>Duração</th></tr></thead>
+                      <tbody>{medicacoesFicha.map(m => (
+                        <tr key={m.id}><td>{m.id}</td><td>{m.nome}</td><td>{m.dose}</td><td>{m.periodicidade}</td><td>{m.duracao}</td></tr>
+                      ))}</tbody>
+                    </table>
+                  )
+                }
+                {user?.perfil !== 'ADMINISTRADOR' && (
+                  <form onSubmit={adicionarMedicacao} style={{marginTop:'0.75rem'}}>
+                    <div className="row" style={{flexWrap:'wrap'}}>
+                      <input list="sugestoes-med-ficha" value={formMedicacao.nome} onChange={e => setFormMedicacao(p => ({...p, nome: e.target.value}))} placeholder="Nome do medicamento" required />
+                      <input value={formMedicacao.dose} onChange={e => setFormMedicacao(p => ({...p, dose: e.target.value}))} placeholder="Dose (ex: 200mg)" required />
+                      <input list="sugestoes-period-ficha" value={formMedicacao.periodicidade} onChange={e => setFormMedicacao(p => ({...p, periodicidade: e.target.value}))} placeholder="Periodicidade" required />
+                      <input list="sugestoes-dur-med-ficha" value={formMedicacao.duracao} onChange={e => setFormMedicacao(p => ({...p, duracao: e.target.value}))} placeholder="Duração" required />
+                      <button type="submit">+ Medicação</button>
+                    </div>
+                    <datalist id="sugestoes-med-ficha">
+                      {['Salbutamol','Budesonida','Fluticasona','Montelucaste','Cetirizina','Loratadina','Fexofenadina','Brometo de ipratrópio','Salmeterol','Formoterol','Tiotropio','Omeprazol','Desloratadina'].map(m => <option key={m} value={m} />)}
+                    </datalist>
+                    <datalist id="sugestoes-period-ficha">
+                      {['1x/dia','2x/dia','3x/dia','De manhã','À noite','Em SOS','Semana sim/semana não','1x/semana','Contínuo'].map(p => <option key={p} value={p} />)}
+                    </datalist>
+                    <datalist id="sugestoes-dur-med-ficha">
+                      {['7 dias','14 dias','1 mês','3 meses','6 meses','Uso contínuo','Sazonal','Até melhoria'].map(d => <option key={d} value={d} />)}
+                    </datalist>
+                  </form>
+                )}
+                {erroFicha && <p className="erro" style={{marginTop:'6px'}}>{erroFicha}</p>}
+                {sucessoFicha && <p className="sucesso" style={{marginTop:'6px'}}>{sucessoFicha}</p>}
+              </div>
+            </div>
+          )}
           <div className="card">
             <h2>Anamneses Registadas</h2>
             {anamneses.length === 0 ? <p className="vazio">Nenhuma anamnese registada.</p> : (
@@ -1622,8 +1785,15 @@
                     <td><span className="badge badge-green">{a.utente_id}</span></td>
                     <td>{a.sexo || '—'}</td>
                     <td><span className="badge badge-orange">{a.tabagismo}</span></td>
-                    <td style={{maxWidth:'300px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.historico_familiar}</td>
-                    <td><button type="button" className="btn-sec" onClick={() => iniciarEdicao(a)}>Editar</button></td>
+                    <td style={{maxWidth:'220px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.historico_familiar}</td>
+                    <td>
+                      <div className="row" style={{gap:'4px', flexWrap:'nowrap'}}>
+                        <button type="button" className="btn-sec" onClick={() => iniciarEdicao(a)}>Editar</button>
+                        <button type="button" onClick={() => fichaId === String(a.id) ? (setFichaId(''), setAlergiasFicha([]), setComorbidadesFicha([]), setMedicacoesFicha([])) : abrirFicha(a.id)} style={{background: fichaId === String(a.id) ? '#553c9a' : undefined}}>
+                          {fichaId === String(a.id) ? 'Fechar' : 'Ficha'}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}</tbody>
               </table>
@@ -2804,6 +2974,7 @@
       const [utentes, setUtentes] = useState([]);
       const [form, setForm] = useState({ medico_id: '', utente_id: '', frequencia_avaliacao: '', data_inicio: '', data_fim: '', recomendacao_medica: '' });
       const [edicoesPlanos, setEdicoesPlanos] = useState({});
+      const [editandoPlanoId, setEditandoPlanoId] = useState(null);
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       function dataInput(valor) {
@@ -2877,6 +3048,7 @@
         });
         if (r.ok) {
           setSucesso(`Plano #${plano.id} atualizado com sucesso.`);
+          setEditandoPlanoId(null);
           buscar();
         } else {
           setErro(r.data.erro || 'Erro ao atualizar plano.');
@@ -2930,7 +3102,7 @@
                     <td><span className={`badge ${eb[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
                     <td>{p.data_inicio ? new Date(p.data_inicio).toLocaleDateString('pt-PT') : '—'}</td>
                     <td>{p.data_fim ? new Date(p.data_fim).toLocaleDateString('pt-PT') : '—'}</td>
-                    <td style={{maxWidth:'260px',fontSize:'0.85em',color:'#555'}}>{p.recomendacao_medica || '—'}</td>
+                    <td style={{maxWidth:'260px', fontSize:'0.85em', wordBreak:'break-word'}}>{p.recomendacao_medica || '—'}</td>
                   </tr>
                 ))}</tbody>
               </table>
@@ -2991,26 +3163,43 @@
             {sucesso && <p className="sucesso">{sucesso}</p>}
             {planos.length === 0 ? <p className="vazio">Nenhum plano registado.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Médico</th><th>Utente</th><th>Frequência</th><th>Estado</th><th>Início</th><th>Fim</th><th>Recomendação</th><th>Ações</th></tr></thead>
-                <tbody>{planos.map(p => (
-                  <tr key={p.id}><td>{p.id}</td>
-                    <td><span className="badge badge-blue">{p.medico_id}</span></td>
-                    <td><span className="badge badge-green">{p.utente_id}</span></td>
-                    <td><input value={edicoesPlanos[p.id]?.frequencia_avaliacao || ''} onChange={setEdicaoPlano(p.id, 'frequencia_avaliacao')} /></td>
-                    <td>
-                      <select value={edicoesPlanos[p.id]?.estado || p.estado} onChange={setEdicaoPlano(p.id, 'estado')}>
-                        <option value="ATIVO">Ativo</option>
-                        <option value="SUSPENSO">Suspenso</option>
-                        <option value="CONCLUIDO">Concluído</option>
-                        <option value="CANCELADO">Cancelado</option>
-                      </select>
-                    </td>
-                    <td><input type="date" value={edicoesPlanos[p.id]?.data_inicio || ''} onChange={setEdicaoPlano(p.id, 'data_inicio')} /></td>
-                    <td><input type="date" value={edicoesPlanos[p.id]?.data_fim || ''} onChange={setEdicaoPlano(p.id, 'data_fim')} /></td>
-                    <td><input value={edicoesPlanos[p.id]?.recomendacao_medica || ''} onChange={setEdicaoPlano(p.id, 'recomendacao_medica')} /></td>
-                    <td><button type="button" onClick={() => guardarEdicaoPlano(p)}>Guardar</button></td>
-                  </tr>
-                ))}</tbody>
+                <thead><tr><th>#</th><th>Médico</th><th>Utente</th><th>Frequência</th><th>Estado</th><th>Início</th><th>Fim</th><th>Recomendação</th><th></th></tr></thead>
+                <tbody>{planos.map(p => {
+                  const emEdicao = editandoPlanoId === p.id;
+                  const ed = edicoesPlanos[p.id] || {};
+                  return (
+                    <tr key={p.id}>
+                      <td>{p.id}</td>
+                      <td><span className="badge badge-blue">{p.medico_id}</span></td>
+                      <td><span className="badge badge-green">{p.utente_id}</span></td>
+                      {emEdicao ? <>
+                        <td><input value={ed.frequencia_avaliacao || ''} onChange={setEdicaoPlano(p.id, 'frequencia_avaliacao')} /></td>
+                        <td>
+                          <select value={ed.estado || p.estado} onChange={setEdicaoPlano(p.id, 'estado')}>
+                            <option value="ATIVO">Ativo</option>
+                            <option value="SUSPENSO">Suspenso</option>
+                            <option value="CONCLUIDO">Concluído</option>
+                            <option value="CANCELADO">Cancelado</option>
+                          </select>
+                        </td>
+                        <td><input type="date" value={ed.data_inicio || ''} onChange={setEdicaoPlano(p.id, 'data_inicio')} /></td>
+                        <td><input type="date" value={ed.data_fim || ''} onChange={setEdicaoPlano(p.id, 'data_fim')} /></td>
+                        <td><input value={ed.recomendacao_medica || ''} onChange={setEdicaoPlano(p.id, 'recomendacao_medica')} /></td>
+                        <td style={{whiteSpace:'nowrap'}}>
+                          <button type="button" style={{marginRight:'4px'}} onClick={() => guardarEdicaoPlano(p)}>Guardar</button>
+                          <button type="button" className="btn-tiny" onClick={() => setEditandoPlanoId(null)}>Cancelar</button>
+                        </td>
+                      </> : <>
+                        <td>{p.frequencia_avaliacao || '—'}</td>
+                        <td><span className={`badge ${eb[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
+                        <td>{p.data_inicio ? new Date(p.data_inicio).toLocaleDateString('pt-PT') : '—'}</td>
+                        <td>{p.data_fim ? new Date(p.data_fim).toLocaleDateString('pt-PT') : '—'}</td>
+                        <td style={{maxWidth:'260px', fontSize:'0.85em', wordBreak:'break-word'}}>{p.recomendacao_medica || '—'}</td>
+                        <td><button type="button" className="btn-tiny" onClick={() => setEditandoPlanoId(p.id)}>Editar</button></td>
+                      </>}
+                    </tr>
+                  );
+                })}</tbody>
               </table>
             )}
           </div>
@@ -3233,13 +3422,422 @@
     }
 
     /* --------------------------------------------------------------------------
+       DASHBOARD
+       ---------------------------------------------------------------------- */
+    function SecaoDashboard({ apiFetch, user }) {
+      const [utentes, setUtentes] = useState([]);
+      const [utenteId, setUtenteId] = useState('');
+      const [dashboard, setDashboard] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [erro, setErro] = useState('');
+      // Sintomas — adicionar/editar
+      const [formSintoma, setFormSintoma] = useState({ descricao: '', intensidade: 'LIGEIRA', duracao: '' });
+      const [sintomaEditId, setSintomaEditId] = useState('');
+      const [formSintomaEdit, setFormSintomaEdit] = useState({ descricao: '', intensidade: 'LIGEIRA', duracao: '' });
+      const [erroSintoma, setErroSintoma] = useState('');
+      const [sucessoSintoma, setSucessoSintoma] = useState('');
+      const [ordemCarat, setOrdemCarat] = useState('desc');
+      const [ordemAlertas, setOrdemAlertas] = useState('desc');
+      const [ordemSintomas, setOrdemSintomas] = useState('desc');
+
+      function ordenarPorData(arr, campo, ordem) {
+        if (!arr) return [];
+        return [...arr].sort((a, b) => {
+          const da = new Date(a[campo]); const db = new Date(b[campo]);
+          return ordem === 'asc' ? da - db : db - da;
+        });
+      }
+
+      const sintomasSugeridos = ['Dispneia','Dispneia ao esforço','Dispneia noturna','Tosse seca persistente','Tosse produtiva','Pieira','Pieira noturna','Aperto torácico','Falta de ar','Fadiga respiratória','Despertares noturnos por falta de ar','Expetoração persistente','Congestão torácica','Sensação de peito preso','Cansaço ao esforço','Tosse após exercício','Chiadeira no peito'];
+
+      async function carregarUtentes() {
+        try {
+          const r = await apiFetch('/api/utentes');
+          if (r.ok) return listaDados(r.data.dados);
+        } catch {}
+        return [];
+      }
+
+      async function carregarDashboard(id) {
+        if (!id) return;
+        setLoading(true); setErro(''); setDashboard(null);
+        try {
+          const r = await apiFetch(`/api/dashboard/${id}`);
+          if (r.ok) setDashboard(r.data.dados);
+          else setErro(r.data.erro || 'Erro ao carregar dashboard.');
+        } catch { setErro('Erro de ligação ao servidor.'); }
+        setLoading(false);
+      }
+
+      useEffect(() => {
+        carregarUtentes().then(dados => {
+          setUtentes(dados);
+          if (user?.perfil === 'UTENTE') {
+            const meuUtente = dados.find(u => u.utilizador_id === user.id);
+            if (meuUtente) { setUtenteId(String(meuUtente.id)); carregarDashboard(meuUtente.id); }
+          }
+        });
+      }, []);
+
+      async function adicionarSintoma(e) {
+        e.preventDefault(); setErroSintoma(''); setSucessoSintoma('');
+        const r = await apiFetch('/api/sintomas', { method: 'POST', body: { utente_id: Number(utenteId), descricao: formSintoma.descricao, intensidade: formSintoma.intensidade, duracao: formSintoma.duracao } });
+        if (r.ok) { setFormSintoma({ descricao: '', intensidade: 'LIGEIRA', duracao: '' }); setSucessoSintoma('Sintoma registado.'); carregarDashboard(utenteId); }
+        else setErroSintoma(r.data.erro || 'Erro ao registar sintoma.');
+      }
+      function iniciarEdicaoSintoma(s) {
+        setSintomaEditId(String(s.id));
+        setFormSintomaEdit({ descricao: s.descricao, intensidade: s.intensidade, duracao: s.duracao });
+        setErroSintoma(''); setSucessoSintoma('');
+      }
+      async function guardarEdicaoSintoma(e) {
+        e.preventDefault(); setErroSintoma(''); setSucessoSintoma('');
+        const r = await apiFetch(`/api/sintomas/${sintomaEditId}`, { method: 'PUT', body: { utente_id: Number(utenteId), descricao: formSintomaEdit.descricao, intensidade: formSintomaEdit.intensidade, duracao: formSintomaEdit.duracao } });
+        if (r.ok) { setSintomaEditId(''); setSucessoSintoma('Sintoma atualizado.'); carregarDashboard(utenteId); }
+        else setErroSintoma(r.data.erro || 'Erro ao atualizar sintoma.');
+      }
+
+      const estadoBadge = {
+        'Doenca bem controlada': 'badge-green',
+        'Doenca parcialmente controlada': 'badge-orange',
+        'Doenca mal controlada': 'badge-red'
+      };
+      const estadoLabel = {
+        'Doenca bem controlada': 'Bem controlada',
+        'Doenca parcialmente controlada': 'Parcialmente controlada',
+        'Doenca mal controlada': 'Mal controlada'
+      };
+      const eb = { NOVO: 'badge-red', VISTO: 'badge-orange', 'EM SEGUIMENTO': 'badge-blue', FECHADO: 'badge-green' };
+      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-blue', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
+      const ib = { LIGEIRA: 'badge-green', MODERADA: 'badge-orange', GRAVE: 'badge-red' };
+
+      return (
+        <>
+          {user?.perfil !== 'UTENTE' && (
+            <div className="card">
+              <h2>Dashboard do Utente</h2>
+              <div className="row" style={{maxWidth:'500px'}}>
+                <select value={utenteId} onChange={e => setUtenteId(e.target.value)}>
+                  <option value="">-- Selecionar utente --</option>
+                  {utentes.map(u => (
+                    <option key={u.id} value={u.id}>Utente #{u.id} — Nº {u.nr_utente}</option>
+                  ))}
+                </select>
+                <button type="button" onClick={() => carregarDashboard(utenteId)} disabled={!utenteId || loading}>
+                  {loading ? 'A carregar...' : 'Ver Dashboard'}
+                </button>
+              </div>
+              {erro && <p className="erro" style={{marginTop:'6px'}}>{erro}</p>}
+            </div>
+          )}
+
+          {user?.perfil === 'UTENTE' && loading && (
+            <div className="card"><p className="vazio">A carregar dashboard...</p></div>
+          )}
+          {user?.perfil === 'UTENTE' && erro && (
+            <div className="card"><p className="erro">{erro}</p></div>
+          )}
+
+          {dashboard && (
+            <>
+              <div className="card" style={{borderLeft:`3px solid ${dashboard.estado_doenca === 'Doenca bem controlada' ? '#276749' : dashboard.estado_doenca === 'Doenca parcialmente controlada' ? '#c05621' : '#c53030'}`}}>
+                <h2>Estado Atual da Doença</h2>
+                <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'0.75rem', flexWrap:'wrap'}}>
+                  <span className={`badge ${estadoBadge[dashboard.estado_doenca] || 'badge-blue'}`} style={{fontSize:'0.85rem', padding:'4px 14px'}}>
+                    {estadoLabel[dashboard.estado_doenca] || dashboard.estado_doenca || 'Sem avaliação'}
+                  </span>
+                  <span style={{fontSize:'0.82rem', color:'#718096'}}>Limiar de controlo: <strong>{dashboard.limiar_controlo}/30</strong></span>
+                  {dashboard.historico_avaliacoes?.length > 0 && (
+                    <span style={{fontSize:'0.82rem', color:'#718096'}}>
+                      Último score: <strong style={{color: dashboard.historico_avaliacoes[0].score >= 21 ? '#276749' : dashboard.historico_avaliacoes[0].score >= 16 ? '#c05621' : '#c53030'}}>
+                        {dashboard.historico_avaliacoes[0].score}/30
+                      </strong>
+                    </span>
+                  )}
+                </div>
+                {dashboard.recomendacoes?.length > 0 && (
+                  <div style={{background:'#f7fafc', border:'1px solid #e2e8f0', borderRadius:'6px', padding:'0.75rem', fontSize:'0.875rem', color:'#4a5568'}}>
+                    {dashboard.recomendacoes[0]}
+                  </div>
+                )}
+                {!dashboard.estado_doenca && <p className="vazio">Sem avaliações CARAT registadas.</p>}
+              </div>
+
+              <div className="card">
+                <h2 style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                  Histórico de Respostas CARAT
+                  {dashboard.historico_avaliacoes?.length > 0 && (
+                    <button className="btn-tiny" style={{fontWeight:400}} onClick={() => setOrdemCarat(o => o === 'desc' ? 'asc' : 'desc')}>
+                      {ordemCarat === 'desc' ? '↓ Mais recente' : '↑ Mais antigo'}
+                    </button>
+                  )}
+                </h2>
+                {!dashboard.historico_avaliacoes?.length
+                  ? <p className="vazio">Nenhuma avaliação CARAT registada.</p>
+                  : (
+                    <table>
+                      <thead><tr><th>#</th><th>Data</th><th>Score</th><th>Estado</th><th>Recomendação</th></tr></thead>
+                      <tbody>{ordenarPorData(dashboard.historico_avaliacoes, 'data', ordemCarat).map(a => (
+                        <tr key={a.id}>
+                          <td>{a.id}</td>
+                          <td>{a.data ? new Date(a.data).toLocaleDateString('pt-PT') : '—'}</td>
+                          <td>
+                            <span className={`badge ${a.score >= 21 ? 'badge-green' : a.score >= 16 ? 'badge-orange' : 'badge-red'}`}>
+                              {a.score}/30
+                            </span>
+                          </td>
+                          <td style={{fontSize:'0.82rem'}}>{estadoLabel[a.interpretacao] || a.interpretacao}</td>
+                          <td style={{maxWidth:'260px', fontSize:'0.78rem', color:'#718096'}}>{a.recomendacao}</td>
+                        </tr>
+                      ))}</tbody>
+                    </table>
+                  )
+                }
+              </div>
+
+              <div className="card">
+                <h2 style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                  <span>
+                    Alertas Ativos
+                    {dashboard.alertas_ativos?.length > 0 && (
+                      <span className="badge badge-red" style={{marginLeft:'8px', verticalAlign:'middle'}}>{dashboard.alertas_ativos.length}</span>
+                    )}
+                  </span>
+                  {dashboard.alertas_ativos?.length > 0 && (
+                    <button className="btn-tiny" style={{fontWeight:400}} onClick={() => setOrdemAlertas(o => o === 'desc' ? 'asc' : 'desc')}>
+                      {ordemAlertas === 'desc' ? '↓ Mais recente' : '↑ Mais antigo'}
+                    </button>
+                  )}
+                </h2>
+                {!dashboard.alertas_ativos?.length
+                  ? <p className="vazio">Sem alertas ativos.</p>
+                  : (
+                    <table>
+                      <thead><tr><th>#</th><th>Tipo</th><th>Estado</th><th>Prioridade</th><th>Data</th><th>Notas</th></tr></thead>
+                      <tbody>{ordenarPorData(dashboard.alertas_ativos, 'data_criacao', ordemAlertas).map(a => (
+                        <tr key={a.id}>
+                          <td>{a.id}</td>
+                          <td>{a.tipo}</td>
+                          <td><span className={`badge ${eb[a.estado] || 'badge-blue'}`}>{a.estado}</span></td>
+                          <td><span className={`badge ${pb[a.prioridade] || 'badge-blue'}`}>{a.prioridade}</span></td>
+                          <td>{a.data_criacao ? new Date(a.data_criacao).toLocaleDateString('pt-PT') : '—'}</td>
+                          <td style={{fontSize:'0.78rem', color:'#718096', maxWidth:'200px'}}>{a.notas || '—'}</td>
+                        </tr>
+                      ))}</tbody>
+                    </table>
+                  )
+                }
+              </div>
+
+              <div className="card">
+                <h2 style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                  Sintomas ao Longo do Tempo
+                  {dashboard.sintomas?.length > 0 && (
+                    <button className="btn-tiny" style={{fontWeight:400}} onClick={() => setOrdemSintomas(o => o === 'desc' ? 'asc' : 'desc')}>
+                      {ordemSintomas === 'desc' ? '↓ Mais recente' : '↑ Mais antigo'}
+                    </button>
+                  )}
+                </h2>
+
+                {sintomaEditId && (
+                  <div style={{background:'#f7fafc', border:'1px solid #e2e8f0', borderRadius:'6px', padding:'0.75rem', marginBottom:'1rem'}}>
+                    <p style={{fontWeight:600, fontSize:'0.85rem', marginBottom:'6px', color:'#2b6cb0'}}>Editar Sintoma #{sintomaEditId}</p>
+                    <form onSubmit={guardarEdicaoSintoma}>
+                      <div className="row" style={{flexWrap:'wrap'}}>
+                        <input list="sugestoes-sint-edit" value={formSintomaEdit.descricao} onChange={e => setFormSintomaEdit(p => ({...p, descricao: e.target.value}))} placeholder="Descrição" required />
+                        <select value={formSintomaEdit.intensidade} onChange={e => setFormSintomaEdit(p => ({...p, intensidade: e.target.value}))}>
+                          <option value="LIGEIRA">Ligeira</option>
+                          <option value="MODERADA">Moderada</option>
+                          <option value="GRAVE">Grave</option>
+                        </select>
+                        <input value={formSintomaEdit.duracao} onChange={e => setFormSintomaEdit(p => ({...p, duracao: e.target.value}))} placeholder="Duração (ex: 3 dias)" required />
+                        <button type="submit">Guardar</button>
+                        <button type="button" className="btn-sec" onClick={() => setSintomaEditId('')}>Cancelar</button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {!dashboard.sintomas?.length
+                  ? <p className="vazio">Nenhum sintoma registado.</p>
+                  : (
+                    <table>
+                      <thead><tr><th>#</th><th>Descrição</th><th>Intensidade</th><th>Duração</th><th>Data</th><th></th></tr></thead>
+                      <tbody>{ordenarPorData(dashboard.sintomas, 'data_registo', ordemSintomas).map(s => (
+                        <tr key={s.id}>
+                          <td>{s.id}</td>
+                          <td>{s.descricao}</td>
+                          <td><span className={`badge ${ib[s.intensidade] || 'badge-blue'}`}>{s.intensidade}</span></td>
+                          <td>{s.duracao}</td>
+                          <td>{s.data_registo ? new Date(s.data_registo).toLocaleDateString('pt-PT') : '—'}</td>
+                          <td><button type="button" className="btn-sec" style={{fontSize:'0.75rem', padding:'3px 8px'}} onClick={() => iniciarEdicaoSintoma(s)}>Editar</button></td>
+                        </tr>
+                      ))}</tbody>
+                    </table>
+                  )
+                }
+
+                <datalist id="sugestoes-sint-edit">
+                  {sintomasSugeridos.map(s => <option key={s} value={s} />)}
+                </datalist>
+
+                <div style={{marginTop:'1rem', paddingTop:'0.75rem', borderTop:'1px solid #e2e8f0'}}>
+                  <p style={{fontWeight:600, fontSize:'0.85rem', marginBottom:'6px', color:'#2b6cb0'}}>Registar Novo Sintoma</p>
+                  <form onSubmit={adicionarSintoma}>
+                    <div className="row" style={{flexWrap:'wrap'}}>
+                      <input list="sugestoes-sint-dash" value={formSintoma.descricao} onChange={e => setFormSintoma(p => ({...p, descricao: e.target.value}))} placeholder="Descrição do sintoma" required />
+                      <select value={formSintoma.intensidade} onChange={e => setFormSintoma(p => ({...p, intensidade: e.target.value}))}>
+                        <option value="LIGEIRA">Ligeira</option>
+                        <option value="MODERADA">Moderada</option>
+                        <option value="GRAVE">Grave</option>
+                      </select>
+                      <input value={formSintoma.duracao} onChange={e => setFormSintoma(p => ({...p, duracao: e.target.value}))} placeholder="Duração (ex: 2 dias)" required />
+                      <button type="submit" disabled={!utenteId}>+ Sintoma</button>
+                    </div>
+                    <datalist id="sugestoes-sint-dash">
+                      {sintomasSugeridos.map(s => <option key={s} value={s} />)}
+                    </datalist>
+                  </form>
+                  {erroSintoma && <p className="erro" style={{marginTop:'4px'}}>{erroSintoma}</p>}
+                  {sucessoSintoma && <p className="sucesso" style={{marginTop:'4px'}}>{sucessoSintoma}</p>}
+                </div>
+              </div>
+            </>
+          )}
+        </>
+      );
+    }
+
+    /* --------------------------------------------------------------------------
+       AUDITORIA (só ADMINISTRADOR)
+       ---------------------------------------------------------------------- */
+    function SecaoAuditoria({ apiFetch }) {
+      const [logs, setLogs] = useState([]);
+      const [loading, setLoading] = useState(false);
+      const [filtros, setFiltros] = useState({ tabela: '', operacao: '', utilizador_id: '', dataInicio: '', dataFim: '' });
+      const [detalhe, setDetalhe] = useState(null);
+
+      useEffect(() => { carregar(); }, []);
+
+      async function carregar() {
+        setLoading(true);
+        try {
+          const r = await apiFetch('/api/auditoria?limite=100');
+          if (r.ok) setLogs(r.data.dados ?? []);
+        } finally { setLoading(false); }
+      }
+
+      const tabelasUnicas = Array.from(new Set(logs.map(l => l.tabela))).sort();
+      const utilizadoresUnicos = Array.from(new Set(logs.map(l => l.utilizador_id).filter(id => id !== null))).sort((a, b) => a - b);
+
+      const logsFiltrados = logs.filter(l => {
+        if (filtros.tabela && l.tabela !== filtros.tabela) return false;
+        if (filtros.operacao && l.operacao !== filtros.operacao) return false;
+        if (filtros.utilizador_id && String(l.utilizador_id) !== filtros.utilizador_id) return false;
+        if (filtros.dataInicio && new Date(l.timestamp) < new Date(filtros.dataInicio)) return false;
+        if (filtros.dataFim && new Date(l.timestamp) > new Date(filtros.dataFim + 'T23:59:59')) return false;
+        return true;
+      });
+
+      async function verDiff(id) {
+        if (detalhe?.id === id) { setDetalhe(null); return; }
+        const r = await apiFetch(`/api/auditoria/${id}/diferencas`);
+        if (r.ok) setDetalhe({ id, ...r.data.dados });
+      }
+
+      const OPERACAO_BADGE = { CRIACAO: 'badge-green', ALTERACAO: 'badge-blue', ELIMINACAO: 'badge-red' };
+
+      return (
+        <>
+          <div className="card">
+            <h2>Auditoria</h2>
+            <div className="row" style={{flexWrap:'wrap', gap:'8px', marginBottom:'1rem', alignItems:'center'}}>
+              <select value={filtros.tabela} onChange={e => setFiltros(p => ({...p, tabela: e.target.value}))}>
+                <option value="">Todas as tabelas</option>
+                {tabelasUnicas.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+              <select value={filtros.operacao} onChange={e => setFiltros(p => ({...p, operacao: e.target.value}))}>
+                <option value="">Todas as operações</option>
+                <option value="CRIACAO">Criação</option>
+                <option value="ALTERACAO">Alteração</option>
+                <option value="ELIMINACAO">Eliminação</option>
+              </select>
+              <select value={filtros.utilizador_id} onChange={e => setFiltros(p => ({...p, utilizador_id: e.target.value}))}>
+                <option value="">Todos os utilizadores</option>
+                {utilizadoresUnicos.map(id => <option key={id} value={String(id)}>#{id}</option>)}
+              </select>
+              <label style={{display:'flex', alignItems:'center', gap:'4px', fontSize:'0.85rem', fontWeight:500}}>
+                De <input type="date" value={filtros.dataInicio} onChange={e => setFiltros(p => ({...p, dataInicio: e.target.value}))} />
+              </label>
+              <label style={{display:'flex', alignItems:'center', gap:'4px', fontSize:'0.85rem', fontWeight:500}}>
+                Até <input type="date" value={filtros.dataFim} onChange={e => setFiltros(p => ({...p, dataFim: e.target.value}))} />
+              </label>
+              <button className="btn-sec" onClick={() => setFiltros({ tabela: '', operacao: '', utilizador_id: '', dataInicio: '', dataFim: '' })}>Limpar</button>
+            </div>
+            {loading
+              ? <p>A carregar...</p>
+              : logsFiltrados.length === 0
+                ? <p className="vazio">Nenhum registo de auditoria encontrado.</p>
+                : (
+                  <table>
+                    <thead><tr>
+                      <th>#</th><th>Data / Hora</th><th>Utilizador</th><th>Tabela</th><th>ID Registo</th><th>Operação</th><th></th>
+                    </tr></thead>
+                    <tbody>
+                      {logsFiltrados.map(l => (
+                        <tr key={l.log_id}>
+                          <td>{l.log_id}</td>
+                          <td>{new Date(l.timestamp).toLocaleString('pt-PT')}</td>
+                          <td>{l.utilizador_id ?? '—'}</td>
+                          <td><code style={{fontSize:'0.8rem'}}>{l.tabela}</code></td>
+                          <td>{l.tabela_id}</td>
+                          <td><span className={`badge ${OPERACAO_BADGE[l.operacao] || 'badge-blue'}`} style={{fontSize:'0.72rem'}}>{l.operacao}</span></td>
+                          <td>
+                            {l.operacao === 'ALTERACAO' && (
+                              <button className="btn-sec" style={{fontSize:'0.72rem', padding:'2px 7px'}}
+                                onClick={() => verDiff(l.log_id)}>
+                                {detalhe?.id === l.log_id ? 'Fechar' : 'Diff'}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )
+            }
+          </div>
+
+          {detalhe && detalhe.diferenças?.length > 0 && (
+            <div className="card">
+              <h3 style={{marginTop:0}}>Diferenças — log #{detalhe.id}</h3>
+              <table>
+                <thead><tr><th>Campo</th><th style={{color:'#c53030'}}>Antes</th><th style={{color:'#276749'}}>Depois</th></tr></thead>
+                <tbody>
+                  {detalhe.diferenças.map((d, i) => (
+                    <tr key={i}>
+                      <td><code style={{fontSize:'0.8rem'}}>{d.campo}</code></td>
+                      <td style={{color:'#c53030'}}>{JSON.stringify(d.anterior)}</td>
+                      <td style={{color:'#276749'}}>{JSON.stringify(d.novo)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
+            </div>
+          )}
+        </>
+      );
+    }
+
+    /* --------------------------------------------------------------------------
        APP PRINCIPAL
        ---------------------------------------------------------------------- */
-    const TODAS_TABS = ['Administradores','Médicos','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Med. Habituais','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
+    const TODAS_TABS = ['Dashboard','Administradores','Médicos','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
     const TABS_POR_PERFIL = {
-      ADMINISTRADOR: ['Utilizador', ...TODAS_TABS],
-      MEDICO: ['Utilizador','Utentes','Prescrições','Anamneses','Alergias','Comorbidades','Sintomas','Med. Habituais','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos'],
-      UTENTE: ['Utilizador','Prescrições','Sintomas','Aval. CARAT','Resp. CARAT','Planos'],
+      ADMINISTRADOR: ['Perfil', ...TODAS_TABS, 'Auditoria'],
+      MEDICO: ['Perfil','Dashboard','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos'],
+      UTENTE: ['Perfil','Dashboard','Prescrições','Aval. CARAT','Resp. CARAT','Planos'],
     };
 
     function App() {
@@ -3279,11 +3877,12 @@
             {tabAtiva === 'Utilizadores'   && <SecaoUtilizadores apiFetch={apiFetch} />}
             {tabAtiva === 'Administradores' && <SecaoAdministradores apiFetch={apiFetch} />}
             {tabAtiva === 'Médicos'        && <SecaoMedicos apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Utilizador'     && (user?.perfil === 'UTENTE'
+            {tabAtiva === 'Perfil'         && (user?.perfil === 'UTENTE'
               ? <SecaoUtentes apiFetch={apiFetch} user={user} />
               : user?.perfil === 'MEDICO'
                 ? <SecaoMedicos apiFetch={apiFetch} user={user} />
                 : <SecaoUtilizadorAutenticado apiFetch={apiFetch} user={user} />)}
+            {tabAtiva === 'Dashboard'      && <SecaoDashboard apiFetch={apiFetch} user={user} />}
             {tabAtiva === 'Utentes'        && <SecaoUtentes apiFetch={apiFetch} user={user} />}
             {tabAtiva === 'Prescrições'    && <SecaoPrescricoes apiFetch={apiFetch} user={user} />}
             {tabAtiva === 'Anamneses'      && <SecaoAnamneses apiFetch={apiFetch} user={user} />}
@@ -3297,6 +3896,7 @@
             {tabAtiva === 'Resp. CARAT'    && <SecaoRespostasCarat apiFetch={apiFetch} user={user} />}
             {tabAtiva === 'Planos'         && <SecaoPlanos apiFetch={apiFetch} user={user} />}
             {tabAtiva === 'FHIR'           && <SecaoFhir apiFetch={apiFetch} />}
+            {tabAtiva === 'Auditoria'      && <SecaoAuditoria apiFetch={apiFetch} />}
           </div>
           <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT &nbsp;&bull;&nbsp; Autenticado como <strong>{user.perfil}</strong></footer>
         </>

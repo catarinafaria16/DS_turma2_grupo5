@@ -1,5 +1,7 @@
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 import { GeneroUtilizador } from '../enums/GeneroUtilizador.enum.js';
+import { RespostaCarat1a9 } from '../enums/RespostaCarat1a9.enum.js';
+import { RespostaCarat10 } from '../enums/RespostaCarat10.enum.js';
 import { TipoPrescricao } from '../enums/TipoPrescricao.enum.js';
 import { EstadoPrescricao } from '../enums/EstadoPrescricao.enum.js';
 import { TipoExame } from '../enums/TipoExame.enum.js';
@@ -12,6 +14,7 @@ import { TipoAlerta } from '../enums/TipoAlerta.enum.js';
 import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
 import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum.js';
+import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export const testeUtilizadores = [
     {
@@ -1235,4 +1238,125 @@ export const testePlanosAcompanhamento = [
     { id: 10108, medico_id: 2004, utente_id: 3020, frequencia_avaliacao: 'Semanal', data_inicio: new Date('2026-05-18'), data_fim: new Date('2026-07-18'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Acompanhar dispneia ao deitar e qualidade do sono.' },
     { id: 10109, medico_id: 2005, utente_id: 3023, frequencia_avaliacao: 'Quinzenal', data_inicio: new Date('2026-05-08'), data_fim: new Date('2026-09-08'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Registar despertares noturnos e resposta ao plano terapeutico.' },
     { id: 10110, medico_id: 2005, utente_id: 3025, frequencia_avaliacao: 'Mensal', data_inicio: new Date('2026-05-22'), data_fim: new Date('2026-12-22'), estado: EstadoPlanoAcompanhamento.ATIVO, recomendacao_medica: 'Reforcar evitamento de fumos e acompanhar aperto toracico.' },
+];
+
+const R = RespostaCarat1a9;
+const R10 = RespostaCarat10;
+const BEM = 'Doenca bem controlada';
+const PARCIAL = 'Doenca parcialmente controlada';
+const MAL = 'Doenca mal controlada';
+const REC_BEM = 'A doenca esta bem controlada. Continue o tratamento atual e mantenha a adesao a medicacao.';
+const REC_PARCIAL = 'A doenca esta parcialmente controlada. Reveja a adesao a medicacao e consulte o medico.';
+const REC_MAL = 'A doenca esta mal controlada. Consulte o medico com urgencia para rever o tratamento.';
+
+// avaliacao_id=1 corresponde ao questionário CARAT v1 inserido no seed
+export const testeRespostasCarat = [
+    // Utente 3001 — deterioração ao longo de 2 meses: 22 → 18 → 12
+    { id: 11001, avaliacao_id: 1, utente_id: 3001, data_avaliacao: new Date('2026-04-01'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.AteUmOuDoisDias, r7: R.AteUmOuDoisDias, r8: R.Nunca, r9: R.Nunca,
+      r10: R10.Menos_De_7_Dias, score_total: 22, interpretacao: BEM, recomendacao_automatica: REC_BEM },
+    { id: 11002, avaliacao_id: 1, utente_id: 3001, data_avaliacao: new Date('2026-05-01'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.AteUmOuDoisDias, r7: R.MaisDeDoisDiasPorSemana, r8: R.AteUmOuDoisDias, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Menos_De_7_Dias, score_total: 18, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+    { id: 11003, avaliacao_id: 1, utente_id: 3001, data_avaliacao: new Date('2026-05-18'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.MaisDeDoisDiasPorSemana, r5: R.MaisDeDoisDiasPorSemana, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10._7_Ou_Mais_Dias, score_total: 12, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+
+    // Utente 3002 — deterioração: 20 → 14
+    { id: 11004, avaliacao_id: 1, utente_id: 3002, data_avaliacao: new Date('2026-04-15'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.AteUmOuDoisDias, r7: R.AteUmOuDoisDias, r8: R.AteUmOuDoisDias, r9: R.AteUmOuDoisDias,
+      r10: R10.Menos_De_7_Dias, score_total: 20, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+    { id: 11005, avaliacao_id: 1, utente_id: 3002, data_avaliacao: new Date('2026-05-21'),
+      r1: R.MaisDeDoisDiasPorSemana, r2: R.MaisDeDoisDiasPorSemana, r3: R.AteUmOuDoisDias, r4: R.MaisDeDoisDiasPorSemana, r5: R.AteUmOuDoisDias, r6: R.MaisDeDoisDiasPorSemana, r7: R.AteUmOuDoisDias, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Menos_De_7_Dias, score_total: 14, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+
+    // Utente 3006 — deterioração: 19 → 11
+    { id: 11006, avaliacao_id: 1, utente_id: 3006, data_avaliacao: new Date('2026-04-20'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.AteUmOuDoisDias, r7: R.MaisDeDoisDiasPorSemana, r8: R.AteUmOuDoisDias, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Nunca, score_total: 19, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+    { id: 11007, avaliacao_id: 1, utente_id: 3006, data_avaliacao: new Date('2026-05-22'),
+      r1: R.MaisDeDoisDiasPorSemana, r2: R.MaisDeDoisDiasPorSemana, r3: R.MaisDeDoisDiasPorSemana, r4: R.MaisDeDoisDiasPorSemana, r5: R.MaisDeDoisDiasPorSemana, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Menos_De_7_Dias, score_total: 11, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+
+    // Utente 3007 — score baixo consistente: 15 → 8
+    { id: 11008, avaliacao_id: 1, utente_id: 3007, data_avaliacao: new Date('2026-05-10'),
+      r1: R.MaisDeDoisDiasPorSemana, r2: R.AteUmOuDoisDias, r3: R.MaisDeDoisDiasPorSemana, r4: R.AteUmOuDoisDias, r5: R.MaisDeDoisDiasPorSemana, r6: R.AteUmOuDoisDias, r7: R.MaisDeDoisDiasPorSemana, r8: R.AteUmOuDoisDias, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Menos_De_7_Dias, score_total: 15, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+    { id: 11009, avaliacao_id: 1, utente_id: 3007, data_avaliacao: new Date('2026-05-23'),
+      r1: R.MaisDeDoisDiasPorSemana, r2: R.MaisDeDoisDiasPorSemana, r3: R.MaisDeDoisDiasPorSemana, r4: R.MaisDeDoisDiasPorSemana, r5: R.MaisDeDoisDiasPorSemana, r6: R.MaisDeDoisDiasPorSemana, r7: R.QuaseTodosOsDias, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10._7_Ou_Mais_Dias, score_total: 8, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+
+    // Utente 3010 — estabilização após boa resposta: 24 → 19
+    { id: 11010, avaliacao_id: 1, utente_id: 3010, data_avaliacao: new Date('2026-04-01'),
+      r1: R.Nunca, r2: R.Nunca, r3: R.Nunca, r4: R.Nunca, r5: R.AteUmOuDoisDias, r6: R.AteUmOuDoisDias, r7: R.AteUmOuDoisDias, r8: R.AteUmOuDoisDias, r9: R.AteUmOuDoisDias,
+      r10: R10.Menos_De_7_Dias, score_total: 24, interpretacao: BEM, recomendacao_automatica: REC_BEM },
+    { id: 11011, avaliacao_id: 1, utente_id: 3010, data_avaliacao: new Date('2026-05-18'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.AteUmOuDoisDias, r7: R.MaisDeDoisDiasPorSemana, r8: R.AteUmOuDoisDias, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Nunca, score_total: 19, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+
+    // Utente 3011 — score baixo progressivo: 16 → 10
+    { id: 11012, avaliacao_id: 1, utente_id: 3011, data_avaliacao: new Date('2026-04-20'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Menos_De_7_Dias, score_total: 16, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+    { id: 11013, avaliacao_id: 1, utente_id: 3011, data_avaliacao: new Date('2026-05-24'),
+      r1: R.MaisDeDoisDiasPorSemana, r2: R.MaisDeDoisDiasPorSemana, r3: R.MaisDeDoisDiasPorSemana, r4: R.AteUmOuDoisDias, r5: R.MaisDeDoisDiasPorSemana, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10._7_Ou_Mais_Dias, score_total: 10, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+
+    // Utente 3013 — agravamento sazonal: 17 → 13
+    { id: 11014, avaliacao_id: 1, utente_id: 3013, data_avaliacao: new Date('2026-04-25'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Nunca, score_total: 17, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+    { id: 11015, avaliacao_id: 1, utente_id: 3013, data_avaliacao: new Date('2026-05-24'),
+      r1: R.MaisDeDoisDiasPorSemana, r2: R.MaisDeDoisDiasPorSemana, r3: R.MaisDeDoisDiasPorSemana, r4: R.MaisDeDoisDiasPorSemana, r5: R.MaisDeDoisDiasPorSemana, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.AteUmOuDoisDias, r9: R.AteUmOuDoisDias,
+      r10: R10.Menos_De_7_Dias, score_total: 13, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+
+    // Utente 3016 — descida ligeira: 22 → 17
+    { id: 11016, avaliacao_id: 1, utente_id: 3016, data_avaliacao: new Date('2026-04-15'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.AteUmOuDoisDias, r7: R.AteUmOuDoisDias, r8: R.Nunca, r9: R.Nunca,
+      r10: R10.Menos_De_7_Dias, score_total: 22, interpretacao: BEM, recomendacao_automatica: REC_BEM },
+    { id: 11017, avaliacao_id: 1, utente_id: 3016, data_avaliacao: new Date('2026-05-19'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Nunca, score_total: 17, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+
+    // Utente 3020 — score baixo: 20 → 12
+    { id: 11018, avaliacao_id: 1, utente_id: 3020, data_avaliacao: new Date('2026-04-05'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.AteUmOuDoisDias, r7: R.AteUmOuDoisDias, r8: R.AteUmOuDoisDias, r9: R.AteUmOuDoisDias,
+      r10: R10.Menos_De_7_Dias, score_total: 20, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+    { id: 11019, avaliacao_id: 1, utente_id: 3020, data_avaliacao: new Date('2026-05-25'),
+      r1: R.AteUmOuDoisDias, r2: R.MaisDeDoisDiasPorSemana, r3: R.MaisDeDoisDiasPorSemana, r4: R.MaisDeDoisDiasPorSemana, r5: R.MaisDeDoisDiasPorSemana, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Menos_De_7_Dias, score_total: 12, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+
+    // Utente 3023 — pieira recorrente: 19 → 14
+    { id: 11020, avaliacao_id: 1, utente_id: 3023, data_avaliacao: new Date('2026-05-05'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.AteUmOuDoisDias, r7: R.AteUmOuDoisDias, r8: R.AteUmOuDoisDias, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Menos_De_7_Dias, score_total: 19, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+    { id: 11021, avaliacao_id: 1, utente_id: 3023, data_avaliacao: new Date('2026-05-25'),
+      r1: R.MaisDeDoisDiasPorSemana, r2: R.MaisDeDoisDiasPorSemana, r3: R.AteUmOuDoisDias, r4: R.MaisDeDoisDiasPorSemana, r5: R.AteUmOuDoisDias, r6: R.MaisDeDoisDiasPorSemana, r7: R.AteUmOuDoisDias, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Menos_De_7_Dias, score_total: 14, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+
+    // Utente 3025 — aperto torácico após fumos: 16 → 9
+    { id: 11022, avaliacao_id: 1, utente_id: 3025, data_avaliacao: new Date('2026-05-01'),
+      r1: R.AteUmOuDoisDias, r2: R.AteUmOuDoisDias, r3: R.AteUmOuDoisDias, r4: R.AteUmOuDoisDias, r5: R.AteUmOuDoisDias, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10.Menos_De_7_Dias, score_total: 16, interpretacao: PARCIAL, recomendacao_automatica: REC_PARCIAL },
+    { id: 11023, avaliacao_id: 1, utente_id: 3025, data_avaliacao: new Date('2026-05-27'),
+      r1: R.MaisDeDoisDiasPorSemana, r2: R.MaisDeDoisDiasPorSemana, r3: R.MaisDeDoisDiasPorSemana, r4: R.MaisDeDoisDiasPorSemana, r5: R.MaisDeDoisDiasPorSemana, r6: R.MaisDeDoisDiasPorSemana, r7: R.MaisDeDoisDiasPorSemana, r8: R.MaisDeDoisDiasPorSemana, r9: R.MaisDeDoisDiasPorSemana,
+      r10: R10._7_Ou_Mais_Dias, score_total: 9, interpretacao: MAL, recomendacao_automatica: REC_MAL },
+];
+
+export const testeAuditorias = [
+    { log_id: 9001, utilizador_id: 1001, tabela: 'utente',    tabela_id: 3001, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null, valor_novo: '{"id":3001,"nome":"Ana Ferreira"}' },
+    { log_id: 9002, utilizador_id: 1001, tabela: 'utente',    tabela_id: 3002, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null, valor_novo: '{"id":3002,"nome":"Bruno Costa"}' },
+    { log_id: 9003, utilizador_id: 2001, tabela: 'utente',    tabela_id: 3001, operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado_doenca":"Controlada"}', valor_novo: '{"estado_doenca":"Parcialmente controlada"}' },
+    { log_id: 9004, utilizador_id: 2001, tabela: 'alerta',    tabela_id: 4001, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null, valor_novo: '{"tipo":"SCORE_BAIXO","prioridade":"ALTA"}' },
+    { log_id: 9005, utilizador_id: 2001, tabela: 'alerta',    tabela_id: 4001, operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"NOVO"}', valor_novo: '{"estado":"EM SEGUIMENTO"}' },
+    { log_id: 9006, utilizador_id: 2002, tabela: 'alerta',    tabela_id: 4002, operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"NOVO"}', valor_novo: '{"estado":"VISTO"}' },
+    { log_id: 9007, utilizador_id: 2001, tabela: 'sintoma',   tabela_id: 5001, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null, valor_novo: '{"descricao":"Falta de ar","intensidade":"MODERADA"}' },
+    { log_id: 9008, utilizador_id: 3001, tabela: 'sintoma',   tabela_id: 5001, operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"intensidade":"MODERADA"}', valor_novo: '{"intensidade":"GRAVE"}' },
+    { log_id: 9009, utilizador_id: 2003, tabela: 'anamnese',  tabela_id: 6001, operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"tabagismo":"NAO_FUMADOR"}', valor_novo: '{"tabagismo":"EX_FUMADOR"}' },
+    { log_id: 9010, utilizador_id: 1001, tabela: 'prescricao',tabela_id: 7001, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null, valor_novo: '{"medicamento":"Ventilan","dose":"100mcg"}' },
+    { log_id: 9011, utilizador_id: 2001, tabela: 'prescricao',tabela_id: 7001, operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ATIVA"}', valor_novo: '{"estado":"SUSPENSA"}' },
+    { log_id: 9012, utilizador_id: 2002, tabela: 'prescricao',tabela_id: 7002, operacao: OperacaoAuditoria.ELIMINACAO, valor_anterior: '{"medicamento":"Nasonex","dose":"50mcg"}', valor_novo: null },
+    { log_id: 9013, utilizador_id: 2001, tabela: 'plano_acompanhamento', tabela_id: 8001, operacao: OperacaoAuditoria.CRIACAO,   valor_anterior: null, valor_novo: '{"objetivo":"Controlar rinite"}' },
+    { log_id: 9014, utilizador_id: 2001, tabela: 'plano_acompanhamento', tabela_id: 8001, operacao: OperacaoAuditoria.ALTERACAO, valor_anterior: '{"estado":"ATIVO"}', valor_novo: '{"estado":"CONCLUIDO"}' },
+    { log_id: 9015, utilizador_id: 3002, tabela: 'resposta_carat', tabela_id: 11004, operacao: OperacaoAuditoria.CRIACAO, valor_anterior: null, valor_novo: '{"score_total":20,"interpretacao":"Doenca parcialmente controlada"}' },
 ];

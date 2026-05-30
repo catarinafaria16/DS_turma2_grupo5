@@ -1,7 +1,11 @@
 import { AppDataSource } from '../database/data-source.js';
 import { Utente } from '../models/utente.entity.js';
+import { RespostaCarat } from '../models/respostaCarat.entity.js';
+import { Alerta } from '../models/alerta.entity.js';
+import { Sintoma } from '../models/sintoma.entity.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 
 export interface EvolucaoScore {
     data: Date;
@@ -23,6 +27,15 @@ export interface AlertaAtivo {
     estado: string;
     prioridade: string;
     data_criacao: Date;
+    notas: string | undefined;
+}
+
+export interface SintomaTempo {
+    id: number;
+    descricao: string;
+    intensidade: string;
+    duracao: string;
+    data_registo: Date;
 }
 
 export interface DashboardUtenteDto {
@@ -33,10 +46,14 @@ export interface DashboardUtenteDto {
     historico_avaliacoes: ResumoAvaliacaoCarat[];
     alertas_ativos: AlertaAtivo[];
     recomendacoes: string[];
+    sintomas: SintomaTempo[];
 }
 
 export class DashboardService {
     private get utenteRepo() { return AppDataSource.getRepository(Utente); }
+    private get respostaCaratRepo() { return AppDataSource.getRepository(RespostaCarat); }
+    private get alertaRepo() { return AppDataSource.getRepository(Alerta); }
+    private get sintomaRepo() { return AppDataSource.getRepository(Sintoma); }
 
     private async validarAcessoDashboard(utenteId: number, utilizador: UtilizadorAutenticado): Promise<Utente> {
         const utente = await this.utenteRepo.findOne({ where: { id: utenteId } });
@@ -74,14 +91,59 @@ export class DashboardService {
 
         await this.validarAcessoDashboard(utenteId, utilizador);
 
+        const respostas = await this.respostaCaratRepo.find({
+            where: { utente_id: utenteId },
+            order: { data_avaliacao: 'DESC' }
+        });
+
+        const alertas = await this.alertaRepo.find({
+            where: { utente_id: utenteId },
+            order: { data_criacao: 'DESC' }
+        });
+
+        const sintomas = await this.sintomaRepo.find({
+            where: { utente_id: utenteId },
+            order: { data_registo: 'DESC' }
+        });
+
+        const ultimaResposta = respostas[0];
+
+        const alertas_ativos = alertas
+            .filter(a => a.estado !== EstadoAlerta.FECHADO)
+            .map(a => ({
+                id: a.id,
+                tipo: a.tipo,
+                estado: a.estado,
+                prioridade: a.prioridade,
+                data_criacao: a.data_criacao,
+                notas: a.notas
+            }));
+
         return {
             utente_id: utenteId,
-            estado_doenca: null,
-            evolucao_scores: [],
+            estado_doenca: ultimaResposta?.interpretacao ?? null,
+            evolucao_scores: respostas.map(r => ({
+                data: r.data_avaliacao,
+                score: r.score_total,
+                interpretacao: r.interpretacao
+            })),
             limiar_controlo: 21,
-            historico_avaliacoes: [],
-            alertas_ativos: [],
-            recomendacoes: []
+            historico_avaliacoes: respostas.map(r => ({
+                id: r.id,
+                data: r.data_avaliacao,
+                score: r.score_total,
+                interpretacao: r.interpretacao,
+                recomendacao: r.recomendacao_automatica
+            })),
+            alertas_ativos,
+            recomendacoes: ultimaResposta ? [ultimaResposta.recomendacao_automatica] : [],
+            sintomas: sintomas.map(s => ({
+                id: s.id,
+                descricao: s.descricao,
+                intensidade: s.intensidade,
+                duracao: s.duracao,
+                data_registo: s.data_registo
+            }))
         };
     }
 }

@@ -40,8 +40,10 @@ import { MedicacaoHabitual } from './models/medicacaoHabitual.entity.js';
 import { Exame } from './models/exame.entity.js';
 import { Sintoma } from './models/sintoma.entity.js';
 import { PlanoAcompanhamento } from './models/planoAcompanhamento.entity.js';
+import { RespostaCarat } from './models/respostaCarat.entity.js';
+import { Auditoria } from './models/auditoria.entity.js';
 import { PerfilUtilizador } from './enums/PerfilUtilizador.enum.js';
-import { testeUtilizadores, testeAdministradores, testeMedicos, testeUtentes, testePrescricoes, testeMedicacoes, testeExames, testeSintomas, testeAnamneses, testeAlergias, testeComorbidades, testeMedicacoesHabituais, testeAlertas, testePlanosAcompanhamento } from './data/dadosTeste.js';
+import { testeUtilizadores, testeAdministradores, testeMedicos, testeUtentes, testePrescricoes, testeMedicacoes, testeExames, testeSintomas, testeAnamneses, testeAlergias, testeComorbidades, testeMedicacoesHabituais, testeAlertas, testePlanosAcompanhamento, testeRespostasCarat, testeAuditorias } from './data/dadosTeste.js';
 
 const OPTS_1_9 = { 0: 'Nunca', 1: 'Até 2 dias por semana', 2: 'Mais de 2 dias por semana', 3: 'Quase todos os dias' };
 const OPTS_10  = { 0: 'Não estou a tomar medicamentos', 1: 'Nunca', 2: 'Menos de 7 dias', 3: '7 ou mais dias' };
@@ -88,7 +90,7 @@ app.post('/api/login', async (req, res) => {
         perfil: utilizador.perfil
     };
     const token = jwt.sign(
-        { id: utilizador.id, email: utilizador.email, perfil: utilizador.perfil },
+        { id: utilizador.id, perfil: utilizador.perfil },
         JWT_SECRET,
         { expiresIn: '8h' }
     );
@@ -177,6 +179,8 @@ async function seedTestData() {
     const exameRepo = AppDataSource.getRepository(Exame);
     const sintomaRepo = AppDataSource.getRepository(Sintoma);
     const planoAcompanhamentoRepo = AppDataSource.getRepository(PlanoAcompanhamento);
+    const respostaCaratRepo = AppDataSource.getRepository(RespostaCarat);
+    const auditoriaRepo = AppDataSource.getRepository(Auditoria);
 
     for (const utilizador of testeUtilizadores) {
         const existente = await utilizadorRepo.findOneBy({ id: utilizador.id });
@@ -280,6 +284,20 @@ async function seedTestData() {
     if (!existeAvaliacaoV1) {
         await avaliacaoCaratRepo.save(avaliacaoCaratRepo.create(AVALIACAO_CARAT_V1));
         console.log('AvaliacaoCarat v1 inserida');
+    }
+
+    for (const resposta of testeRespostasCarat) {
+        const existente = await respostaCaratRepo.findOneBy({ id: resposta.id });
+        if (!existente) {
+            await respostaCaratRepo.save(resposta);
+        }
+    }
+
+    for (const auditoria of testeAuditorias) {
+        const existente = await auditoriaRepo.findOneBy({ log_id: auditoria.log_id });
+        if (!existente) {
+            await auditoriaRepo.save(auditoria);
+        }
     }
 }
 
