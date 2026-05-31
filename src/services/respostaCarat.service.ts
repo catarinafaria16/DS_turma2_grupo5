@@ -119,7 +119,7 @@ export class RespostaCaratService {
         );
 
         for (const regra of regrasAplicaveis) {
-            if (scoreTotal <= regra.limiar_score) {
+            if (regra.limiar_score != null && scoreTotal <= regra.limiar_score) {
                 const tipo = scoreTotal < 16 ? TipoAlerta.SCORE_BAIXO : TipoAlerta.DETERIORACAO;
                 const alerta = this.alertaRepo.create({
                     utente_id: utenteId,
