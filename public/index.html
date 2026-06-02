@@ -3,20 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Sistema CARAT</title>
+  <title>Login - Sistema de avaliação CARAT</title>
   <style>
     :root {
       --bg-primary:   #ffffff;
-      --bg-secondary: #f0f3f6;
-      --bg-tertiary:  #e8ecf0;
-      --bg-danger:    #FCEBEB;
-      --color-primary:   #1a2d3f;
-      --color-secondary: #546170;
-      --color-tertiary:  #8794a0;
-      --color-danger:    #791F1F;
-      --border-tertiary: #dce2e8;
-      --border-secondary:#ced5dc;
-      --topbar-bg:       #1a3352;
+      --bg-secondary: #EEF4FF;
+      --bg-tertiary:  #ffffff;
+      --color-primary:   #1A3A6B;
+      --color-secondary: #3A6AAA;
+      --color-tertiary:  #7AAACF;
+      --color-danger:    #9A3B3B;
+      --border-tertiary: #D6E8FF;
+      --border-secondary:#B8D4F0;
+      --topbar-bg:       #3D6DB5;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,7 +55,8 @@
     .login-card {
       background: var(--bg-primary);
       border: 0.5px solid var(--border-tertiary);
-      border-radius: 12px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(132,118,180,0.12);
       padding: 48px 44px;
       width: 100%;
       max-width: 520px;
@@ -95,6 +95,7 @@
       width: 100%;
       padding: 12px 14px;
       font-size: 17px;
+      line-height: 1.4;
       border: 0.5px solid var(--border-secondary);
       border-radius: 8px;
       background: var(--bg-primary);
@@ -112,7 +113,7 @@
     .btn-primary {
       width: 100%;
       padding: 14px 12px;
-      background: #1a3352;
+      background: #3D6DB5;
       color: white;
       border: none;
       border-radius: 8px;
@@ -122,7 +123,7 @@
       margin-top: 4px;
     }
 
-    .btn-primary:hover { background: #152840; }
+    .btn-primary:hover { background: #4A7EC4; }
     .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 
     .hint {
@@ -134,12 +135,12 @@
 
     .message { font-size: 14px; margin-top: 6px; }
     .message.error   { color: var(--color-danger); }
-    .message.success { color: #27500A; }
+    .message.success { color: #2E6320; }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <span class="topbar-title">Sistema CARAT</span>
+    <span class="topbar-title">Sistema de avaliação CARAT</span>
   </header>
   <div class="page-body">
     <div class="login-card">
@@ -148,7 +149,7 @@
 
       <form id="login-form">
         <div class="field">
-          <label for="login-id">ID do utilizador</label>
+          <label for="login-id">Nº de utilizador</label>
           <input id="login-id" name="id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="username" required />
         </div>
         <div class="field">
@@ -156,7 +157,7 @@
           <input id="login-password" name="password" type="password" autocomplete="current-password" required />
         </div>
         <button id="login-button" class="btn-primary" type="submit">Entrar</button>
-        <p class="hint">Utilizadores de teste: IDs 1001–1005 administrador, 2001–2005 médico ou 3001–3005 utente. Exemplo: ID <strong>1001</strong> com password <strong>pass1001</strong>.</p>
+        <p class="hint">Utilizadores de teste: IDs 2026001–2026005 administrador, 2026101–2026105 médico ou 2026201–2026205 utente. Exemplo: ID <strong>2026001</strong> com password <strong>pass2026001</strong>.</p>
         <div id="login-message"></div>
       </form>
     </div>
