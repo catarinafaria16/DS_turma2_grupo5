@@ -1,6 +1,6 @@
 export enum PrioridadeRegraAlerta {
-    BAIXA = 'BAIXA',
-    MEDIA = 'MEDIA',
-    ALTA = 'ALTA',
-    MUITO_ALTA = 'MUITO ALTA'
+    BAIXA = 'baixa',
+    MEDIA = 'media',
+    ALTA = 'alta',
+    MUITO_ALTA = 'muito alta'
 }

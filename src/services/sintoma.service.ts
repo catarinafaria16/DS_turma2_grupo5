@@ -3,10 +3,12 @@ import { Sintoma } from '../models/sintoma.entity.js';
 import { Utente } from '../models/utente.entity.js';
 import type { CreateSintomaDto } from '../dtos/sintoma/create-sintoma.dto.js';
 import type { SintomaResponseDto } from '../dtos/sintoma/sintoma-response.dto.js';
+import { IntensidadeSintoma } from '../enums/IntensidadeSintoma.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class SintomaService {
     private auditoriaService: AuditoriaService;
@@ -52,6 +54,7 @@ export class SintomaService {
             if (!sintomaData.descricao || sintomaData.descricao.trim().length === 0) {
                 throw new Error('Descricao do sintoma e obrigatoria');
             }
+            validarEnum(IntensidadeSintoma, sintomaData.intensidade, 'intensidade');
             await this.validarAcessoUtente(sintomaData.utente_id, utilizador);
 
             const sintoma = this.repo.create(sintomaData);
@@ -132,6 +135,10 @@ export class SintomaService {
         utilizador: UtilizadorAutenticado
     ): Promise<SintomaResponseDto> {
         try {
+            if (!sintomaData.descricao || sintomaData.descricao.trim().length === 0) {
+                throw new Error('Descricao do sintoma e obrigatoria');
+            }
+            validarEnum(IntensidadeSintoma, sintomaData.intensidade, 'intensidade');
             const anterior = await this.obterInterno(sintomaId);
             await this.validarAcessoUtente(anterior.utente_id, utilizador);
             await this.validarAcessoUtente(sintomaData.utente_id, utilizador);

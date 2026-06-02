@@ -1,5 +1,5 @@
 export enum GeneroUtilizador {
-    FEMININO = 'FEMININO',
-    MASCULINO = 'MASCULINO',
-    OUTRO = 'OUTRO'
+    FEMININO = 'feminino',
+    MASCULINO = 'masculino',
+    OUTRO = 'outro'
 }

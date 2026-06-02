@@ -4,10 +4,12 @@ import { Anamnese } from '../models/anamnese.entity.js';
 import { Utente } from '../models/utente.entity.js';
 import type { CreateAlergiaDto } from '../dtos/alergia/create-alergia.dto.js';
 import type { AlergiaResponseDto } from '../dtos/alergia/alergia-response.dto.js';
+import { IntensidadeCriseAlergia } from '../enums/IntensidadeCriseAlergia.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class AlergiaService {
     private auditoriaService: AuditoriaService;
@@ -70,6 +72,7 @@ export class AlergiaService {
             if (!alergiaData.intensidade_crise) {
                 throw new Error('Intensidade das crises e obrigatoria');
             }
+            validarEnum(IntensidadeCriseAlergia, alergiaData.intensidade_crise, 'intensidade_crise');
             if (!alergiaData.frequencia_crise || alergiaData.frequencia_crise.trim().length === 0) {
                 throw new Error('Frequencia das crises e obrigatoria');
             }
@@ -154,6 +157,13 @@ export class AlergiaService {
         utilizador: UtilizadorAutenticado
     ): Promise<AlergiaResponseDto> {
         try {
+            if (!alergiaData.descricao || alergiaData.descricao.trim().length === 0) {
+                throw new Error('Descricao da alergia e obrigatoria');
+            }
+            if (!alergiaData.frequencia_crise || alergiaData.frequencia_crise.trim().length === 0) {
+                throw new Error('Frequencia das crises e obrigatoria');
+            }
+            validarEnum(IntensidadeCriseAlergia, alergiaData.intensidade_crise, 'intensidade_crise');
             const anterior = await this.obterInterna(alergiaId);
             await this.validarAcessoAnamnese(anterior.anamnese_id, utilizador);
             await this.validarAcessoAnamnese(alergiaData.anamnese_id, utilizador);

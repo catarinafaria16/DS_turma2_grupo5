@@ -1,5 +1,5 @@
 export enum PerfilUtilizador {
-    ADMINISTRADOR = 'ADMINISTRADOR',
-    MEDICO = 'MEDICO',
-    UTENTE = 'UTENTE'
+    ADMINISTRADOR = 'administrador',
+    MEDICO = 'medico',
+    UTENTE = 'utente'
 }

@@ -8,6 +8,7 @@ import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class PlanoAcompanhamentoService {
     private auditoriaService: AuditoriaService;
@@ -67,6 +68,9 @@ export class PlanoAcompanhamentoService {
         try {
             if (planoData.medico_id <= 0 || planoData.utente_id <= 0) {
                 throw new Error('IDs de medico e utente devem ser validos');
+            }
+            if (planoData.estado !== undefined) {
+                validarEnum(EstadoPlanoAcompanhamento, planoData.estado, 'estado');
             }
             if (planoData.data_inicio >= planoData.data_fim) {
                 throw new Error('Data de inicio deve ser anterior a data de fim');
@@ -164,6 +168,12 @@ export class PlanoAcompanhamentoService {
         utilizador: UtilizadorAutenticado
     ): Promise<PlanoAcompanhamentoResponseDto> {
         try {
+            if (planoData.data_inicio >= planoData.data_fim) {
+                throw new Error('Data de inicio deve ser anterior a data de fim');
+            }
+            if (planoData.estado !== undefined) {
+                validarEnum(EstadoPlanoAcompanhamento, planoData.estado, 'estado');
+            }
             const anterior = await this.obterInterno(planoId);
             const utenteAnterior = await this.validarAcessoUtente(anterior.utente_id, utilizador);
             const utenteNovo = await this.validarAcessoUtente(planoData.utente_id, utilizador);
@@ -178,6 +188,10 @@ export class PlanoAcompanhamentoService {
                 )
             ) {
                 throw new Error('Acesso negado: nao pode alterar planos de outro medico');
+            }
+
+            if (planoData.estado !== undefined) {
+                validarEnum(EstadoPlanoAcompanhamento, planoData.estado, 'estado');
             }
 
             const atualizado = await this.repo.save({ ...anterior, ...planoData, id: planoId });
@@ -204,6 +218,7 @@ export class PlanoAcompanhamentoService {
         utilizador: UtilizadorAutenticado
     ): Promise<PlanoAcompanhamentoResponseDto> {
         try {
+            validarEnum(EstadoPlanoAcompanhamento, novoEstado, 'estado');
             const anterior = await this.obterInterno(planoId);
             await this.validarAcessoUtente(anterior.utente_id, utilizador);
 

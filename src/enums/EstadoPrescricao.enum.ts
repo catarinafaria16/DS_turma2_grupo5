@@ -1,5 +1,5 @@
 export enum EstadoPrescricao {
-    ATIVA = 'ATIVA',
-    DISPENSADA = 'DISPENSADA',
-    CANCELADA = 'CANCELADA'
+    ATIVA = 'ativa',
+    DISPENSADA = 'dispensada',
+    CANCELADA = 'cancelada'
 }

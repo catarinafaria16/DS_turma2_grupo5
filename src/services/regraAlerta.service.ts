@@ -5,8 +5,10 @@ import type { RegraAlertaResponseDto } from '../dtos/regraAlerta/regraAlerta-res
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { CategoriaRegraAlerta } from '../enums/CategoriaRegraAlerta.enum.js';
+import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class RegraAlertaService {
     private auditoriaService: AuditoriaService;
@@ -48,6 +50,9 @@ export class RegraAlertaService {
             }
 
             this.validarAcessoMedico(regraData.medico_id, utilizador);
+
+            validarEnum(CategoriaRegraAlerta, regraData.categoria, 'categoria');
+            validarEnum(PrioridadeRegraAlerta, regraData.prioridade, 'prioridade');
 
             if (regraData.categoria === CategoriaRegraAlerta.LIMIAR_SCORE && (regraData.limiar_score === undefined || regraData.limiar_score === null)) {
                 throw new Error('limiar_score e obrigatorio para a categoria LIMIAR_SCORE');
@@ -120,6 +125,16 @@ export class RegraAlertaService {
             const anterior = await this.obterInterna(regraId);
             this.validarAcessoMedico(anterior.medico_id, utilizador);
             this.validarAcessoMedico(regraData.medico_id, utilizador);
+
+            validarEnum(CategoriaRegraAlerta, regraData.categoria, 'categoria');
+            validarEnum(PrioridadeRegraAlerta, regraData.prioridade, 'prioridade');
+
+            if (regraData.categoria === CategoriaRegraAlerta.LIMIAR_SCORE && (regraData.limiar_score === undefined || regraData.limiar_score === null)) {
+                throw new Error('limiar_score e obrigatorio para a categoria LIMIAR_SCORE');
+            }
+            if (regraData.categoria === CategoriaRegraAlerta.DETERIORACAO && (regraData.valor_deterioracao === undefined || regraData.valor_deterioracao === null)) {
+                throw new Error('valor_deterioracao e obrigatorio para a categoria DETERIORACAO');
+            }
 
             const atualizada = await this.repo.save({ ...anterior, ...regraData, id: regraId });
 

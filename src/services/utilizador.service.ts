@@ -6,6 +6,8 @@ import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { GeneroUtilizador } from '../enums/GeneroUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class UtilizadorService {
     private auditoriaService: AuditoriaService;
@@ -33,6 +35,7 @@ export class UtilizadorService {
             if (!utilizadorData.genero) {
                 throw new Error('Género do utilizador e obrigatorio');
             }
+            validarEnum(GeneroUtilizador, utilizadorData.genero, 'genero');
 
             const emailExistente = await this.repo.findOne({ where: { email: utilizadorData.email } });
             if (emailExistente) {
@@ -126,6 +129,9 @@ export class UtilizadorService {
                 }
                 if (utilizadorData.perfil !== undefined) {
                     this.validarPerfil(utilizadorData.perfil);
+                }
+                if (utilizadorData.genero !== undefined) {
+                    validarEnum(GeneroUtilizador, utilizadorData.genero, 'genero');
                 }
             }
 

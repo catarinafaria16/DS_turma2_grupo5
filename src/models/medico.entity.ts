@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn } from 'typeorm';
+import { EspecialidadeMedico } from '../enums/EspecialidadeMedico.enum.js';
 
 @Entity()
 export class Medico {
@@ -9,8 +10,8 @@ export class Medico {
     @Column('int')
     utilizador_id!: number;
 
-    @Column('text')
-    especialidade!: string;
+    @Column({ type: 'simple-enum', enum: EspecialidadeMedico })
+    especialidade!: EspecialidadeMedico;
 
     @Column('text')
     contacto!: string;

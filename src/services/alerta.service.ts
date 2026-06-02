@@ -4,10 +4,13 @@ import { Utente } from '../models/utente.entity.js';
 import type { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto.js';
 import type { AlertaResponseDto } from '../dtos/alerta/alerta-response.dto.js';
 import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
+import { TipoAlerta } from '../enums/TipoAlerta.enum.js';
+import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class AlertaService {
     private auditoriaService: AuditoriaService;
@@ -55,6 +58,8 @@ export class AlertaService {
             if (alertaData.regra_id !== undefined && alertaData.regra_id <= 0) {
                 throw new Error('ID de regra invalido');
             }
+            validarEnum(TipoAlerta, alertaData.tipo, 'tipo');
+            validarEnum(PrioridadeRegraAlerta, alertaData.prioridade, 'prioridade');
 
             const utente = await this.validarAcessoUtente(alertaData.utente_id, utilizador);
             if (
@@ -66,6 +71,7 @@ export class AlertaService {
 
             const alerta = this.repo.create({
                 ...alertaData,
+                estado: EstadoAlerta.NOVO,
                 data_atualizacao_estado: new Date()
             });
             const saved = await this.repo.save(alerta);
@@ -144,6 +150,7 @@ export class AlertaService {
 
     async atualizarEstado(alertaId: number, novoEstado: EstadoAlerta, utilizador: UtilizadorAutenticado): Promise<AlertaResponseDto> {
         try {
+            validarEnum(EstadoAlerta, novoEstado, 'estado');
             const anterior = await this.obterInterno(alertaId);
             await this.validarAcessoUtente(anterior.utente_id, utilizador);
 

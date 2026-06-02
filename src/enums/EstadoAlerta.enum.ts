@@ -1,6 +1,6 @@
 export enum EstadoAlerta {
-    NOVO = 'NOVO',
-    VISTO = 'VISTO',
-    EM_SEGUIMENTO = 'EM SEGUIMENTO',
-    FECHADO = 'FECHADO'
+    NOVO = 'novo',
+    VISTO = 'visto',
+    EM_SEGUIMENTO = 'em seguimento',
+    FECHADO = 'fechado'
 }

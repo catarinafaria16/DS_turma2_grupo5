@@ -4,10 +4,13 @@ import { Prescricao } from '../models/prescricao.entity.js';
 import { Utente } from '../models/utente.entity.js';
 import type { CreateExameDto } from '../dtos/exame/create-exame.dto.js';
 import type { ExameResponseDto } from '../dtos/exame/exame-response.dto.js';
+import { EstadoExame } from '../enums/EstadoExame.enum.js';
+import { TipoExame } from '../enums/TipoExame.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class ExameService {
     private auditoriaService: AuditoriaService;
@@ -71,6 +74,8 @@ export class ExameService {
 
     async criar(exameData: CreateExameDto, utilizador: UtilizadorAutenticado): Promise<ExameResponseDto> {
         try {
+            validarEnum(TipoExame, exameData.tipo_exame, 'tipo_exame');
+            validarEnum(EstadoExame, exameData.estado, 'estado');
             await this.validarAcessoPrescricao(exameData.prescricao_id, utilizador);
 
             const exame = this.repo.create(exameData);
@@ -151,6 +156,8 @@ export class ExameService {
         utilizador: UtilizadorAutenticado
     ): Promise<ExameResponseDto> {
         try {
+            validarEnum(TipoExame, exameData.tipo_exame, 'tipo_exame');
+            validarEnum(EstadoExame, exameData.estado, 'estado');
             const anterior = await this.obterInterno(exameId);
             await this.validarAcessoPrescricao(anterior.prescricao_id, utilizador);
             await this.validarAcessoPrescricao(exameData.prescricao_id, utilizador);

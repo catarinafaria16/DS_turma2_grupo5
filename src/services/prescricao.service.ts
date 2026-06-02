@@ -3,10 +3,13 @@ import { Prescricao } from '../models/prescricao.entity.js';
 import { Utente } from '../models/utente.entity.js';
 import type { CreatePrescricaoDto } from '../dtos/prescricao/create-prescricao.dto.js';
 import type { PrescricaoResponseDto } from '../dtos/prescricao/prescricao-response.dto.js';
+import { TipoPrescricao } from '../enums/TipoPrescricao.enum.js';
+import { EstadoPrescricao } from '../enums/EstadoPrescricao.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class PrescricaoService {
     private auditoriaService: AuditoriaService;
@@ -51,6 +54,12 @@ export class PrescricaoService {
         try {
             if (prescricaoData.medico_id <= 0 || prescricaoData.utente_id <= 0) {
                 throw new Error('IDs de medico e utente devem ser validos');
+            }
+            validarEnum(TipoPrescricao, prescricaoData.tipo, 'tipo');
+            validarEnum(EstadoPrescricao, prescricaoData.estado, 'estado');
+            if (prescricaoData.data_emissao && prescricaoData.data_validade &&
+                new Date(prescricaoData.data_validade) <= new Date(prescricaoData.data_emissao)) {
+                throw new Error('Data de validade deve ser posterior a data de emissao');
             }
 
             const utente = await this.validarAcessoUtente(prescricaoData.utente_id, utilizador);
@@ -138,6 +147,12 @@ export class PrescricaoService {
         utilizador: UtilizadorAutenticado
     ): Promise<PrescricaoResponseDto> {
         try {
+            validarEnum(TipoPrescricao, prescricaoData.tipo, 'tipo');
+            validarEnum(EstadoPrescricao, prescricaoData.estado, 'estado');
+            if (prescricaoData.data_emissao && prescricaoData.data_validade &&
+                new Date(prescricaoData.data_validade) <= new Date(prescricaoData.data_emissao)) {
+                throw new Error('Data de validade deve ser posterior a data de emissao');
+            }
             const anterior = await this.obterInterna(prescricaoId);
             const utente = await this.validarAcessoUtente(anterior.utente_id, utilizador);
 

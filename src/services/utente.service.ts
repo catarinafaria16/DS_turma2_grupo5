@@ -85,7 +85,7 @@ export class UtenteService {
                 throw new Error('Utilizador associado ao utente nao encontrado');
             }
             if (utilizadorAssociado.perfil !== PerfilUtilizador.UTENTE) {
-                throw new Error('Utilizador associado deve ter perfil UTENTE');
+                throw new Error('Utilizador associado deve ter perfil utente');
             }
 
             const existeNrUtente = await this.repo.findOne({ where: { nr_utente: utenteData.nr_utente } });

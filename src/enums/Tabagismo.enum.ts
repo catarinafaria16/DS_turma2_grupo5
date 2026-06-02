@@ -1,9 +1,9 @@
 export enum Tabagismo {
-    NAO_FUMADOR = 'NAO FUMADOR',
-    EX_FUMADOR = 'EX-FUMADOR',
-    EXPOSICAO_PASSIVA = 'EXPOSICAO PASSIVA',
-    OCASIONAL = 'OCASIONAL',
-    MENOS_10_CIGARROS_DIA = 'MENOS DE 10 CIGARROS/DIA',
-    _10_A_20_CIGARROS_DIA = '10 A 20 CIGARROS/DIA',
-    MAIS_20_CIGARROS_DIA = 'MAIS DE 20 CIGARROS/DIA'
+    NAO_FUMADOR = 'nao fumador',
+    EX_FUMADOR = 'ex-fumador',
+    EXPOSICAO_PASSIVA = 'exposicao passiva',
+    OCASIONAL = 'ocasional',
+    MENOS_10_CIGARROS_DIA = 'menos de 10 cigarros/dia',
+    _10_A_20_CIGARROS_DIA = '10 a 20 cigarros/dia',
+    MAIS_20_CIGARROS_DIA = 'mais de 20 cigarros/dia'
 }

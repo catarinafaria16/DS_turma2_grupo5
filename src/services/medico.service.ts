@@ -3,10 +3,12 @@ import { Medico } from '../models/medico.entity.js';
 import { Utilizador } from '../models/utilizador.entity.js';
 import type { CreateMedicoDto } from '../dtos/medico/create-medico.dto.js';
 import type { MedicoResponseDto } from '../dtos/medico/medico-response.dto.js';
+import { EspecialidadeMedico } from '../enums/EspecialidadeMedico.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class MedicoService {
     private auditoriaService: AuditoriaService;
@@ -49,7 +51,7 @@ export class MedicoService {
             throw new Error('Utilizador associado ao medico nao encontrado');
         }
         if (utilizador.perfil !== PerfilUtilizador.MEDICO) {
-            throw new Error('Utilizador associado deve ter perfil MEDICO');
+            throw new Error('Utilizador associado deve ter perfil medico');
         }
 
         const medicoExistente = await this.repo.findOne({ where: { utilizador_id: utilizadorId } });
@@ -73,6 +75,7 @@ export class MedicoService {
             if (!medicoData.especialidade || String(medicoData.especialidade).trim().length === 0) {
                 throw new Error('Especialidade e obrigatoria');
             }
+            validarEnum(EspecialidadeMedico, medicoData.especialidade, 'especialidade');
 
             await this.validarUtilizadorAssociado(medicoData.utilizador_id);
 
@@ -150,6 +153,9 @@ export class MedicoService {
                 }
                 if (medicoData.utilizador_id !== undefined) {
                     await this.validarUtilizadorAssociado(medicoData.utilizador_id, medicoId);
+                }
+                if (medicoData.especialidade !== undefined) {
+                    validarEnum(EspecialidadeMedico, medicoData.especialidade, 'especialidade');
                 }
             }
 

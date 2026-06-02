@@ -99,10 +99,10 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.post('/api/registar', async (req, res) => {
-    const { nome, email, password, perfil } = req.body;
+    const { nome, email, password, perfil, genero } = req.body;
 
-    if (!nome || !email || !password || !perfil) {
-        return res.status(400).json({ erro: 'Nome, email, password e perfil sao obrigatorios' });
+    if (!nome || !email || !password || !perfil || !genero) {
+        return res.status(400).json({ erro: 'Nome, email, password, perfil e genero sao obrigatorios' });
     }
 
     if (password.length < 6) {
@@ -110,7 +110,12 @@ app.post('/api/registar', async (req, res) => {
     }
 
     if (perfil !== PerfilUtilizador.UTENTE) {
-        return res.status(403).json({ erro: 'Registo publico apenas permite criar utilizadores com perfil UTENTE' });
+        return res.status(403).json({ erro: 'Registo publico apenas permite criar utilizadores com perfil utente' });
+    }
+
+    const { GeneroUtilizador } = await import('./enums/GeneroUtilizador.enum.js');
+    if (!Object.values(GeneroUtilizador).includes(genero)) {
+        return res.status(400).json({ erro: `Genero invalido. Valores aceites: ${Object.values(GeneroUtilizador).join(', ')}` });
     }
 
     const utilizadorRepo = AppDataSource.getRepository(Utilizador);
@@ -120,7 +125,7 @@ app.post('/api/registar', async (req, res) => {
         return res.status(400).json({ erro: 'Email ja esta atribuido a outro utilizador' });
     }
 
-    const utilizador = utilizadorRepo.create({ nome, email, password, perfil });
+    const utilizador = utilizadorRepo.create({ nome, email, password, perfil, genero });
     const saved = await utilizadorRepo.save(utilizador);
 
     return res.status(201).json({

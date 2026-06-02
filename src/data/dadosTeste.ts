@@ -15,6 +15,7 @@ import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
 import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
+import { EspecialidadeMedico } from '../enums/EspecialidadeMedico.enum.js';
 
 // ─────────────────────────────────────────────────────────────
 //  UTILIZADORES
@@ -73,11 +74,11 @@ export const testeAdministradores = [
 ];
 
 export const testeMedicos = [
-    { id: 2026101, utilizador_id: 2026101, especialidade: 'PNEUMOLOGIA',      contacto: '+351910000101' },
-    { id: 2026102, utilizador_id: 2026102, especialidade: 'ALERGOLOGIA',      contacto: '+351910000102' },
-    { id: 2026103, utilizador_id: 2026103, especialidade: 'IMUNOALERGOLOGIA', contacto: '+351910000103' },
-    { id: 2026104, utilizador_id: 2026104, especialidade: 'MEDICINA INTERNA', contacto: '+351910000104' },
-    { id: 2026105, utilizador_id: 2026105, especialidade: 'PEDIATRIA',        contacto: '+351910000105' },
+    { id: 2026101, utilizador_id: 2026101, especialidade: EspecialidadeMedico.PNEUMOLOGIA,       contacto: '+351910000101' },
+    { id: 2026102, utilizador_id: 2026102, especialidade: EspecialidadeMedico.ALERGOLOGIA,       contacto: '+351910000102' },
+    { id: 2026103, utilizador_id: 2026103, especialidade: EspecialidadeMedico.IMUNOALERGOLOGIA,  contacto: '+351910000103' },
+    { id: 2026104, utilizador_id: 2026104, especialidade: EspecialidadeMedico.MEDICINA_INTERNA,  contacto: '+351910000104' },
+    { id: 2026105, utilizador_id: 2026105, especialidade: EspecialidadeMedico.PEDIATRIA,         contacto: '+351910000105' },
 ];
 
 // 6 utentes por médico, nr_utente = id
@@ -382,19 +383,19 @@ export const testeRespostasCarat = [
 
 // ─── AUDITORIAS ─── cobre CRIACAO, ALTERACAO, ELIMINACAO
 export const testeAuditorias = [
-    { log_id: 9001, utilizador_id: 2026001, tabela: 'utilizador',           tabela_id: 2026201, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"id":2026201,"nome":"Ana Ferreira","perfil":"UTENTE"}' },
-    { log_id: 9002, utilizador_id: 2026001, tabela: 'utilizador',           tabela_id: 2026202, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"id":2026202,"nome":"Bruno Costa","perfil":"UTENTE"}' },
+    { log_id: 9001, utilizador_id: 2026001, tabela: 'utilizador',           tabela_id: 2026201, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"id":2026201,"nome":"Ana Ferreira","perfil":"utente"}' },
+    { log_id: 9002, utilizador_id: 2026001, tabela: 'utilizador',           tabela_id: 2026202, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"id":2026202,"nome":"Bruno Costa","perfil":"utente"}' },
     { log_id: 9003, utilizador_id: 2026101, tabela: 'utente',               tabela_id: 2026201, operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"medico_id":2026102}',         valor_novo: '{"medico_id":2026101}' },
-    { log_id: 9004, utilizador_id: 2026101, tabela: 'prescricao',           tabela_id: 5001,    operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"tipo":"MEDICACAO","estado":"ATIVA"}' },
-    { log_id: 9005, utilizador_id: 2026101, tabela: 'prescricao',           tabela_id: 5013,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ATIVA"}',            valor_novo: '{"estado":"DISPENSADA"}' },
-    { log_id: 9006, utilizador_id: 2026102, tabela: 'alerta',               tabela_id: 9905,    operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"tipo":"DETERIORACAO","prioridade":"ALTA"}' },
-    { log_id: 9007, utilizador_id: 2026102, tabela: 'alerta',               tabela_id: 9904,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"NOVO"}',             valor_novo: '{"estado":"FECHADO"}' },
-    { log_id: 9008, utilizador_id: 2026103, tabela: 'sintoma',              tabela_id: 8010,    operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"descricao":"Urticaria apos contacto com latex","intensidade":"GRAVE"}' },
-    { log_id: 9009, utilizador_id: 2026201, tabela: 'sintoma',              tabela_id: 8001,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"intensidade":"LIGEIRA"}',     valor_novo: '{"intensidade":"MODERADA"}' },
-    { log_id: 9010, utilizador_id: 2026104, tabela: 'plano_acompanhamento', tabela_id: 10107,   operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ATIVO"}',            valor_novo: '{"estado":"SUSPENSO"}' },
+    { log_id: 9004, utilizador_id: 2026101, tabela: 'prescricao',           tabela_id: 5001,    operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"tipo":"medicacao","estado":"ativa"}' },
+    { log_id: 9005, utilizador_id: 2026101, tabela: 'prescricao',           tabela_id: 5013,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ativa"}',            valor_novo: '{"estado":"dispensada"}' },
+    { log_id: 9006, utilizador_id: 2026102, tabela: 'alerta',               tabela_id: 9905,    operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"tipo":"deterioracao","prioridade":"alta"}' },
+    { log_id: 9007, utilizador_id: 2026102, tabela: 'alerta',               tabela_id: 9904,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"novo"}',             valor_novo: '{"estado":"fechado"}' },
+    { log_id: 9008, utilizador_id: 2026103, tabela: 'sintoma',              tabela_id: 8010,    operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null,                            valor_novo: '{"descricao":"Urticaria apos contacto com latex","intensidade":"grave"}' },
+    { log_id: 9009, utilizador_id: 2026201, tabela: 'sintoma',              tabela_id: 8001,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"intensidade":"ligeira"}',     valor_novo: '{"intensidade":"moderada"}' },
+    { log_id: 9010, utilizador_id: 2026104, tabela: 'plano_acompanhamento', tabela_id: 10107,   operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ativo"}',            valor_novo: '{"estado":"suspenso"}' },
     { log_id: 9011, utilizador_id: 2026001, tabela: 'administrador',        tabela_id: 2026005, operacao: OperacaoAuditoria.ELIMINACAO, valor_anterior: '{"id":2026005,"nome":"Eva Rodrigues"}', valor_novo: null },
-    { log_id: 9012, utilizador_id: 2026001, tabela: 'utilizador',           tabela_id: 2026005, operacao: OperacaoAuditoria.ELIMINACAO, valor_anterior: '{"id":2026005,"nome":"Eva Rodrigues","perfil":"ADMINISTRADOR"}', valor_novo: null },
-    { log_id: 9013, utilizador_id: 2026105, tabela: 'prescricao',           tabela_id: 5017,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ATIVA"}',            valor_novo: '{"estado":"CANCELADA"}' },
-    { log_id: 9014, utilizador_id: 2026102, tabela: 'alerta',               tabela_id: 9911,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"NOVO"}',             valor_novo: '{"estado":"EM SEGUIMENTO"}' },
-    { log_id: 9015, utilizador_id: 2026103, tabela: 'plano_acompanhamento', tabela_id: 10106,   operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ATIVO"}',            valor_novo: '{"estado":"CONCLUIDO"}' },
+    { log_id: 9012, utilizador_id: 2026001, tabela: 'utilizador',           tabela_id: 2026005, operacao: OperacaoAuditoria.ELIMINACAO, valor_anterior: '{"id":2026005,"nome":"Eva Rodrigues","perfil":"administrador"}', valor_novo: null },
+    { log_id: 9013, utilizador_id: 2026105, tabela: 'prescricao',           tabela_id: 5017,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ativa"}',            valor_novo: '{"estado":"cancelada"}' },
+    { log_id: 9014, utilizador_id: 2026102, tabela: 'alerta',               tabela_id: 9911,    operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"novo"}',             valor_novo: '{"estado":"em seguimento"}' },
+    { log_id: 9015, utilizador_id: 2026103, tabela: 'plano_acompanhamento', tabela_id: 10106,   operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ativo"}',            valor_novo: '{"estado":"concluido"}' },
 ];

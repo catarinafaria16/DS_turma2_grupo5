@@ -3,10 +3,13 @@ import { Anamnese } from '../models/anamnese.entity.js';
 import { Utente } from '../models/utente.entity.js';
 import type { CreateAnamneseDto } from '../dtos/anamnese/create-anamnese.dto.js';
 import type { AnamneseResponseDto } from '../dtos/anamnese/anamnese-response.dto.js';
+import { Tabagismo } from '../enums/Tabagismo.enum.js';
+import { SexoAnamnese } from '../enums/SexoAnamnese.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { validarEnum } from '../utils/validateEnum.js';
 
 export class AnamneseService {
     private auditoriaService: AuditoriaService;
@@ -48,7 +51,12 @@ export class AnamneseService {
     async criar(anamneseData: CreateAnamneseDto, utilizador: UtilizadorAutenticado): Promise<AnamneseResponseDto> {
         try {
             if (anamneseData.utente_id <= 0) throw new Error('ID do utente deve ser valido');
+            if (!anamneseData.historico_familiar || anamneseData.historico_familiar.trim().length === 0) {
+                throw new Error('Historico familiar e obrigatorio');
+            }
             if (!anamneseData.sexo) throw new Error('Sexo da anamnese e obrigatorio');
+            validarEnum(SexoAnamnese, anamneseData.sexo, 'sexo');
+            validarEnum(Tabagismo, anamneseData.tabagismo, 'tabagismo');
             await this.validarAcessoUtente(anamneseData.utente_id, utilizador);
 
             const anamnese = this.repo.create(anamneseData);
@@ -117,6 +125,11 @@ export class AnamneseService {
         utilizador: UtilizadorAutenticado
     ): Promise<AnamneseResponseDto> {
         try {
+            if (!anamneseData.historico_familiar || anamneseData.historico_familiar.trim().length === 0) {
+                throw new Error('Historico familiar e obrigatorio');
+            }
+            validarEnum(SexoAnamnese, anamneseData.sexo, 'sexo');
+            validarEnum(Tabagismo, anamneseData.tabagismo, 'tabagismo');
             const anterior = await this.obterInterna(anamneseId);
             await this.validarAcessoUtente(anterior.utente_id, utilizador);
             await this.validarAcessoUtente(anamneseData.utente_id, utilizador);

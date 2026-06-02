@@ -1,5 +1,5 @@
 export enum IntensidadeCriseAlergia {
-    LEVE = 'LEVE',
-    MODERADA = 'MODERADA',
-    GRAVE = 'GRAVE'
+    LEVE = 'leve',
+    MODERADA = 'moderada',
+    GRAVE = 'grave'
 }
