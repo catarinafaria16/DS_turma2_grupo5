@@ -8,134 +8,183 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
+    /* ── variáveis ── */
+    :root {
+      --bg-primary:   #ffffff;
+      --bg-secondary: #f0f3f6;
+      --bg-tertiary:  #e8ecf0;
+      --bg-success:   #EAF3DE;
+      --bg-warning:   #FAEEDA;
+      --bg-danger:    #FCEBEB;
+      --bg-info:      #E6F1FB;
+      --color-primary:   #1a2d3f;
+      --color-secondary: #546170;
+      --color-tertiary:  #8794a0;
+      --color-success:   #27500A;
+      --color-warning:   #633806;
+      --color-danger:    #791F1F;
+      --color-info:      #1a3352;
+      --border-primary:  #c4ccd4;
+      --border-secondary:#ced5dc;
+      --border-tertiary: #dce2e8;
+      --topbar-bg:       #1a3352;
+      --sidebar-width:   180px;
+    }
+
+    /* ── reset ── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 14px; }
+    body { font-family: Arial, sans-serif; background: var(--bg-tertiary); color: var(--color-primary); font-size: 15px; font-weight: 400; }
 
-    header { background: #2b6cb0; color: white; padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
-    header h1 { font-size: 1.2rem; }
-    header span { font-size: 0.82rem; opacity: 0.85; }
+    /* ── layout geral ── */
+    .app-layout { display: flex; flex-direction: column; height: 100vh; }
+    .body-row   { display: flex; flex: 1; overflow: hidden; }
 
-    .tabs { background: white; border-bottom: 1px solid #ccc; display: flex; flex-wrap: wrap; padding: 0 10px; }
-    .tab { padding: 10px 14px; font-size: 1.1rem; cursor: pointer; border-bottom: 2px solid transparent; color: #555; white-space: nowrap; }
-    .tab:hover { color: #2b6cb0; }
-    .tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; font-weight: bold; }
+    /* ── topbar ── */
+    .topbar { height: 52px; background: var(--topbar-bg); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; gap: 12px; }
+    .topbar-title { font-size: 18px; font-weight: 500; color: #fff; }
+    .topbar-user  { display: flex; align-items: center; gap: 10px; }
+    .topbar-username { font-size: 14px; color: rgba(255,255,255,0.85); }
 
-    .container { max-width: 900px; margin: 20px auto; padding: 0 16px; }
-    .card { background: white; border: 1px solid #ddd; padding: 16px; margin-bottom: 16px; }
-    .card h2 { font-size: 1rem; margin-bottom: 12px; color: #2b6cb0; }
+    /* ── sidebar ── */
+    .sidebar { width: var(--sidebar-width); background: var(--bg-secondary); border-right: 0.5px solid var(--border-tertiary); flex-shrink: 0; overflow-y: auto; padding: 14px 10px; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 3px; }
+    .sidebar-item { padding: 9px 10px; border-radius: 8px; font-size: 14px; font-weight: 400; color: var(--color-secondary); cursor: pointer; border: 0.5px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-item:hover { background: var(--bg-tertiary); color: var(--color-primary); }
+    .sidebar-item.active { background: var(--bg-primary); color: var(--color-primary); font-weight: 500; border-color: var(--border-tertiary); }
 
-    form { display: flex; flex-direction: column; gap: 6px; max-width: 480px; }
-    label { font-size: 0.85rem; font-weight: bold; }
-    input, select, textarea { padding: 7px 8px; font-size: 14px; border: 1px solid #ccc; background: white; font-family: inherit; width: 100%; }
-    input:focus, select:focus, textarea:focus { outline: 2px solid #2b6cb0; }
+    /* ── conteúdo principal ── */
+    .main-content { flex: 1; background: var(--bg-tertiary); overflow-y: auto; padding: 16px; }
+
+    /* ── cards ── */
+    .card { background: var(--bg-primary); border: 0.5px solid var(--border-tertiary); border-radius: 12px; padding: 20px; margin-bottom: 14px; }
+    .card h2 { font-size: 15px; font-weight: 500; color: var(--color-primary); margin-bottom: 14px; }
+
+    /* ── formulários ── */
+    form { display: flex; flex-direction: column; gap: 8px; max-width: 680px; }
+    label { font-size: 13px; font-weight: 500; color: var(--color-secondary); }
+    input, select, textarea { padding: 9px 10px; font-size: 15px; border: 0.5px solid var(--border-secondary); border-radius: 8px; background: var(--bg-primary); font-family: inherit; width: 100%; color: var(--color-primary); }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--topbar-bg); }
     textarea { resize: vertical; min-height: 70px; }
+    .row { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+    .row input, .row select { width: 100%; }
 
-    .row { display: flex; gap: 8px; }
-    .row input, .row select { flex: 1; }
-
-    button { padding: 8px 16px; background: #2b6cb0; color: white; border: none; cursor: pointer; font-size: 14px; align-self: flex-start; }
-    button:hover { background: #1d4f86; }
+    /* ── botões ── */
+    button { padding: 8px 16px; background: #1a3352; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; align-self: flex-start; }
+    button:hover { background: #152840; }
     button:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-sec { background: transparent; color: var(--color-secondary); border: 0.5px solid var(--border-secondary); }
+    .btn-sec:hover { background: var(--bg-secondary); color: var(--color-primary); }
+    .btn-tiny { padding: 4px 10px; font-size: 13px; cursor: pointer; border: 0.5px solid var(--border-secondary); background: transparent; color: var(--color-secondary); border-radius: 8px; font-weight: 400; }
+    .btn-tiny:hover { background: var(--bg-secondary); }
+    .btn-tiny.active { background: #1a3352; color: white; border-color: #1a3352; }
 
-    .btn-sec { background: #666; }
-    .btn-sec:hover { background: #444; }
-    .btn-tiny { padding: 3px 8px; font-size: 0.78rem; cursor: pointer; border: 1px solid #ccc; background: white; color: #333; }
-    .btn-tiny:hover { background: #eee; }
-    .btn-tiny.active { background: #2b6cb0; color: white; border-color: #2b6cb0; }
+    /* ── feedback ── */
+    .erro    { color: var(--color-danger);   font-size: 13px; margin-top: 4px; }
+    .sucesso { color: var(--color-success);  font-size: 13px; margin-top: 4px; }
+    .vazio   { color: var(--color-tertiary); font-size: 15px; padding: 10px 0; }
 
-    .erro    { color: red; font-size: 0.85rem; margin-top: 4px; }
-    .sucesso { color: green; font-size: 0.85rem; margin-top: 4px; }
-    .vazio   { color: #999; font-size: 0.875rem; padding: 10px 0; }
+    /* ── tabelas ── */
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 15px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 0.5px solid var(--border-tertiary); }
+    th { background: #D6E8F7; font-weight: 500; font-size: 13px; color: #1a3352; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:hover td { background: var(--bg-secondary); }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.875rem; }
-    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; }
-    th { background: #f0f0f0; font-weight: bold; font-size: 0.78rem; text-transform: uppercase; }
-    tr:hover td { background: #fafafa; }
+    /* ── chips / badges ── */
+    .badge { display: inline-block; font-size: 12px; font-weight: 500; border-radius: 99px; padding: 3px 9px; border: 0.5px solid; }
+    .badge-blue   { background: #C4DCF5; color: #06245A; border-color: #4E83C0; }
+    .badge-green  { background: #EEE8AA; color: #0A2E0A; border-color: #228B22; }
+    .badge-yellow { background: #FFFACD; color: #3D2600; border-color: #CCCC00; }
+    .badge-orange { background: #FFE4B5; color: #3D1200; border-color: #CC7A00; }
+    .badge-red    { background: #FFDAB9; color: #5C0000; border-color: #CC0000; }
+    .badge-pink   { background: #DEC9F2; color: #2D0655; border-color: #8A4EC0; }
+    .badge-brown  { background: #D4A87A; color: #2E1203; border-color: #7A4018; }
 
-    .badge { display: inline-block; font-size: 1.1rem; font-weight: bold; }
-    .badge-blue   { color: #0d3b66; }
-    .badge-green  { color: #d4456d; }
-    .badge-orange { color: #8b6f47; }
-    .badge-red    { color: #c53030; }
-
+    /* ── filtros ── */
     .filtro-row { display: flex; gap: 8px; margin-bottom: 10px; max-width: 480px; }
     .filtro-row input { flex: 1; }
     .toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 
-    .fhir-resource { font-size: 0.72rem; font-weight: bold; font-family: monospace; padding: 2px 6px; background: #eee; color: #333; border: 1px solid #ccc; }
+    /* ── FHIR ── */
+    .fhir-resource { font-size: 12px; font-weight: 500; font-family: monospace; padding: 2px 6px; background: var(--bg-secondary); color: var(--color-primary); border: 0.5px solid var(--border-secondary); border-radius: 4px; }
     .fhir-subtabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
-    .fhir-subtab { padding: 4px 12px; font-size: 0.78rem; cursor: pointer; border: 1px solid #ccc; background: white; font-family: monospace; color: #333; }
-    .fhir-subtab:hover { background: #eee; }
-    .fhir-subtab.active { background: #2b6cb0; color: white; border-color: #2b6cb0; }
-    .url-pill { font-family: monospace; font-size: 0.78rem; background: #f5f5f5; border: 1px solid #ddd; padding: 5px 10px; color: #333; word-break: break-all; margin: 8px 0; display: flex; align-items: center; gap: 8px; }
-    .url-pill span { color: green; font-weight: bold; flex-shrink: 0; }
-    .json-box { background: #1a1a1a; color: #eee; font-family: monospace; font-size: 0.75rem; padding: 12px; overflow: auto; max-height: 420px; white-space: pre; margin-top: 8px; }
+    .fhir-subtab { padding: 4px 12px; font-size: 12px; cursor: pointer; border: 0.5px solid var(--border-secondary); background: transparent; font-family: monospace; color: var(--color-secondary); border-radius: 8px; }
+    .fhir-subtab:hover { background: var(--bg-secondary); }
+    .fhir-subtab.active { background: #1a3352; color: white; border-color: #1a3352; }
+    .url-pill { font-family: monospace; font-size: 12px; background: var(--bg-secondary); border: 0.5px solid var(--border-secondary); border-radius: 8px; padding: 5px 10px; color: var(--color-primary); word-break: break-all; margin: 8px 0; display: flex; align-items: center; gap: 8px; }
+    .url-pill span { color: var(--color-success); font-weight: 500; flex-shrink: 0; }
+    .json-box { background: #1a1a1a; color: #eee; font-family: monospace; font-size: 12px; padding: 12px; overflow: auto; max-height: 420px; white-space: pre; margin-top: 8px; border-radius: 8px; }
     .json-box .key  { color: #76e4f7; }
     .json-box .str  { color: #9ae6b4; }
     .json-box .num  { color: #fbd38d; }
     .json-box .bool { color: #f6ad55; }
     .json-box .null { color: #fc8181; }
 
+    /* ── auditoria ── */
     .audit-card { overflow: hidden; }
     .audit-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
     .audit-header h2 { margin-bottom: 4px; }
-    .audit-subtitle { color: #718096; font-size: 0.82rem; }
-    .audit-count { background: #edf2f7; color: #2d3748; border: 1px solid #d9e2ec; padding: 5px 10px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
-    .audit-filters { display: grid; grid-template-columns: minmax(150px, 1.1fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(130px, 0.8fr) minmax(130px, 0.8fr) auto; gap: 8px; align-items: end; margin-bottom: 14px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; }
-    .audit-filter label { display: block; color: #4a5568; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0; margin-bottom: 4px; }
-    .audit-filter input, .audit-filter select { height: 36px; border-color: #cbd5e0; }
-    .audit-filter-action { height: 36px; align-self: end; }
-    .audit-table-wrap { overflow-x: auto; border: 1px solid #e2e8f0; background: white; }
+    .audit-subtitle { color: var(--color-secondary); font-size: 13px; }
+    .audit-count { background: var(--bg-secondary); color: var(--color-primary); border: 0.5px solid var(--border-secondary); border-radius: 99px; padding: 4px 12px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+    .audit-filters { display: grid; grid-template-columns: minmax(150px,1.1fr) minmax(150px,1fr) minmax(150px,1fr) minmax(130px,.8fr) minmax(130px,.8fr) auto; gap: 8px; align-items: end; margin-bottom: 14px; padding: 12px; background: var(--bg-secondary); border: 0.5px solid var(--border-tertiary); border-radius: 8px; }
+    .audit-filter label { display: block; color: var(--color-tertiary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .audit-filter input, .audit-filter select { height: 32px; }
+    .audit-filter-action { height: 32px; align-self: end; }
+    .audit-table-wrap { overflow-x: auto; border: 0.5px solid var(--border-tertiary); background: var(--bg-primary); border-radius: 8px; }
     .audit-table { margin-top: 0; min-width: 860px; border-collapse: separate; border-spacing: 0; }
-    .audit-table th { background: #edf2f7; color: #2d3748; border-bottom: 1px solid #d9e2ec; padding: 10px 12px; }
-    .audit-table td { padding: 11px 12px; vertical-align: middle; color: #1a202c; }
-    .audit-table tbody tr:nth-child(even) td { background: #fbfdff; }
-    .audit-table tbody tr:hover td { background: #eef6ff; }
-    .audit-id { font-weight: 700; color: #2b6cb0; }
-    .audit-date { color: #4a5568; white-space: nowrap; }
-    .audit-code { display: inline-block; font-family: Consolas, monospace; font-size: 0.78rem; background: #f1f5f9; border: 1px solid #e2e8f0; color: #2d3748; padding: 3px 7px; }
-    .audit-user { display: inline-block; min-width: 44px; color: #2d3748; font-weight: 700; }
-    .audit-record { color: #4a5568; font-weight: 700; }
-    .audit-op { display: inline-flex; align-items: center; justify-content: center; min-width: 88px; height: 26px; padding: 0 10px; border: 1px solid transparent; font-size: 0.74rem; font-weight: 800; text-transform: uppercase; cursor: default; }
-    .audit-op-create { background: #fce7ef; color: #b8325f; border-color: #f6c6d8; }
-    .audit-op-update { background: #e6f0fb; color: #1d4f86; border-color: #c3daef; cursor: pointer; }
-    .audit-op-delete { background: #fff1f0; color: #c53030; border-color: #fed7d7; cursor: pointer; }
-    .audit-op-close { background: #4a5568; color: white; border-color: #4a5568; cursor: pointer; }
-    .audit-op-update:hover { background: #d8e8f8; color: #1d4f86; }
-    .audit-op-delete:hover { background: #ffe4e2; color: #c53030; }
-    .audit-op-close:hover { background: #2d3748; color: white; }
-    .audit-detail { border-left: 4px solid #2b6cb0; }
-    .audit-detail h3 { color: #2d3748; font-size: 1rem; margin: 0 0 4px; }
-    .audit-detail-meta { color: #718096; font-size: 0.84rem; margin-bottom: 10px; }
+    .audit-table th { background: var(--bg-secondary); color: var(--color-secondary); border-bottom: 0.5px solid var(--border-tertiary); padding: 11px 14px; font-size: 13px; }
+    .audit-table td { padding: 11px 14px; vertical-align: middle; color: var(--color-primary); font-size: 15px; }
+    .audit-table tbody tr:nth-child(even) td { background: var(--bg-secondary); }
+    .audit-table tbody tr:hover td { background: var(--bg-info); }
+    .audit-id { font-weight: 500; color: var(--color-info); }
+    .audit-date { color: var(--color-secondary); white-space: nowrap; }
+    .audit-code { display: inline-block; font-family: Consolas, monospace; font-size: 13px; background: var(--bg-secondary); border: 0.5px solid var(--border-secondary); color: var(--color-primary); padding: 2px 6px; border-radius: 4px; }
+    .audit-user   { display: inline-block; min-width: 44px; color: var(--color-primary); font-weight: 500; }
+    .audit-record { color: var(--color-secondary); font-weight: 500; }
+    .audit-op { display: inline-flex; align-items: center; justify-content: center; min-width: 96px; height: 26px; padding: 0 12px; border: 0.5px solid transparent; border-radius: 99px; font-size: 12px; font-weight: 500; cursor: default; }
+    .audit-op-create { background: var(--bg-success); color: var(--color-success); border-color: #C0DD97; }
+    .audit-op-update { background: #FFFACD; color: #3D2600; border-color: #CCCC00; cursor: pointer; }
+    .audit-op-delete { background: var(--bg-danger);  color: var(--color-danger);  border-color: #F09595; cursor: pointer; }
+    .audit-op-close  { background: var(--bg-secondary); color: var(--color-secondary); border-color: var(--border-secondary); cursor: pointer; }
+    .audit-op-update:hover { background: #EAB308; }
+    .audit-op-delete:hover { background: #ffe4e2; }
+    .audit-op-close:hover  { background: var(--bg-tertiary); }
+    .audit-detail { border-left: 2px solid #1a3352; }
+    .audit-detail h3 { color: var(--color-primary); font-size: 15px; font-weight: 500; margin: 0 0 4px; }
+    .audit-detail-meta { color: var(--color-tertiary); font-size: 13px; margin-bottom: 10px; }
     .audit-detail-table { margin-top: 8px; }
     .audit-detail-table td { word-break: break-word; }
-    .audit-before { color: #c53030; }
-    .audit-after { color: #276749; }
+    .audit-before { color: var(--color-danger); }
+    .audit-after  { color: var(--color-success); }
 
-    footer { text-align: center; padding: 16px; font-size: 0.8rem; color: #999; border-top: 1px solid #ddd; background: white; margin-top: 20px; }
+    /* ── footer ── */
+    footer { text-align: center; padding: 14px; font-size: 13px; color: var(--color-tertiary); border-top: 0.5px solid var(--border-tertiary); background: var(--bg-primary); margin-top: 8px; border-radius: 8px; }
 
+    /* ── login (componente embutido) ── */
     .login-container { max-width: 420px; margin: 60px auto; padding: 0 16px; }
-    .login-card { background: white; border: 1px solid #ddd; padding: 24px; }
-    .login-card h1 { font-size: 1.3rem; margin-bottom: 4px; text-align: center; color: #2b6cb0; }
-    .login-card .subtitulo { text-align: center; color: #666; font-size: 0.85rem; margin-bottom: 20px; }
+    .login-card { background: var(--bg-primary); border: 0.5px solid var(--border-tertiary); border-radius: 12px; padding: 24px; }
+    .login-card h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; text-align: center; color: var(--color-primary); }
+    .login-card .subtitulo { text-align: center; color: var(--color-secondary); font-size: 14px; margin-bottom: 20px; }
     .login-card form { max-width: 100%; }
-    .login-tabs { display: flex; margin-bottom: 16px; border-bottom: 1px solid #ddd; }
-    .login-tab { flex: 1; text-align: center; padding: 8px; font-size: 0.85rem; cursor: pointer; color: #555; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-    .login-tab:hover { color: #2b6cb0; }
-    .login-tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; font-weight: bold; }
-    .divider { border: none; border-top: 1px solid #ddd; margin: 16px 0; }
-    .registo-box { background: #f9f9f9; border: 1px solid #eee; padding: 12px; }
-    .registo-box h3 { font-size: 0.9rem; margin-bottom: 10px; }
-    .logout-btn { background: #c53030; }
-    .logout-btn:hover { background: #9b2c2c; }
+    .login-tabs { display: flex; margin-bottom: 16px; border-bottom: 0.5px solid var(--border-tertiary); }
+    .login-tab { flex: 1; text-align: center; padding: 8px; font-size: 15px; cursor: pointer; color: var(--color-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .login-tab:hover { color: var(--color-primary); }
+    .login-tab.active { color: #1a3352; border-bottom-color: #1a3352; font-weight: 500; }
+    .divider { border: none; border-top: 0.5px solid var(--border-tertiary); margin: 16px 0; }
+    .registo-box { background: var(--bg-secondary); border: 0.5px solid var(--border-tertiary); border-radius: 8px; padding: 12px; }
+    .registo-box h3 { font-size: 15px; font-weight: 500; margin-bottom: 10px; }
+    .logout-btn { background: rgba(255,255,255,0.15) !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.6) !important; font-size: 14px !important; padding: 5px 12px !important; }
+    .logout-btn:hover { background: rgba(255,255,255,0.28) !important; }
     .user-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .token-info { font-family: monospace; font-size: 0.7rem; background: #f0f0f0; padding: 4px 8px; color: #555; word-break: break-all; margin-top: 4px; }
+    .token-info { font-family: monospace; font-size: 11px; background: rgba(255,255,255,0.1); padding: 3px 8px; color: rgba(255,255,255,0.7); word-break: break-all; margin-top: 4px; border-radius: 4px; }
+
+    /* ── responsivo ── */
     @media (max-width: 900px) {
       .audit-header { flex-direction: column; }
       .audit-filters { grid-template-columns: 1fr 1fr; }
       .audit-filter-action { width: 100%; }
     }
     @media (max-width: 560px) {
+      .sidebar { display: none; }
       .audit-filters { grid-template-columns: 1fr; }
     }
   </style>
@@ -365,7 +414,7 @@
                   required
                   autoFocus
                 />
-                <p style={{fontSize:'0.72rem', color:'#718096', marginTop:'2px'}}>
+                <p style={{fontSize:'0.72rem', color:'var(--color-secondary)', marginTop:'2px'}}>
                   Ex: eyJpZCI6MSwiZW1haWwiOiJqb2FvLmFkbWluQGhvc3BpdGFsLnB0IiwicGVyZmlsIjoiQURNSU5JU1RSQURPUiJ9
                 </p>
                 <button type="submit" style={{width:'100%'}} disabled={loading}>
@@ -374,7 +423,7 @@
                 {erro && <p className="erro">{erro}</p>}
                 <div className="registo-box" style={{marginTop:'12px'}}>
                   <h3>Tokens de teste</h3>
-                  <p style={{fontSize:'0.7rem', color:'#718096', marginBottom:'6px'}}>Clique para preencher automaticamente:</p>
+                  <p style={{fontSize:'0.7rem', color:'var(--color-secondary)', marginBottom:'6px'}}>Clique para preencher automaticamente:</p>
                   <button type="button" className="btn-tiny" style={{marginRight:'4px', marginBottom:'4px'}}
                     onClick={() => setTokenInput('eyJpZCI6MSwiZW1haWwiOiJqb2FvLmFkbWluQGhvc3BpdGFsLnB0IiwicGVyZmlsIjoiQURNSU5JU1RSQURPUiJ9')}>
                     Admin (ID 1)
@@ -404,7 +453,7 @@
       const [passwordForm, setPasswordForm] = useState({ password: '', confirmar: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
-      const perfilBadge = { UTENTE: 'badge-green', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-orange' };
+      const perfilBadge = { UTENTE: 'badge-pink', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-brown' };
       function setPassword(f) { return e => setPasswordForm(p => ({ ...p, [f]: e.target.value })); }
       async function atualizarPassword(e) {
         e.preventDefault(); setErro(''); setSucesso('');
@@ -471,7 +520,7 @@
         if (r.ok) { setForm({ nome: '', email: '', password: '', perfil: 'UTENTE', genero: '' }); setSucesso(`Utilizador criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar utilizador.');
       }
-      const perfilBadge = { UTENTE: 'badge-green', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-orange' };
+      const perfilBadge = { UTENTE: 'badge-pink', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-brown' };
       return (
         <>
           <div className="card">
@@ -581,7 +630,7 @@
                       <td>{a.id}</td>
                       <td>{utilizador?.nome || '—'}</td>
                       <td>{utilizador?.email || '—'}</td>
-                      <td><span className="badge badge-orange">{a.utilizador_id}</span></td>
+                      <td><span className="badge badge-brown">{a.utilizador_id}</span></td>
                     </tr>
                   );
                 })}</tbody>
@@ -1039,7 +1088,7 @@
                     <tr><td><strong>Password</strong></td><td>********</td></tr>
                     <tr><td><strong>Nome</strong></td><td>{user.nome || '—'}</td></tr>
                     <tr><td><strong>E-mail</strong></td><td>{user.email || '—'}</td></tr>
-                    <tr><td><strong>Perfil</strong></td><td><span className="badge badge-green">{user.perfil}</span></td></tr>
+                    <tr><td><strong>Perfil</strong></td><td><span className="badge badge-pink">{user.perfil}</span></td></tr>
                     <tr><td><strong>Nº Utente</strong></td><td>{utenteAutenticado.nr_utente || '—'}</td></tr>
                     <tr><td><strong>Data Nascimento</strong></td><td>{utenteAutenticado.data_nascimento ? new Date(utenteAutenticado.data_nascimento).toLocaleDateString('pt-PT') : '—'}</td></tr>
                     <tr><td><strong>Morada</strong></td><td>{utenteAutenticado.morada || '—'}</td></tr>
@@ -1124,7 +1173,7 @@
                 <input type="number" value={form.nr_faturacao} onChange={set('nr_faturacao')} placeholder="Nº faturação" required />
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:4}}>
-                <span style={{fontSize:'0.82rem',color:'#718096',fontWeight:600}}>Data de nascimento</span>
+                <span style={{fontSize:'0.82rem',color:'var(--color-secondary)',fontWeight:500}}>Data de nascimento</span>
                 <input type="date" value={form.data_nascimento} onChange={set('data_nascimento')} required />
               </div>
               <input value={form.morada} onChange={set('morada')} placeholder="Morada" required />
@@ -1329,7 +1378,7 @@
         setFormExame({ tipo_exame: 'ESPIROMETRIA', consentimento: 'true' });
         setSucesso('Prescrição criada com sucesso.'); buscar();
       }
-      const estadoBadge = { ATIVA: 'badge-green', DISPENSADA: 'badge-orange', CANCELADA: 'badge-red' };
+      const estadoBadge = { ATIVA: 'badge-green', DISPENSADA: 'badge-yellow', CANCELADA: 'badge-red' };
       const prescricoesFiltradas = prescricoes.filter(p => {
         const matchUtente = !utenteSelecionado || String(p.utente_id) === String(utenteSelecionado);
         const matchTipo = !tipoFiltro || p.tipo === tipoFiltro;
@@ -1408,16 +1457,16 @@
               </div>
               <div className="row">
                 <div style={{display:'flex',flexDirection:'column',flex:1,gap:4}}>
-                  <span style={{fontSize:'0.82rem',color:'#718096',fontWeight:600}}>Data de emissão</span>
-                  <input type="date" value={new Date().toISOString().split('T')[0]} readOnly style={{background:'#edf2f7',cursor:'default',color:'#718096'}} />
+                  <span style={{fontSize:'0.82rem',color:'var(--color-secondary)',fontWeight:500}}>Data de emissão</span>
+                  <input type="date" value={new Date().toISOString().split('T')[0]} readOnly style={{background:'var(--bg-secondary)',cursor:'default',color:'var(--color-tertiary)'}} />
                 </div>
                 <div style={{display:'flex',flexDirection:'column',flex:1,gap:4}}>
-                  <span style={{fontSize:'0.82rem',color:'#718096',fontWeight:600}}>Data de validade</span>
+                  <span style={{fontSize:'0.82rem',color:'var(--color-secondary)',fontWeight:500}}>Data de validade</span>
                   <input type="date" value={form.data_validade} onChange={set('data_validade')} required />
                 </div>
               </div>
               {form.tipo === 'MEDICACAO' && (<>
-                <hr style={{margin:'12px 0', border:'none', borderTop:'1px solid #e2e8f0'}} />
+                <hr style={{margin:'12px 0', border:'none', borderTop:'0.5px solid var(--border-tertiary)'}} />
                 <input
                   list="sugestoes-medicamentos"
                   value={formMed.nome}
@@ -1469,7 +1518,7 @@
                 <input value={formMed.duracao} onChange={setMed('duracao')} placeholder="Duração (ex: 7 dias)" required />
               </>)}
               {form.tipo === 'EXAME' && (<>
-                <hr style={{margin:'12px 0', border:'none', borderTop:'1px solid #e2e8f0'}} />
+                <hr style={{margin:'12px 0', border:'none', borderTop:'0.5px solid var(--border-tertiary)'}} />
                 <input
                   list="sugestoes-exames"
                   value={formExame.tipo_exame}
@@ -1497,7 +1546,7 @@
             <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.45)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000}}>
               <div className="card" style={{maxWidth:'360px',width:'90%',margin:0}}>
                 <h3 style={{marginBottom:'0.5rem'}}>Confirmar identidade</h3>
-                <p style={{fontSize:'0.9rem',color:'#4a5568',marginBottom:'1rem'}}>Introduza a sua password para confirmar a criação da prescrição.</p>
+                <p style={{fontSize:'0.9rem',color:'var(--color-secondary)',marginBottom:'1rem'}}>Introduza a sua password para confirmar a criação da prescrição.</p>
                 <input
                   type="password"
                   value={confirmPass}
@@ -1541,7 +1590,7 @@
                     <td><span className={`badge ${estadoBadge[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
                     <td>{p.data_emissao ? new Date(p.data_emissao).toLocaleDateString('pt-PT') : '—'}</td>
                     <td>{p.data_validade ? new Date(p.data_validade).toLocaleDateString('pt-PT') : '—'}</td>
-                    <td><span className="badge badge-green">{p.utente_id}</span></td>
+                    <td><span className="badge badge-pink">{p.utente_id}</span></td>
                     <td><span className="badge badge-blue">{p.medico_id}</span></td>
                   </tr>
                 ))}</tbody>
@@ -1645,7 +1694,7 @@
         if (r.ok) { setFormMedicacao({ nome: '', dose: '', duracao: '', periodicidade: '' }); setSucessoFicha('Medicação habitual adicionada.'); abrirFicha(fichaId); }
         else setErroFicha(r.data.erro || 'Erro ao adicionar medicação habitual.');
       }
-      const ib = { LEVE: 'badge-green', MODERADA: 'badge-orange', GRAVE: 'badge-red' };
+      const ib = { LEVE: 'badge-green', MODERADA: 'badge-yellow', GRAVE: 'badge-red' };
       const utentesSemAnamnese = utentes.filter(u => !anamneses.some(a => a.utente_id === u.id));
       return (
         <>
@@ -1711,7 +1760,7 @@
             </div>
           )}
           {fichaId && (
-            <div className="card" style={{borderLeft:'3px solid #2b6cb0'}}>
+            <div className="card" style={{borderLeft:'2px solid #1a3352'}}>
               <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem'}}>
                 <h2 style={{margin:0}}>Ficha de Anamnese #{fichaId}</h2>
                 <button type="button" className="btn-sec" style={{fontSize:'0.78rem', padding:'5px 12px'}} onClick={() => { setFichaId(''); setAlergiasFicha([]); setComorbidadesFicha([]); setMedicacoesFicha([]); }}>Fechar</button>
@@ -1758,7 +1807,7 @@
                 )}
               </div>
 
-              <hr style={{border:'none', borderTop:'1px solid #e2e8f0', margin:'0 0 1.25rem 0'}} />
+              <hr style={{border:'none', borderTop:'0.5px solid var(--border-tertiary)', margin:'0 0 1.25rem 0'}} />
 
               <div>
                 <h3 style={{fontSize:'0.9rem', color:'#553c9a', marginBottom:'0.5rem', display:'flex', alignItems:'center', gap:'6px'}}>
@@ -1788,7 +1837,7 @@
                 )}
               </div>
 
-              <hr style={{border:'none', borderTop:'1px solid #e2e8f0', margin:'0 0 1.25rem 0'}} />
+              <hr style={{border:'none', borderTop:'0.5px solid var(--border-tertiary)', margin:'0 0 1.25rem 0'}} />
 
               <div>
                 <h3 style={{fontSize:'0.9rem', color:'#276749', marginBottom:'0.5rem', display:'flex', alignItems:'center', gap:'6px'}}>
@@ -1837,7 +1886,7 @@
                 <thead><tr><th>#</th><th>Utente ID</th><th>Sexo</th><th>Tabagismo</th><th>Histórico Familiar</th><th>Ações</th></tr></thead>
                 <tbody>{anamneses.map(a => (
                   <tr key={a.id}><td>{a.id}</td>
-                    <td><span className="badge badge-green">{a.utente_id}</span></td>
+                    <td><span className="badge badge-pink">{a.utente_id}</span></td>
                     <td>{a.sexo || '—'}</td>
                     <td><span className="badge badge-orange">{a.tabagismo}</span></td>
                     <td style={{maxWidth:'220px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.historico_familiar}</td>
@@ -1895,7 +1944,7 @@
         if (r.ok) { setForm({ anamnese_id: '', descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' }); setSucesso(`Alergia criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
         else setErro(r.data.erro || 'Erro ao criar alergia.');
       }
-      const ib = { LEVE: 'badge-green', MODERADA: 'badge-orange', GRAVE: 'badge-red' };
+      const ib = { LEVE: 'badge-green', MODERADA: 'badge-yellow', GRAVE: 'badge-red' };
       return (
         <>
           {user?.perfil !== 'ADMINISTRADOR' && (
@@ -2121,7 +2170,7 @@
         if (r.ok) { setForm({ utente_id: '', descricao: '', intensidade: 'LIGEIRA', duracao: '' }); setSucesso(`Sintoma registado com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
         else setErro(r.data.erro || 'Erro ao registar sintoma.');
       }
-      const ib = { LIGEIRA: 'badge-green', MODERADA: 'badge-orange', GRAVE: 'badge-red' };
+      const ib = { LIGEIRA: 'badge-green', MODERADA: 'badge-yellow', GRAVE: 'badge-red' };
       function dataSintoma(sintoma) {
         const data = sintoma.data_registo ? new Date(sintoma.data_registo).getTime() : 0;
         return Number.isNaN(data) ? 0 : data;
@@ -2235,7 +2284,7 @@
                 <thead><tr><th>#</th><th>Utente</th><th>Descrição</th><th>Intensidade</th><th>Duração</th><th>Data</th></tr></thead>
                 <tbody>{sintomasFiltrados.map(s => (
                   <tr key={s.id}><td>{s.id}</td>
-                    <td><span className="badge badge-green">{s.utente_id}</span></td>
+                    <td><span className="badge badge-pink">{s.utente_id}</span></td>
                     <td>{s.descricao}</td>
                     <td><span className={`badge ${ib[s.intensidade] || 'badge-blue'}`}>{s.intensidade}</span></td>
                     <td>{s.duracao}</td>
@@ -2373,7 +2422,7 @@
         if (r.ok) { setForm({ prescricao_id: '', tipo_exame: '', resultado: '{}', consentimento: 'true', estado: 'PENDENTE' }); setSucesso(`Exame criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
         else setErro(r.data.erro || 'Erro ao criar exame.');
       }
-      const eb = { PENDENTE: 'badge-orange', REALIZADO: 'badge-blue', ANALISADO: 'badge-green', CANCELADO: 'badge-red' };
+      const eb = { PENDENTE: 'badge-orange', REALIZADO: 'badge-green', ANALISADO: 'badge-yellow', CANCELADO: 'badge-red' };
       return (
         <>
           <div className="card">
@@ -2497,8 +2546,8 @@
         setSucesso(`Alerta #${alertaId} atualizado com sucesso.`);
         buscar();
       }
-      const eb = { NOVO: 'badge-red', VISTO: 'badge-orange', 'EM SEGUIMENTO': 'badge-blue', FECHADO: 'badge-green' };
-      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-blue', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
+      const eb = { NOVO: 'badge-green', VISTO: 'badge-yellow', 'EM SEGUIMENTO': 'badge-orange', FECHADO: 'badge-red' };
+      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-yellow', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
       const podeCriarAlerta = user?.perfil !== 'MEDICO' && user?.perfil !== 'ADMINISTRADOR';
       const podeEditarAlertas = user?.perfil === 'MEDICO';
       const alertasFiltrados = alertas.filter(a => {
@@ -2566,7 +2615,7 @@
                 <thead><tr><th>#</th><th>Utente</th><th>Médico</th><th>Tipo</th><th>Estado</th><th>Prioridade</th>{podeEditarAlertas && <th>Nota</th>}{podeEditarAlertas && <th>Ações</th>}</tr></thead>
                 <tbody>{alertasFiltrados.map(a => (
                   <tr key={a.id}><td>{a.id}</td>
-                    <td><span className="badge badge-green">{a.utente_id}</span></td>
+                    <td><span className="badge badge-pink">{a.utente_id}</span></td>
                     <td><span className="badge badge-blue">{a.medico_id}</span></td>
                     <td>{a.tipo}</td>
                     <td>{podeEditarAlertas ? (
@@ -2632,18 +2681,18 @@
         if (r.ok) { setForm(initForm()); setSucesso(`Regra criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar regra de alerta.');
       }
-      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-blue', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
+      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-yellow', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
       return (
         <>
           <div className="card">
             <h2>Nova Regra de Alerta</h2>
-            <p style={{fontSize:'0.8rem',color:'#718096',marginBottom:'8px'}}>
+            <p style={{fontSize:'0.8rem',color:'var(--color-secondary)',marginBottom:'8px'}}>
               As regras permitem definir limiares personalizados. Deixe "Utente" vazio para aplicar a <strong>todos os utentes</strong> do médico.
             </p>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                {isMedico && <input type="number" min="1" value={form.medico_id} readOnly style={{background:'#f7f8fa',color:'#718096',cursor:'default'}} placeholder="ID do médico" />}
-                {isAdmin && <input type="number" min="1" value={form.administrador_id} readOnly style={{background:'#f7f8fa',color:'#718096',cursor:'default'}} placeholder="ID do administrador" />}
+                {isMedico && <input type="number" min="1" value={form.medico_id} readOnly style={{background:'var(--bg-secondary)',color:'var(--color-tertiary)',cursor:'default'}} placeholder="ID do médico" />}
+                {isAdmin && <input type="number" min="1" value={form.administrador_id} readOnly style={{background:'var(--bg-secondary)',color:'var(--color-tertiary)',cursor:'default'}} placeholder="ID do administrador" />}
               </div>
               <select value={form.utente_id} onChange={set('utente_id')}>
                 <option value="">— Aplicar a todos os utentes do médico —</option>
@@ -2651,7 +2700,7 @@
               </select>
               <div className="row">
                 <div style={{flex:1}}>
-                  <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>Tipo de alerta</label>
+                  <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>Tipo de alerta</label>
                   <select value={form.categoria} onChange={set('categoria')} style={{width:'100%'}}>
                     <option value="LIMIAR_SCORE">Limiar de Score</option>
                     <option value="DETERIORACAO">Valor de Deterioração</option>
@@ -2662,7 +2711,7 @@
                   </span>
                 </div>
                 <div style={{flex:1}}>
-                  <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>Prioridade</label>
+                  <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>Prioridade</label>
                   <select value={form.prioridade} onChange={set('prioridade')} style={{width:'100%'}}>
                     <option value="BAIXA">Baixa</option>
                     <option value="MEDIA">Média</option>
@@ -2679,13 +2728,13 @@
               </div>
               {form.categoria === 'LIMIAR_SCORE' && (
               <div style={{marginBottom:'10px'}}>
-                <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>Limiar score — alerta se score ≤ este valor</label>
+                <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>Limiar score — alerta se score ≤ este valor</label>
                 <input type="number" value={form.limiar_score} onChange={set('limiar_score')} placeholder="Ex: 20 (parcialmente controlada)" required style={{width:'100%'}} />
               </div>
               )}
               {form.categoria === 'DETERIORACAO' && (
               <div style={{marginBottom:'10px'}}>
-                <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>Valor de deterioração — alerta se a diferença entre avaliações for ≥ este valor</label>
+                <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>Valor de deterioração — alerta se a diferença entre avaliações for ≥ este valor</label>
                 <input type="number" value={form.valor_deterioracao} onChange={set('valor_deterioracao')} placeholder="Ex: 5" required style={{width:'100%'}} />
               </div>
               )}
@@ -2696,7 +2745,7 @@
           </div>
           <div className="card">
             <h2>Regras de Alerta</h2>
-            <p style={{fontSize:'0.78rem',color:'#718096',marginBottom:'8px'}}>
+            <p style={{fontSize:'0.78rem',color:'var(--color-secondary)',marginBottom:'8px'}}>
               Nota: os alertas CARAT são também criados automaticamente (score &lt; 16 = MUITO ALTA, score 16–20 = ALTA), independentemente das regras abaixo.
             </p>
             {regras.length === 0 ? <p className="vazio">Nenhuma regra registada.</p> : (
@@ -2705,8 +2754,8 @@
                 <tbody>{regras.map(r => (
                   <tr key={r.id}><td>{r.id}</td>
                     <td><span className="badge badge-blue">{r.medico_id}</span></td>
-                    <td><span className="badge badge-orange">{r.administrador_id}</span></td>
-                    <td>{r.utente_id ? <span className="badge badge-green">{r.utente_id}</span> : <span style={{color:'#a0aec0',fontSize:'0.78rem'}}>todos</span>}</td>
+                    <td><span className="badge badge-brown">{r.administrador_id}</span></td>
+                    <td>{r.utente_id ? <span className="badge badge-pink">{r.utente_id}</span> : <span style={{color:'#a0aec0',fontSize:'0.78rem'}}>todos</span>}</td>
                     <td>{r.categoria}</td>
                     <td>{r.limiar_score}</td>
                     <td><span className={`badge ${pb[r.prioridade] || 'badge-blue'}`}>{r.prioridade}</span></td>
@@ -2862,25 +2911,25 @@
               <form onSubmit={handleSubmit}>
                 <div className="row">
                   <input type="number" value={form.avaliacao_id} onChange={set('avaliacao_id')} placeholder="ID da avaliação CARAT" min="1" required />
-                  <input type="number" value={form.utente_id} readOnly placeholder="ID do utente" style={{background:'#f7f8fa',color:'#718096',cursor:'default'}} />
+                  <input type="number" value={form.utente_id} readOnly placeholder="ID do utente" style={{background:'var(--bg-secondary)',color:'var(--color-tertiary)',cursor:'default'}} />
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:4}}>
-                  <span style={{fontSize:'0.82rem',color:'#718096',fontWeight:600}}>Data da avaliação</span>
-                  <input type="datetime-local" value={form.data_avaliacao} readOnly style={{background:'#f7f8fa',color:'#718096',cursor:'default'}} />
+                  <span style={{fontSize:'0.82rem',color:'var(--color-secondary)',fontWeight:500}}>Data da avaliação</span>
+                  <input type="datetime-local" value={form.data_avaliacao} readOnly style={{background:'var(--bg-secondary)',color:'var(--color-tertiary)',cursor:'default'}} />
                 </div>
-                <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Respostas às perguntas 1–9 (nas últimas 4 semanas):</p>
+                <p style={{fontSize:'0.8rem',color:'var(--color-secondary)',margin:'6px 0 2px'}}>Respostas às perguntas 1–9 (nas últimas 4 semanas):</p>
                 <div style={{display:'flex',flexDirection:'column',gap:'6px',maxWidth:'480px'}}>
                   {[1,2,3,4,5,6,7,8,9].map(n => (
                     <div key={n}>
-                      <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>{n}. {PERGUNTAS_1_9[n-1]}</label>
+                      <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>{n}. {PERGUNTAS_1_9[n-1]}</label>
                       <select value={form[`r${n}`]} onChange={set(`r${n}`)} style={{width:'100%'}}>
                         {R1_9.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
                       </select>
                     </div>
                   ))}
                 </div>
-                <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Pergunta 10 — Utilização de medicamentos (nas últimas 4 semanas):</p>
-                <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>10. Aumentar a utilização dos seus medicamentos por causa das suas doenças alérgicas respiratórias (asma/rinite/alergia)?</label>
+                <p style={{fontSize:'0.8rem',color:'var(--color-secondary)',margin:'6px 0 2px'}}>Pergunta 10 — Utilização de medicamentos (nas últimas 4 semanas):</p>
+                <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>10. Aumentar a utilização dos seus medicamentos por causa das suas doenças alérgicas respiratórias (asma/rinite/alergia)?</label>
                 <select value={form.r10} onChange={set('r10')} style={{maxWidth:'480px'}}>
                   {R10.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
                 </select>
@@ -2941,7 +2990,7 @@
                 <thead><tr><th>#</th><th>Utente</th><th>Avaliação</th><th>Score</th><th>Interpretação</th><th>Recomendação</th><th>Data</th></tr></thead>
                 <tbody>{respostasFiltradas.map(r => (
                   <tr key={r.id}><td>{r.id}</td>
-                    <td><span className="badge badge-green">{r.utente_id}</span></td>
+                    <td><span className="badge badge-pink">{r.utente_id}</span></td>
                     <td><span className="badge badge-blue">{r.avaliacao_id}</span></td>
                     <td><span className={`badge ${scoreBadge(r.score_total)}`}>{r.score_total}/30</span></td>
                     <td>{r.interpretacao}</td>
@@ -2965,22 +3014,22 @@
                 <input type="number" value={form.utente_id} onChange={set('utente_id')} placeholder="ID do utente" min="1" required />
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:4}}>
-                <span style={{fontSize:'0.82rem',color:'#718096',fontWeight:600}}>Data da avaliação</span>
-                <input type="datetime-local" value={form.data_avaliacao} readOnly style={{background:'#f7f8fa',color:'#718096',cursor:'default'}} />
+                <span style={{fontSize:'0.82rem',color:'var(--color-secondary)',fontWeight:500}}>Data da avaliação</span>
+                <input type="datetime-local" value={form.data_avaliacao} readOnly style={{background:'var(--bg-secondary)',color:'var(--color-tertiary)',cursor:'default'}} />
               </div>
-              <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Respostas às perguntas 1–9 (nas últimas 4 semanas):</p>
+              <p style={{fontSize:'0.8rem',color:'var(--color-secondary)',margin:'6px 0 2px'}}>Respostas às perguntas 1–9 (nas últimas 4 semanas):</p>
               <div style={{display:'flex',flexDirection:'column',gap:'6px',maxWidth:'480px'}}>
                 {[1,2,3,4,5,6,7,8,9].map(n => (
                   <div key={n}>
-                    <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>{n}. {PERGUNTAS_1_9[n-1]}</label>
+                    <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>{n}. {PERGUNTAS_1_9[n-1]}</label>
                     <select value={form[`r${n}`]} onChange={set(`r${n}`)} style={{width:'100%'}}>
                       {R1_9.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
                     </select>
                   </div>
                 ))}
               </div>
-              <p style={{fontSize:'0.8rem',color:'#718096',margin:'6px 0 2px'}}>Pergunta 10 — Utilização de medicamentos (nas últimas 4 semanas):</p>
-              <label style={{fontSize:'0.78rem',color:'#4a5568',display:'block',marginBottom:'2px'}}>10. Aumentar a utilização dos seus medicamentos por causa das suas doenças alérgicas respiratórias (asma/rinite/alergia)?</label>
+              <p style={{fontSize:'0.8rem',color:'var(--color-secondary)',margin:'6px 0 2px'}}>Pergunta 10 — Utilização de medicamentos (nas últimas 4 semanas):</p>
+              <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>10. Aumentar a utilização dos seus medicamentos por causa das suas doenças alérgicas respiratórias (asma/rinite/alergia)?</label>
               <select value={form.r10} onChange={set('r10')} style={{maxWidth:'480px'}}>
                 {R10.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
               </select>
@@ -3007,7 +3056,7 @@
                 <thead><tr><th>#</th><th>Utente</th><th>Avaliação</th><th>Score</th><th>Interpretação</th><th>Recomendação</th><th>Data</th></tr></thead>
                 <tbody>{respostasFiltradas.map(r => (
                   <tr key={r.id}><td>{r.id}</td>
-                    <td><span className="badge badge-green">{r.utente_id}</span></td>
+                    <td><span className="badge badge-pink">{r.utente_id}</span></td>
                     <td><span className="badge badge-blue">{r.avaliacao_id}</span></td>
                     <td><span className={`badge ${scoreBadge(r.score_total)}`}>{r.score_total}/30</span></td>
                     <td>{r.interpretacao}</td>
@@ -3109,7 +3158,7 @@
           setErro(r.data.erro || 'Erro ao atualizar plano.');
         }
       }
-      const eb = { ATIVO: 'badge-green', CONCLUIDO: 'badge-blue', SUSPENSO: 'badge-orange', CANCELADO: 'badge-red' };
+      const eb = { ATIVO: 'badge-yellow', CONCLUIDO: 'badge-green', SUSPENSO: 'badge-orange', CANCELADO: 'badge-red' };
       const utenteAutenticado = user?.perfil === 'UTENTE'
         ? utentes.find(u => u.utilizador_id === user.id) ?? null
         : null;
@@ -3152,7 +3201,7 @@
                 <tbody>{planos.map(p => (
                   <tr key={p.id}><td>{p.id}</td>
                     <td><span className="badge badge-blue">{p.medico_id}</span></td>
-                    <td><span className="badge badge-green">{p.utente_id}</span></td>
+                    <td><span className="badge badge-pink">{p.utente_id}</span></td>
                     <td>{p.frequencia_avaliacao}</td>
                     <td><span className={`badge ${eb[p.estado] || 'badge-blue'}`}>{p.estado}</span></td>
                     <td>{p.data_inicio ? new Date(p.data_inicio).toLocaleDateString('pt-PT') : '—'}</td>
@@ -3198,11 +3247,11 @@
               </div>
               <div className="row">
                 <div style={{display:'flex',flexDirection:'column',flex:1,gap:4}}>
-                  <span style={{fontSize:'0.82rem',color:'#718096',fontWeight:600}}>Data de início</span>
+                  <span style={{fontSize:'0.82rem',color:'var(--color-secondary)',fontWeight:500}}>Data de início</span>
                   <input type="date" value={form.data_inicio} onChange={set('data_inicio')} required />
                 </div>
                 <div style={{display:'flex',flexDirection:'column',flex:1,gap:4}}>
-                  <span style={{fontSize:'0.82rem',color:'#718096',fontWeight:600}}>Data de fim</span>
+                  <span style={{fontSize:'0.82rem',color:'var(--color-secondary)',fontWeight:500}}>Data de fim</span>
                   <input type="date" value={form.data_fim} onChange={set('data_fim')} required />
                 </div>
               </div>
@@ -3226,7 +3275,7 @@
                     <tr key={p.id}>
                       <td>{p.id}</td>
                       <td><span className="badge badge-blue">{p.medico_id}</span></td>
-                      <td><span className="badge badge-green">{p.utente_id}</span></td>
+                      <td><span className="badge badge-pink">{p.utente_id}</span></td>
                       {emEdicao ? <>
                         <td><input value={ed.frequencia_avaliacao || ''} onChange={setEdicaoPlano(p.id, 'frequencia_avaliacao')} /></td>
                         <td>
@@ -3463,7 +3512,7 @@
         <>
           <div className="card" style={{marginBottom:'0.5rem'}}>
             <h2>Interoperabilidade FHIR R4</h2>
-            <p style={{fontSize:'0.85rem', color:'#718096', marginBottom:'0.75rem'}}>Consulta de recursos FHIR expostos pela API. Cada endpoint devolve JSON conforme a especificação HL7 FHIR R4.</p>
+            <p style={{fontSize:'0.85rem', color:'var(--color-secondary)', marginBottom:'0.75rem'}}>Consulta de recursos FHIR expostos pela API. Cada endpoint devolve JSON conforme a especificação HL7 FHIR R4.</p>
             <div className="fhir-subtabs">
               {SUBTABS.map(s => <div key={s} className={`fhir-subtab${subtab === s ? ' active' : ''}`} onClick={() => setSubtab(s)}>{s}</div>)}
             </div>
@@ -3562,9 +3611,9 @@
         'Doenca parcialmente controlada': 'Parcialmente controlada',
         'Doenca mal controlada': 'Mal controlada'
       };
-      const eb = { NOVO: 'badge-red', VISTO: 'badge-orange', 'EM SEGUIMENTO': 'badge-blue', FECHADO: 'badge-green' };
-      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-blue', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
-      const ib = { LIGEIRA: 'badge-green', MODERADA: 'badge-orange', GRAVE: 'badge-red' };
+      const eb = { NOVO: 'badge-green', VISTO: 'badge-yellow', 'EM SEGUIMENTO': 'badge-orange', FECHADO: 'badge-red' };
+      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-yellow', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
+      const ib = { LIGEIRA: 'badge-green', MODERADA: 'badge-yellow', GRAVE: 'badge-red' };
 
       return (
         <>
@@ -3595,23 +3644,23 @@
 
           {dashboard && (
             <>
-              <div className="card" style={{borderLeft:`3px solid ${dashboard.estado_doenca === 'Doenca bem controlada' ? '#276749' : dashboard.estado_doenca === 'Doenca parcialmente controlada' ? '#c05621' : '#c53030'}`}}>
-                <h2>Estado Atual da Doença</h2>
+              <div className="card" style={{borderLeft:`2px solid ${dashboard.estado_doenca === 'Doenca bem controlada' ? '#639922' : dashboard.estado_doenca === 'Doenca parcialmente controlada' ? '#BA7517' : '#E24B4A'}`}}>
+                <h2>Estado atual da doença</h2>
                 <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'0.75rem', flexWrap:'wrap'}}>
-                  <span className={`badge ${estadoBadge[dashboard.estado_doenca] || 'badge-blue'}`} style={{fontSize:'0.85rem', padding:'4px 14px'}}>
+                  <span className={`badge ${estadoBadge[dashboard.estado_doenca] || 'badge-blue'}`}>
                     {estadoLabel[dashboard.estado_doenca] || dashboard.estado_doenca || 'Sem avaliação'}
                   </span>
-                  <span style={{fontSize:'0.82rem', color:'#718096'}}>Limiar de controlo: <strong>{dashboard.limiar_controlo}/30</strong></span>
+                  <span style={{fontSize:'11px', color:'var(--color-secondary)'}}>Limiar de controlo: <strong>{dashboard.limiar_controlo}/30</strong></span>
                   {dashboard.historico_avaliacoes?.length > 0 && (
-                    <span style={{fontSize:'0.82rem', color:'#718096'}}>
-                      Último score: <strong style={{color: dashboard.historico_avaliacoes[0].score >= 21 ? '#276749' : dashboard.historico_avaliacoes[0].score >= 16 ? '#c05621' : '#c53030'}}>
+                    <span style={{fontSize:'11px', color:'var(--color-secondary)'}}>
+                      Último score: <strong style={{color: dashboard.historico_avaliacoes[0].score >= 21 ? 'var(--color-success)' : dashboard.historico_avaliacoes[0].score >= 16 ? 'var(--color-warning)' : 'var(--color-danger)'}}>
                         {dashboard.historico_avaliacoes[0].score}/30
                       </strong>
                     </span>
                   )}
                 </div>
                 {dashboard.recomendacoes?.length > 0 && (
-                  <div style={{background:'#f7fafc', border:'1px solid #e2e8f0', borderRadius:'6px', padding:'0.75rem', fontSize:'0.875rem', color:'#4a5568'}}>
+                  <div style={{background:'var(--bg-info)', border:'0.5px solid #B5D4F4', borderRadius:'8px', padding:'10px 12px', fontSize:'13px', color:'var(--color-info)'}}>
                     {dashboard.recomendacoes[0]}
                   </div>
                 )}
@@ -3642,7 +3691,7 @@
                             </span>
                           </td>
                           <td style={{fontSize:'0.82rem'}}>{estadoLabel[a.interpretacao] || a.interpretacao}</td>
-                          <td style={{maxWidth:'260px', fontSize:'0.78rem', color:'#718096'}}>{a.recomendacao}</td>
+                          <td style={{maxWidth:'260px', fontSize:'11px', color:'var(--color-secondary)'}}>{a.recomendacao}</td>
                         </tr>
                       ))}</tbody>
                     </table>
@@ -3676,7 +3725,7 @@
                           <td><span className={`badge ${eb[a.estado] || 'badge-blue'}`}>{a.estado}</span></td>
                           <td><span className={`badge ${pb[a.prioridade] || 'badge-blue'}`}>{a.prioridade}</span></td>
                           <td>{a.data_criacao ? new Date(a.data_criacao).toLocaleDateString('pt-PT') : '—'}</td>
-                          <td style={{fontSize:'0.78rem', color:'#718096', maxWidth:'200px'}}>{a.notas || '—'}</td>
+                          <td style={{fontSize:'0.78rem', color:'var(--color-secondary)', maxWidth:'200px'}}>{a.notas || '—'}</td>
                         </tr>
                       ))}</tbody>
                     </table>
@@ -3695,8 +3744,8 @@
                 </h2>
 
                 {sintomaEditId && (
-                  <div style={{background:'#f7fafc', border:'1px solid #e2e8f0', borderRadius:'6px', padding:'0.75rem', marginBottom:'1rem'}}>
-                    <p style={{fontWeight:600, fontSize:'0.85rem', marginBottom:'6px', color:'#2b6cb0'}}>Editar Sintoma #{sintomaEditId}</p>
+                  <div style={{background:'var(--bg-secondary)', border:'0.5px solid var(--border-tertiary)', borderRadius:'8px', padding:'12px', marginBottom:'1rem'}}>
+                    <p style={{fontWeight:500, fontSize:'12px', marginBottom:'6px', color:'var(--color-primary)'}}>Editar sintoma #{sintomaEditId}</p>
                     <form onSubmit={guardarEdicaoSintoma}>
                       <div className="row" style={{flexWrap:'wrap'}}>
                         <input list="sugestoes-sint-edit" value={formSintomaEdit.descricao} onChange={e => setFormSintomaEdit(p => ({...p, descricao: e.target.value}))} placeholder="Descrição" required />
@@ -3736,8 +3785,8 @@
                   {sintomasSugeridos.map(s => <option key={s} value={s} />)}
                 </datalist>
 
-                <div style={{marginTop:'1rem', paddingTop:'0.75rem', borderTop:'1px solid #e2e8f0'}}>
-                  <p style={{fontWeight:600, fontSize:'0.85rem', marginBottom:'6px', color:'#2b6cb0'}}>Registar Novo Sintoma</p>
+                <div style={{marginTop:'1rem', paddingTop:'0.75rem', borderTop:'0.5px solid var(--border-tertiary)'}}>
+                  <p style={{fontWeight:500, fontSize:'12px', marginBottom:'6px', color:'var(--color-primary)'}}>Registar novo sintoma</p>
                   <form onSubmit={adicionarSintoma}>
                     <div className="row" style={{flexWrap:'wrap'}}>
                       <input list="sugestoes-sint-dash" value={formSintoma.descricao} onChange={e => setFormSintoma(p => ({...p, descricao: e.target.value}))} placeholder="Descrição do sintoma" required />
@@ -3961,7 +4010,7 @@
        ---------------------------------------------------------------------- */
     const TODAS_TABS = ['Dashboard','Administradores','Médicos','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
     const TABS_POR_PERFIL = {
-      ADMINISTRADOR: ['Perfil', ...TODAS_TABS, 'Auditoria'],
+      ADMINISTRADOR: ['Perfil','Administradores','Médicos','Utentes','Regras Alerta','Aval. CARAT','Auditoria'],
       MEDICO: ['Perfil','Dashboard','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos'],
       UTENTE: ['Perfil','Dashboard','Prescrições','Aval. CARAT','Resp. CARAT','Planos'],
     };
@@ -3976,56 +4025,55 @@
         return null;
       }
 
-      const perfilBadge = { UTENTE: 'badge-green', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-orange' };
+      const perfilBadge = { UTENTE: 'badge-pink', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-brown' };
       const tabAtiva = tabs.includes(tab) ? tab : tabs[0];
 
       return (
-        <>
-          <header>
-            <div style={{flex:1}}>
-              <div className="user-bar">
-                <div>
-                  <h1 style={{margin:0}}>Sistema de avaliação CARAT</h1>
-                  <span>Sistema de prevenção e acompanhamento de doenças crónicas respiratórias</span>
-                </div>
-                <div style={{textAlign:'right'}}>
-                  <div style={{fontWeight:600}}>{user.nome || `Utilizador #${user.id}`}</div>
-                  <span className={`badge ${perfilBadge[user.perfil] || 'badge-blue'}`}>{user.perfil}</span>
-                  <button className="logout-btn" style={{marginLeft:'12px', fontSize:'0.78rem', padding:'5px 12px'}} onClick={() => { logout(); window.location.href = '/index.html'; }}>Sair</button>
-                </div>
-              </div>
+        <div className="app-layout">
+          <header className="topbar">
+            <h1 className="topbar-title">Sistema CARAT</h1>
+            <div className="topbar-user">
+              <span className="topbar-username">{user.nome || `Utilizador #${user.id}`}</span>
+              <span className={`badge ${perfilBadge[user.perfil] || 'badge-blue'}`}>{user.perfil}</span>
+              <button className="logout-btn" onClick={() => { logout(); window.location.href = '/index.html'; }}>Sair</button>
             </div>
           </header>
-          <nav className="tabs">
-            {tabs.map(t => <div key={t} className={`tab${tabAtiva === t ? ' active' : ''}`} onClick={() => setTab(t)}>{t}</div>)}
-          </nav>
-          <div className="container">
-            {tabAtiva === 'Utilizadores'   && <SecaoUtilizadores apiFetch={apiFetch} />}
-            {tabAtiva === 'Administradores' && <SecaoAdministradores apiFetch={apiFetch} />}
-            {tabAtiva === 'Médicos'        && <SecaoMedicos apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Perfil'         && (user?.perfil === 'UTENTE'
-              ? <SecaoUtentes apiFetch={apiFetch} user={user} />
-              : user?.perfil === 'MEDICO'
-                ? <SecaoMedicos apiFetch={apiFetch} user={user} />
-                : <SecaoUtilizadorAutenticado apiFetch={apiFetch} user={user} />)}
-            {tabAtiva === 'Dashboard'      && <SecaoDashboard apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Utentes'        && <SecaoUtentes apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Prescrições'    && <SecaoPrescricoes apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Anamneses'      && <SecaoAnamneses apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Alergias'       && <SecaoAlergias apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Comorbidades'   && <SecaoComorbidades apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Sintomas'       && <SecaoSintomas apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Med. Habituais' && <SecaoMedicacoesHabituais apiFetch={apiFetch} />}
-            {tabAtiva === 'Alertas'        && <SecaoAlertas apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Regras Alerta'  && <SecaoRegrasAlerta apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Aval. CARAT'    && <SecaoAvaliacoesCarat apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Resp. CARAT'    && <SecaoRespostasCarat apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'Planos'         && <SecaoPlanos apiFetch={apiFetch} user={user} />}
-            {tabAtiva === 'FHIR'           && <SecaoFhir apiFetch={apiFetch} />}
-            {tabAtiva === 'Auditoria'      && <SecaoAuditoria apiFetch={apiFetch} />}
+          <div className="body-row">
+            <aside className="sidebar">
+              <nav className="sidebar-nav">
+                {tabs.map(t => (
+                  <div key={t} className={`sidebar-item${tabAtiva === t ? ' active' : ''}`} onClick={() => setTab(t)}>{t}</div>
+                ))}
+              </nav>
+            </aside>
+            <main className="main-content">
+              {tabAtiva === 'Utilizadores'   && <SecaoUtilizadores apiFetch={apiFetch} />}
+              {tabAtiva === 'Administradores' && <SecaoAdministradores apiFetch={apiFetch} />}
+              {tabAtiva === 'Médicos'        && <SecaoMedicos apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Perfil'         && (user?.perfil === 'UTENTE'
+                ? <SecaoUtentes apiFetch={apiFetch} user={user} />
+                : user?.perfil === 'MEDICO'
+                  ? <SecaoMedicos apiFetch={apiFetch} user={user} />
+                  : <SecaoUtilizadorAutenticado apiFetch={apiFetch} user={user} />)}
+              {tabAtiva === 'Dashboard'      && <SecaoDashboard apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Utentes'        && <SecaoUtentes apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Prescrições'    && <SecaoPrescricoes apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Anamneses'      && <SecaoAnamneses apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Alergias'       && <SecaoAlergias apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Comorbidades'   && <SecaoComorbidades apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Sintomas'       && <SecaoSintomas apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Med. Habituais' && <SecaoMedicacoesHabituais apiFetch={apiFetch} />}
+              {tabAtiva === 'Alertas'        && <SecaoAlertas apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Regras Alerta'  && <SecaoRegrasAlerta apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Aval. CARAT'    && <SecaoAvaliacoesCarat apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Resp. CARAT'    && <SecaoRespostasCarat apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'Planos'         && <SecaoPlanos apiFetch={apiFetch} user={user} />}
+              {tabAtiva === 'FHIR'           && <SecaoFhir apiFetch={apiFetch} />}
+              {tabAtiva === 'Auditoria'      && <SecaoAuditoria apiFetch={apiFetch} />}
+              <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT &nbsp;&bull;&nbsp; Autenticado como <strong>{user.perfil}</strong></footer>
+            </main>
           </div>
-          <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema CARAT &nbsp;&bull;&nbsp; Autenticado como <strong>{user.perfil}</strong></footer>
-        </>
+        </div>
       );
     }
 

@@ -1,42 +1,167 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - Sistema CARAT</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 520px; margin: 60px auto; padding: 0 20px; font-size: 20px; }
-    h1 { text-align: center; margin-bottom: 8px; font-size: 3rem; }
-    p.subtitle { text-align: center; color: #666; margin-bottom: 24px; font-size: 1.25rem; }
-    h2 { margin: 24px 0 10px; }
-    label { display: block; margin-bottom: 6px; font-size: 1.2rem; }
-    input, select { width: 100%; padding: 14px 12px; margin-bottom: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 1.15rem; }
-    button { width: 100%; padding: 14px; background: #245f9f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.35rem; }
-    button:hover { background: #1d4f86; }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-    button.secondary { background: #666; }
-    button.secondary:hover { background: #444; }
-    hr { margin: 24px 0; border: none; border-top: 1px solid #ddd; }
-    .error { color: red; font-size: 0.88rem; margin-top: 6px; }
-    .success { color: green; font-size: 0.88rem; margin-top: 6px; }
-    .hint { color: #888; font-size: 1rem; margin-top: 10px; line-height: 1.35; }
+    :root {
+      --bg-primary:   #ffffff;
+      --bg-secondary: #f0f3f6;
+      --bg-tertiary:  #e8ecf0;
+      --bg-danger:    #FCEBEB;
+      --color-primary:   #1a2d3f;
+      --color-secondary: #546170;
+      --color-tertiary:  #8794a0;
+      --color-danger:    #791F1F;
+      --border-tertiary: #dce2e8;
+      --border-secondary:#ced5dc;
+      --topbar-bg:       #1a3352;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg-tertiary);
+      color: var(--color-primary);
+      font-size: 17px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      height: 52px;
+      background: var(--topbar-bg);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+    }
+
+    .topbar-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .page-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .login-card {
+      background: var(--bg-primary);
+      border: 0.5px solid var(--border-tertiary);
+      border-radius: 12px;
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .login-card h1 {
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--color-primary);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .login-card .subtitle {
+      text-align: center;
+      color: var(--color-secondary);
+      font-size: 15px;
+      margin-bottom: 36px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-secondary);
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 17px;
+      border: 0.5px solid var(--border-secondary);
+      border-radius: 8px;
+      background: var(--bg-primary);
+      color: var(--color-primary);
+      font-family: inherit;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--topbar-bg);
+    }
+
+    .field { display: flex; flex-direction: column; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px 12px;
+      background: #1a3352;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .btn-primary:hover { background: #152840; }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .hint {
+      color: var(--color-tertiary);
+      font-size: 13px;
+      margin-top: 4px;
+      line-height: 1.6;
+    }
+
+    .message { font-size: 14px; margin-top: 6px; }
+    .message.error   { color: var(--color-danger); }
+    .message.success { color: #27500A; }
   </style>
 </head>
 <body>
-  <h1>Sistema de avaliação CARAT</h1>
-  <p class="subtitle">Autenticação por ID e password</p>
+  <header class="topbar">
+    <span class="topbar-title">Sistema CARAT</span>
+  </header>
+  <div class="page-body">
+    <div class="login-card">
+      <h1>Sistema de avaliação CARAT</h1>
+      <p class="subtitle">Autenticação por ID e password</p>
 
-  <form id="login-form">
-    <label for="login-id">ID do utilizador</label>
-    <input id="login-id" name="id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="username" required />
+      <form id="login-form">
+        <div class="field">
+          <label for="login-id">ID do utilizador</label>
+          <input id="login-id" name="id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <button id="login-button" class="btn-primary" type="submit">Entrar</button>
+        <p class="hint">Utilizadores de teste: IDs 1001–1005 administrador, 2001–2005 médico ou 3001–3005 utente. Exemplo: ID <strong>1001</strong> com password <strong>pass1001</strong>.</p>
+        <div id="login-message"></div>
+      </form>
+    </div>
+  </div>
 
-    <label for="login-password">Password</label>
-    <input id="login-password" name="password" type="password" autocomplete="current-password" required />
-
-    <button id="login-button" type="submit">Entrar</button>
-    <p class="hint">Utilizadores de teste: IDs 1001-1005 administrador, 2001-2005 médico ou 3001-3005 utente. Exemplo: ID <strong>1001</strong> com password <strong>pass1001</strong>.</p>
-    <div id="login-message"></div>
-  </form>
   <script>
     const API_BASE = '';
     const APP_URL = '/app.html';
@@ -73,7 +198,7 @@
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          showMessage(loginMessage, 'error', data.erro || 'Login invalido.');
+          showMessage(loginMessage, 'error', data.erro || 'Login inválido.');
           return;
         }
 
@@ -81,7 +206,7 @@
         localStorage.setItem('carat_user', JSON.stringify(data.user));
         window.location.href = APP_URL;
       } catch {
-        showMessage(loginMessage, 'error', 'Nao foi possivel contactar o servidor em http://localhost/.');
+        showMessage(loginMessage, 'error', 'Não foi possível contactar o servidor.');
       } finally {
         loginButton.disabled = false;
       }
@@ -89,6 +214,3 @@
   </script>
 </body>
 </html>
-
-
-
