@@ -5,147 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - Sistema CARAT</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #eef3f8;
-      color: #263445;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-    main {
-      width: min(100%, 420px);
-      background: #ffffff;
-      border: 1px solid #dbe4ee;
-      border-radius: 8px;
-      box-shadow: 0 10px 28px rgba(29, 57, 89, 0.12);
-      padding: 28px;
-    }
-    h1 {
-      color: #245f9f;
-      font-size: 1.45rem;
-      font-weight: 650;
-      text-align: center;
-      margin-bottom: 6px;
-    }
-    .subtitle {
-      color: #617187;
-      font-size: 0.86rem;
-      line-height: 1.35;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    h2 {
-      color: #245f9f;
-      font-size: 1rem;
-      margin: 24px 0 12px;
-    }
-    form {
-      display: grid;
-      gap: 10px;
-    }
-    label {
-      color: #4b5d73;
-      font-size: 0.82rem;
-      font-weight: 600;
-    }
-    input, select {
-      width: 100%;
-      border: 1px solid #c7d4e2;
-      border-radius: 6px;
-      padding: 10px 11px;
-      font: inherit;
-      font-size: 0.95rem;
-      background: #ffffff;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: #245f9f;
-      box-shadow: 0 0 0 3px rgba(36, 95, 159, 0.14);
-    }
-    button {
-      border: 0;
-      border-radius: 6px;
-      background: #245f9f;
-      color: #ffffff;
-      cursor: pointer;
-      font: inherit;
-      font-weight: 650;
-      padding: 11px 14px;
-      margin-top: 4px;
-    }
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 60px auto; padding: 0 16px; }
+    h1 { text-align: center; margin-bottom: 4px; }
+    p.subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 0.9rem; }
+    h2 { margin: 24px 0 10px; }
+    label { display: block; margin-bottom: 3px; font-size: 0.9rem; }
+    input, select { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
+    button { width: 100%; padding: 9px; background: #245f9f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
     button:hover { background: #1d4f86; }
-    button:disabled { opacity: 0.65; cursor: not-allowed; }
-    .secondary {
-      background: #56677c;
-    }
-    .secondary:hover {
-      background: #455468;
-    }
-    .divider {
-      border: 0;
-      border-top: 1px solid #e2e8f0;
-      margin: 24px 0 0;
-    }
-    .message {
-      border-radius: 6px;
-      font-size: 0.86rem;
-      line-height: 1.35;
-      padding: 9px 10px;
-      margin-top: 10px;
-    }
-    .error { background: #fff5f5; color: #b83232; border: 1px solid #fed7d7; }
-    .success { background: #f0fff4; color: #276749; border: 1px solid #c6f6d5; }
-    .hint {
-      color: #718096;
-      font-size: 0.78rem;
-      line-height: 1.35;
-      margin-top: 8px;
-    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    button.secondary { background: #666; }
+    button.secondary:hover { background: #444; }
+    hr { margin: 24px 0; border: none; border-top: 1px solid #ddd; }
+    .error { color: red; font-size: 0.88rem; margin-top: 6px; }
+    .success { color: green; font-size: 0.88rem; margin-top: 6px; }
+    .hint { color: #888; font-size: 0.78rem; margin-top: 6px; }
   </style>
 </head>
 <body>
-  <main>
-    <h1>Sistema CARAT</h1>
-    <p class="subtitle">Autenticacao por ID e password</p>
+  <h1>Sistema CARAT</h1>
+  <p class="subtitle">Autenticacao por ID e password</p>
 
-    <form id="login-form">
-      <label for="login-id">ID do utilizador</label>
-      <input id="login-id" name="id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="username" required />
+  <form id="login-form">
+    <label for="login-id">ID do utilizador</label>
+    <input id="login-id" name="id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="username" required />
 
-      <label for="login-password">Password</label>
-      <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+    <label for="login-password">Password</label>
+    <input id="login-password" name="password" type="password" autocomplete="current-password" required />
 
-      <button id="login-button" type="submit">Entrar</button>
-      <p class="hint">Utilizadores de teste: IDs 1001-1005, 2001-2005 ou 3001-3005. Exemplo: ID <strong>1001</strong> com password <strong>pass1001</strong>.</p>
-      <div id="login-message"></div>
-    </form>
+    <button id="login-button" type="submit">Entrar</button>
+    <p class="hint">Utilizadores de teste: IDs 1001-1005, 2001-2005 ou 3001-3005. Exemplo: ID <strong>1001</strong> com password <strong>pass1001</strong>.</p>
+    <div id="login-message"></div>
+  </form>
 
-    <hr class="divider" />
+  <hr />
 
-    <h2>Adicionar novo utilizador</h2>
-    <form id="register-form">
-      <label for="reg-nome">Nome</label>
-      <input id="reg-nome" name="nome" type="text" autocomplete="name" required />
+  <h2>Adicionar novo utilizador</h2>
+  <form id="register-form">
+    <label for="reg-nome">Nome</label>
+    <input id="reg-nome" name="nome" type="text" autocomplete="name" required />
 
-      <label for="reg-email">Email</label>
-      <input id="reg-email" name="email" type="email" autocomplete="email" required />
+    <label for="reg-email">Email</label>
+    <input id="reg-email" name="email" type="email" autocomplete="email" required />
 
-      <label for="reg-password">Password</label>
-      <input id="reg-password" name="password" type="password" minlength="6" autocomplete="new-password" required />
+    <label for="reg-password">Password</label>
+    <input id="reg-password" name="password" type="password" minlength="6" autocomplete="new-password" required />
 
-      <label for="reg-perfil">Perfil</label>
-      <select id="reg-perfil" name="perfil" required>
-        <option value="UTENTE">Utente</option>
-      </select>
+    <label for="reg-perfil">Perfil</label>
+    <select id="reg-perfil" name="perfil" required>
+      <option value="UTENTE">Utente</option>
+    </select>
 
-      <button id="register-button" class="secondary" type="submit">Adicionar utilizador</button>
-      <p class="hint">O registo publico cria apenas utilizadores com perfil de utente.</p>
-      <div id="register-message"></div>
-    </form>
-  </main>
+    <button id="register-button" class="secondary" type="submit">Adicionar utilizador</button>
+    <p class="hint">O registo publico cria apenas utilizadores com perfil de utente.</p>
+    <div id="register-message"></div>
+  </form>
 
   <script>
     const API_BASE = '';
