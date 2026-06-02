@@ -96,6 +96,17 @@ export class AuditoriaService {
         }
     }
 
+    async apagar(logId: number): Promise<void> {
+        try {
+            if (logId <= 0) throw new Error('ID de auditoria inválido');
+            await this.repo.delete(logId);
+            console.log(`[AUDITORIA] Apagado log ${logId}`);
+        } catch (error) {
+            console.error('Erro ao apagar auditoria:', error);
+            throw error;
+        }
+    }
+
     async listar(pagina: number = 1, limite: number = 20, ordenacao: 'ASC' | 'DESC' = 'DESC'): Promise<{ total: number; pagina: number; limite: number; auditorias: AuditoriaResponseDto[]; }> {
         try {
             if (pagina < 1) throw new Error('Número de página deve ser maior que 0');

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistema CARAT</title>
+  <title>Sistema de avaliação CARAT</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -16,7 +16,7 @@
     header span { font-size: 0.82rem; opacity: 0.85; }
 
     .tabs { background: white; border-bottom: 1px solid #ccc; display: flex; flex-wrap: wrap; padding: 0 10px; }
-    .tab { padding: 10px 14px; font-size: 0.82rem; cursor: pointer; border-bottom: 2px solid transparent; color: #555; white-space: nowrap; }
+    .tab { padding: 10px 14px; font-size: 1.1rem; cursor: pointer; border-bottom: 2px solid transparent; color: #555; white-space: nowrap; }
     .tab:hover { color: #2b6cb0; }
     .tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; font-weight: bold; }
 
@@ -52,10 +52,10 @@
     th { background: #f0f0f0; font-weight: bold; font-size: 0.78rem; text-transform: uppercase; }
     tr:hover td { background: #fafafa; }
 
-    .badge { display: inline-block; font-size: 0.82rem; font-weight: bold; }
-    .badge-blue   { color: #2b6cb0; }
-    .badge-green  { color: #276749; }
-    .badge-orange { color: #c05621; }
+    .badge { display: inline-block; font-size: 1.1rem; font-weight: bold; }
+    .badge-blue   { color: #0d3b66; }
+    .badge-green  { color: #d4456d; }
+    .badge-orange { color: #8b6f47; }
     .badge-red    { color: #c53030; }
 
     .filtro-row { display: flex; gap: 8px; margin-bottom: 10px; max-width: 480px; }
@@ -76,6 +76,42 @@
     .json-box .bool { color: #f6ad55; }
     .json-box .null { color: #fc8181; }
 
+    .audit-card { overflow: hidden; }
+    .audit-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .audit-header h2 { margin-bottom: 4px; }
+    .audit-subtitle { color: #718096; font-size: 0.82rem; }
+    .audit-count { background: #edf2f7; color: #2d3748; border: 1px solid #d9e2ec; padding: 5px 10px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+    .audit-filters { display: grid; grid-template-columns: minmax(150px, 1.1fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(130px, 0.8fr) minmax(130px, 0.8fr) auto; gap: 8px; align-items: end; margin-bottom: 14px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .audit-filter label { display: block; color: #4a5568; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0; margin-bottom: 4px; }
+    .audit-filter input, .audit-filter select { height: 36px; border-color: #cbd5e0; }
+    .audit-filter-action { height: 36px; align-self: end; }
+    .audit-table-wrap { overflow-x: auto; border: 1px solid #e2e8f0; background: white; }
+    .audit-table { margin-top: 0; min-width: 860px; border-collapse: separate; border-spacing: 0; }
+    .audit-table th { background: #edf2f7; color: #2d3748; border-bottom: 1px solid #d9e2ec; padding: 10px 12px; }
+    .audit-table td { padding: 11px 12px; vertical-align: middle; color: #1a202c; }
+    .audit-table tbody tr:nth-child(even) td { background: #fbfdff; }
+    .audit-table tbody tr:hover td { background: #eef6ff; }
+    .audit-id { font-weight: 700; color: #2b6cb0; }
+    .audit-date { color: #4a5568; white-space: nowrap; }
+    .audit-code { display: inline-block; font-family: Consolas, monospace; font-size: 0.78rem; background: #f1f5f9; border: 1px solid #e2e8f0; color: #2d3748; padding: 3px 7px; }
+    .audit-user { display: inline-block; min-width: 44px; color: #2d3748; font-weight: 700; }
+    .audit-record { color: #4a5568; font-weight: 700; }
+    .audit-op { display: inline-flex; align-items: center; justify-content: center; min-width: 88px; height: 26px; padding: 0 10px; border: 1px solid transparent; font-size: 0.74rem; font-weight: 800; text-transform: uppercase; cursor: default; }
+    .audit-op-create { background: #fce7ef; color: #b8325f; border-color: #f6c6d8; }
+    .audit-op-update { background: #e6f0fb; color: #1d4f86; border-color: #c3daef; cursor: pointer; }
+    .audit-op-delete { background: #fff1f0; color: #c53030; border-color: #fed7d7; cursor: pointer; }
+    .audit-op-close { background: #4a5568; color: white; border-color: #4a5568; cursor: pointer; }
+    .audit-op-update:hover { background: #d8e8f8; color: #1d4f86; }
+    .audit-op-delete:hover { background: #ffe4e2; color: #c53030; }
+    .audit-op-close:hover { background: #2d3748; color: white; }
+    .audit-detail { border-left: 4px solid #2b6cb0; }
+    .audit-detail h3 { color: #2d3748; font-size: 1rem; margin: 0 0 4px; }
+    .audit-detail-meta { color: #718096; font-size: 0.84rem; margin-bottom: 10px; }
+    .audit-detail-table { margin-top: 8px; }
+    .audit-detail-table td { word-break: break-word; }
+    .audit-before { color: #c53030; }
+    .audit-after { color: #276749; }
+
     footer { text-align: center; padding: 16px; font-size: 0.8rem; color: #999; border-top: 1px solid #ddd; background: white; margin-top: 20px; }
 
     .login-container { max-width: 420px; margin: 60px auto; padding: 0 16px; }
@@ -94,6 +130,14 @@
     .logout-btn:hover { background: #9b2c2c; }
     .user-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .token-info { font-family: monospace; font-size: 0.7rem; background: #f0f0f0; padding: 4px 8px; color: #555; word-break: break-all; margin-top: 4px; }
+    @media (max-width: 900px) {
+      .audit-header { flex-direction: column; }
+      .audit-filters { grid-template-columns: 1fr 1fr; }
+      .audit-filter-action { width: 100%; }
+    }
+    @media (max-width: 560px) {
+      .audit-filters { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -262,8 +306,8 @@
       return (
         <div className="login-container">
           <div className="login-card">
-            <h1>Sistema CARAT</h1>
-            <p className="subtitulo">Controlo e Acompanhamento Respirat&oacute;rio e Alergol&oacute;gico em Tratamento</p>
+            <h1>Sistema de avaliação CARAT</h1>
+            <p className="subtitulo">Sistema de prevenção e acompanhamento de doenças crónicas respiratórias</p>
 
             <div className="login-tabs">
               <div className={`login-tab${modo === 'login' ? ' active' : ''}`} onClick={() => { setModo('login'); setErro(''); setSucesso(''); }}>?? Login</div>
@@ -3749,91 +3793,162 @@
         if (filtros.dataFim && new Date(l.timestamp) > new Date(filtros.dataFim + 'T23:59:59')) return false;
         return true;
       });
-
-      async function verDiff(id) {
-        if (detalhe?.id === id) { setDetalhe(null); return; }
-        const r = await apiFetch(`/api/auditoria/${id}/diferencas`);
-        if (r.ok) setDetalhe({ id, ...r.data.dados });
+      function normalizarValorAuditoria(valor) {
+        if (valor === null || valor === undefined || valor === '') return null;
+        let normalizado = valor;
+        for (let i = 0; i < 2; i++) {
+          if (typeof normalizado !== 'string') break;
+          try { normalizado = JSON.parse(normalizado); } catch { break; }
+        }
+        return normalizado;
       }
 
-      const OPERACAO_BADGE = { CRIACAO: 'badge-green', ALTERACAO: 'badge-blue', ELIMINACAO: 'badge-red' };
+      async function verDetalheAuditoria(log) {
+        if (detalhe?.id === log.log_id) { setDetalhe(null); return; }
+
+        if (log.operacao === 'ALTERACAO') {
+          const r = await apiFetch(`/api/auditoria/${log.log_id}/diferencas`);
+          if (r.ok) setDetalhe({ id: log.log_id, tipo: 'ALTERACAO', alteracoes: r.data.dados?.diferenças ?? [] });
+          return;
+        }
+
+        if (log.operacao === 'ELIMINACAO') {
+          const r = await apiFetch(`/api/auditoria/${log.log_id}`);
+          if (r.ok) {
+            const auditoria = r.data.dados;
+            setDetalhe({
+              id: log.log_id,
+              tipo: 'ELIMINACAO',
+              tabela: log.tabela,
+              tabelaId: log.tabela_id,
+              eliminado: normalizarValorAuditoria(auditoria?.valor_anterior)
+            });
+          }
+        }
+      }
+
+      const OPERACAO_LABEL = { CRIACAO: 'Criado', ALTERACAO: 'Alterado', ELIMINACAO: 'Eliminado' };
 
       return (
         <>
-          <div className="card">
-            <h2>Auditoria</h2>
-            <div className="row" style={{flexWrap:'wrap', gap:'8px', marginBottom:'1rem', alignItems:'center'}}>
-              <select value={filtros.tabela} onChange={e => setFiltros(p => ({...p, tabela: e.target.value}))}>
-                <option value="">Todas as tabelas</option>
-                {tabelasUnicas.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-              <select value={filtros.operacao} onChange={e => setFiltros(p => ({...p, operacao: e.target.value}))}>
-                <option value="">Todas as operações</option>
-                <option value="CRIACAO">Criação</option>
-                <option value="ALTERACAO">Alteração</option>
-                <option value="ELIMINACAO">Eliminação</option>
-              </select>
-              <select value={filtros.utilizador_id} onChange={e => setFiltros(p => ({...p, utilizador_id: e.target.value}))}>
-                <option value="">Todos os utilizadores</option>
-                {utilizadoresUnicos.map(id => <option key={id} value={String(id)}>#{id}</option>)}
-              </select>
-              <label style={{display:'flex', alignItems:'center', gap:'4px', fontSize:'0.85rem', fontWeight:500}}>
-                De <input type="date" value={filtros.dataInicio} onChange={e => setFiltros(p => ({...p, dataInicio: e.target.value}))} />
-              </label>
-              <label style={{display:'flex', alignItems:'center', gap:'4px', fontSize:'0.85rem', fontWeight:500}}>
-                Até <input type="date" value={filtros.dataFim} onChange={e => setFiltros(p => ({...p, dataFim: e.target.value}))} />
-              </label>
-              <button className="btn-sec" onClick={() => setFiltros({ tabela: '', operacao: '', utilizador_id: '', dataInicio: '', dataFim: '' })}>Limpar</button>
+          <div className="card audit-card">
+            <div className="audit-header">
+              <div>
+                <h2>Auditoria</h2>
+                <p className="audit-subtitle">Registos de criação, alteração e eliminação do sistema.</p>
+              </div>
+              <span className="audit-count">{logsFiltrados.length} de {logs.length} registos</span>
+            </div>
+            <div className="audit-filters">
+              <div className="audit-filter">
+                <label>Tabela</label>
+                <select value={filtros.tabela} onChange={e => setFiltros(p => ({...p, tabela: e.target.value}))}>
+                  <option value="">Todas as tabelas</option>
+                  {tabelasUnicas.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div className="audit-filter">
+                <label>Operação</label>
+                <select value={filtros.operacao} onChange={e => setFiltros(p => ({...p, operacao: e.target.value}))}>
+                  <option value="">Todas as operações</option>
+                  <option value="CRIACAO">Criação</option>
+                  <option value="ALTERACAO">Alteração</option>
+                  <option value="ELIMINACAO">Eliminação</option>
+                </select>
+              </div>
+              <div className="audit-filter">
+                <label>Utilizador</label>
+                <select value={filtros.utilizador_id} onChange={e => setFiltros(p => ({...p, utilizador_id: e.target.value}))}>
+                  <option value="">Todos os utilizadores</option>
+                  {utilizadoresUnicos.map(id => <option key={id} value={String(id)}>#{id}</option>)}
+                </select>
+              </div>
+              <div className="audit-filter">
+                <label>De</label>
+                <input type="date" value={filtros.dataInicio} onChange={e => setFiltros(p => ({...p, dataInicio: e.target.value}))} />
+              </div>
+              <div className="audit-filter">
+                <label>Até</label>
+                <input type="date" value={filtros.dataFim} onChange={e => setFiltros(p => ({...p, dataFim: e.target.value}))} />
+              </div>
+              <button className="btn-sec audit-filter-action" onClick={() => setFiltros({ tabela: '', operacao: '', utilizador_id: '', dataInicio: '', dataFim: '' })}>Limpar</button>
             </div>
             {loading
               ? <p>A carregar...</p>
               : logsFiltrados.length === 0
                 ? <p className="vazio">Nenhum registo de auditoria encontrado.</p>
                 : (
-                  <table>
-                    <thead><tr>
-                      <th>#</th><th>Data / Hora</th><th>Utilizador</th><th>Tabela</th><th>ID Registo</th><th>Operação</th><th></th>
-                    </tr></thead>
-                    <tbody>
-                      {logsFiltrados.map(l => (
-                        <tr key={l.log_id}>
-                          <td>{l.log_id}</td>
-                          <td>{new Date(l.timestamp).toLocaleString('pt-PT')}</td>
-                          <td>{l.utilizador_id ?? '—'}</td>
-                          <td><code style={{fontSize:'0.8rem'}}>{l.tabela}</code></td>
-                          <td>{l.tabela_id}</td>
-                          <td><span className={`badge ${OPERACAO_BADGE[l.operacao] || 'badge-blue'}`} style={{fontSize:'0.72rem'}}>{l.operacao}</span></td>
-                          <td>
-                            {l.operacao === 'ALTERACAO' && (
-                              <button className="btn-sec" style={{fontSize:'0.72rem', padding:'2px 7px'}}
-                                onClick={() => verDiff(l.log_id)}>
-                                {detalhe?.id === l.log_id ? 'Fechar' : 'Diff'}
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className="audit-table-wrap">
+                    <table className="audit-table">
+                      <thead><tr>
+                        <th>#</th><th>Data / Hora</th><th>Utilizador</th><th>Tabela</th><th>ID Registo</th><th>Operação</th>
+                      </tr></thead>
+                      <tbody>
+                        {logsFiltrados.map(l => (
+                          <tr key={l.log_id}>
+                            <td><span className="audit-id">{l.log_id}</span></td>
+                            <td className="audit-date">{new Date(l.timestamp).toLocaleString('pt-PT')}</td>
+                            <td><span className="audit-user">{l.utilizador_id ? `#${l.utilizador_id}` : '—'}</span></td>
+                            <td><code className="audit-code">{l.tabela}</code></td>
+                            <td><span className="audit-record">#{l.tabela_id}</span></td>
+                            <td>
+                              {l.operacao === 'ALTERACAO' || l.operacao === 'ELIMINACAO' ? (
+                                <button
+                                  className={`audit-op ${detalhe?.id === l.log_id ? 'audit-op-close' : l.operacao === 'ALTERACAO' ? 'audit-op-update' : 'audit-op-delete'}`}
+                                  onClick={() => verDetalheAuditoria(l)}>
+                                  {detalhe?.id === l.log_id ? 'Fechar' : OPERACAO_LABEL[l.operacao]}
+                                </button>
+                              ) : (
+                                <span className="audit-op audit-op-create">{OPERACAO_LABEL[l.operacao] || l.operacao}</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )
             }
           </div>
-
-          {detalhe && detalhe.diferenças?.length > 0 && (
-            <div className="card">
-              <h3 style={{marginTop:0}}>Diferenças — log #{detalhe.id}</h3>
-              <table>
-                <thead><tr><th>Campo</th><th style={{color:'#c53030'}}>Antes</th><th style={{color:'#276749'}}>Depois</th></tr></thead>
+          {detalhe?.tipo === 'ALTERACAO' && detalhe.alteracoes?.length > 0 && (
+            <div className="card audit-detail">
+              <h3>Alterações</h3>
+              <p className="audit-detail-meta">Log #{detalhe.id}</p>
+              <table className="audit-detail-table">
+                <thead><tr><th>Campo</th><th>Antes</th><th>Depois</th></tr></thead>
                 <tbody>
-                  {detalhe.diferenças.map((d, i) => (
+                  {detalhe.alteracoes.map((d, i) => (
                     <tr key={i}>
-                      <td><code style={{fontSize:'0.8rem'}}>{d.campo}</code></td>
-                      <td style={{color:'#c53030'}}>{JSON.stringify(d.anterior)}</td>
-                      <td style={{color:'#276749'}}>{JSON.stringify(d.novo)}</td>
+                      <td><code className="audit-code">{d.campo}</code></td>
+                      <td className="audit-before">{JSON.stringify(d.anterior)}</td>
+                      <td className="audit-after">{JSON.stringify(d.novo)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
+            </div>
+          )}
+
+          {detalhe?.tipo === 'ELIMINACAO' && (
+            <div className="card audit-detail">
+              <h3>Registo eliminado</h3>
+              <p className="audit-detail-meta">Log #{detalhe.id} · {detalhe.tabela} #{detalhe.tabelaId}</p>
+              {detalhe.eliminado && typeof detalhe.eliminado === 'object' ? (
+                <table className="audit-detail-table">
+                  <thead><tr><th>Campo</th><th>Valor eliminado</th></tr></thead>
+                  <tbody>
+                    {Object.entries(detalhe.eliminado).map(([campo, valor]) => (
+                      <tr key={campo}>
+                        <td><code className="audit-code">{campo}</code></td>
+                        <td className="audit-before">{JSON.stringify(valor)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <pre className="json-box">{JSON.stringify(detalhe.eliminado, null, 2)}</pre>
+              )}
               <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
             </div>
           )}
@@ -3870,12 +3985,12 @@
             <div style={{flex:1}}>
               <div className="user-bar">
                 <div>
-                  <h1 style={{margin:0}}>Sistema CARAT</h1>
-                  <span>Controlo e Acompanhamento Respiratório e Alergológico em Tratamento</span>
+                  <h1 style={{margin:0}}>Sistema de avaliação CARAT</h1>
+                  <span>Sistema de prevenção e acompanhamento de doenças crónicas respiratórias</span>
                 </div>
                 <div style={{textAlign:'right'}}>
                   <div style={{fontWeight:600}}>{user.nome || `Utilizador #${user.id}`}</div>
-                  <span className={`badge ${perfilBadge[user.perfil] || 'badge-blue'}`} style={{fontSize:'0.72rem'}}>{user.perfil}</span>
+                  <span className={`badge ${perfilBadge[user.perfil] || 'badge-blue'}`}>{user.perfil}</span>
                   <button className="logout-btn" style={{marginLeft:'12px', fontSize:'0.78rem', padding:'5px 12px'}} onClick={() => { logout(); window.location.href = '/index.html'; }}>Sair</button>
                 </div>
               </div>
@@ -3918,3 +4033,8 @@
   </script>
 </body>
 </html>
+
+
+
+
+

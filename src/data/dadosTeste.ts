@@ -56,6 +56,7 @@ export const testeUtilizadores = [
         password: 'pass1005',
         perfil: PerfilUtilizador.ADMINISTRADOR,
         genero: GeneroUtilizador.FEMININO,
+        deleted_at: new Date('2026-06-02T10:10:00'),
     },
     {
         id: 2001,
@@ -344,7 +345,7 @@ export const testeAdministradores = [
     { id: 1002, utilizador_id: 1002 },
     { id: 1003, utilizador_id: 1003 },
     { id: 1004, utilizador_id: 1004 },
-    { id: 1005, utilizador_id: 1005 },
+    { id: 1005, utilizador_id: 1005, deleted_at: new Date('2026-06-02T10:10:00') },
 ];
 
 export const testeMedicos = [
@@ -1355,8 +1356,9 @@ export const testeAuditorias = [
     { log_id: 9009, utilizador_id: 2003, tabela: 'anamnese',  tabela_id: 6001, operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"tabagismo":"NAO_FUMADOR"}', valor_novo: '{"tabagismo":"EX_FUMADOR"}' },
     { log_id: 9010, utilizador_id: 1001, tabela: 'prescricao',tabela_id: 7001, operacao: OperacaoAuditoria.CRIACAO,    valor_anterior: null, valor_novo: '{"medicamento":"Ventilan","dose":"100mcg"}' },
     { log_id: 9011, utilizador_id: 2001, tabela: 'prescricao',tabela_id: 7001, operacao: OperacaoAuditoria.ALTERACAO,  valor_anterior: '{"estado":"ATIVA"}', valor_novo: '{"estado":"SUSPENSA"}' },
-    { log_id: 9012, utilizador_id: 2002, tabela: 'prescricao',tabela_id: 7002, operacao: OperacaoAuditoria.ELIMINACAO, valor_anterior: '{"medicamento":"Nasonex","dose":"50mcg"}', valor_novo: null },
     { log_id: 9013, utilizador_id: 2001, tabela: 'plano_acompanhamento', tabela_id: 8001, operacao: OperacaoAuditoria.CRIACAO,   valor_anterior: null, valor_novo: '{"objetivo":"Controlar rinite"}' },
     { log_id: 9014, utilizador_id: 2001, tabela: 'plano_acompanhamento', tabela_id: 8001, operacao: OperacaoAuditoria.ALTERACAO, valor_anterior: '{"estado":"ATIVO"}', valor_novo: '{"estado":"CONCLUIDO"}' },
     { log_id: 9015, utilizador_id: 3002, tabela: 'resposta_carat', tabela_id: 11004, operacao: OperacaoAuditoria.CRIACAO, valor_anterior: null, valor_novo: '{"score_total":20,"interpretacao":"Doenca parcialmente controlada"}' },
+    { log_id: 9016, utilizador_id: 1001, tabela: 'administrador', tabela_id: 1005, operacao: OperacaoAuditoria.ELIMINACAO, valor_anterior: '{"id":1005,"utilizador_id":1005}', valor_novo: null },
+    { log_id: 9017, utilizador_id: 1001, tabela: 'utilizador', tabela_id: 1005, operacao: OperacaoAuditoria.ELIMINACAO, valor_anterior: '{"id":1005,"nome":"Eva Rodrigues","email":"eva.rodrigues@administrador.pt","perfil":"ADMINISTRADOR","genero":"FEMININO"}', valor_novo: null },
 ];

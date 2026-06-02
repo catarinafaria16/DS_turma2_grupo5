@@ -14,5 +14,6 @@ routes.get('/tabela/:tabela/:tabelaId', controller.listarHistorico.bind(controll
 routes.get('/', controller.listar.bind(controller));
 routes.get('/:id', controller.obter.bind(controller));
 routes.get('/:id/diferencas', controller.obterDiferencas.bind(controller));
+routes.delete('/:id', controller.apagar.bind(controller));
 
 export default routes;

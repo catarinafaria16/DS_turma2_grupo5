@@ -53,4 +53,14 @@ export class AuditoriaController {
             return res.status(400).json({ erro: error.message || 'Erro ao obter diferenças de auditoria' });
         }
     }
+
+    async apagar(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            await this.service.apagar(Number(id));
+            return res.status(204).send();
+        } catch (error: any) {
+            return res.status(400).json({ erro: error.message || 'Erro ao apagar auditoria' });
+        }
+    }
 }

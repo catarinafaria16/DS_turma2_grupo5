@@ -1,17 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - Sistema CARAT</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 400px; margin: 60px auto; padding: 0 16px; }
-    h1 { text-align: center; margin-bottom: 4px; }
-    p.subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 0.9rem; }
+    body { font-family: Arial, sans-serif; max-width: 520px; margin: 60px auto; padding: 0 20px; font-size: 20px; }
+    h1 { text-align: center; margin-bottom: 8px; font-size: 3rem; }
+    p.subtitle { text-align: center; color: #666; margin-bottom: 24px; font-size: 1.25rem; }
     h2 { margin: 24px 0 10px; }
-    label { display: block; margin-bottom: 3px; font-size: 0.9rem; }
-    input, select { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
-    button { width: 100%; padding: 9px; background: #245f9f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+    label { display: block; margin-bottom: 6px; font-size: 1.2rem; }
+    input, select { width: 100%; padding: 14px 12px; margin-bottom: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 1.15rem; }
+    button { width: 100%; padding: 14px; background: #245f9f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.35rem; }
     button:hover { background: #1d4f86; }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
     button.secondary { background: #666; }
@@ -19,12 +19,12 @@
     hr { margin: 24px 0; border: none; border-top: 1px solid #ddd; }
     .error { color: red; font-size: 0.88rem; margin-top: 6px; }
     .success { color: green; font-size: 0.88rem; margin-top: 6px; }
-    .hint { color: #888; font-size: 0.78rem; margin-top: 6px; }
+    .hint { color: #888; font-size: 1rem; margin-top: 10px; line-height: 1.35; }
   </style>
 </head>
 <body>
-  <h1>Sistema CARAT</h1>
-  <p class="subtitle">Autenticacao por ID e password</p>
+  <h1>Sistema de avaliação CARAT</h1>
+  <p class="subtitle">Autenticação por ID e password</p>
 
   <form id="login-form">
     <label for="login-id">ID do utilizador</label>
@@ -34,42 +34,15 @@
     <input id="login-password" name="password" type="password" autocomplete="current-password" required />
 
     <button id="login-button" type="submit">Entrar</button>
-    <p class="hint">Utilizadores de teste: IDs 1001-1005, 2001-2005 ou 3001-3005. Exemplo: ID <strong>1001</strong> com password <strong>pass1001</strong>.</p>
+    <p class="hint">Utilizadores de teste: IDs 1001-1005 administrador, 2001-2005 médico ou 3001-3005 utente. Exemplo: ID <strong>1001</strong> com password <strong>pass1001</strong>.</p>
     <div id="login-message"></div>
   </form>
-
-  <hr />
-
-  <h2>Adicionar novo utilizador</h2>
-  <form id="register-form">
-    <label for="reg-nome">Nome</label>
-    <input id="reg-nome" name="nome" type="text" autocomplete="name" required />
-
-    <label for="reg-email">Email</label>
-    <input id="reg-email" name="email" type="email" autocomplete="email" required />
-
-    <label for="reg-password">Password</label>
-    <input id="reg-password" name="password" type="password" minlength="6" autocomplete="new-password" required />
-
-    <label for="reg-perfil">Perfil</label>
-    <select id="reg-perfil" name="perfil" required>
-      <option value="UTENTE">Utente</option>
-    </select>
-
-    <button id="register-button" class="secondary" type="submit">Adicionar utilizador</button>
-    <p class="hint">O registo publico cria apenas utilizadores com perfil de utente.</p>
-    <div id="register-message"></div>
-  </form>
-
   <script>
     const API_BASE = '';
     const APP_URL = '/app.html';
     const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
     const loginButton = document.getElementById('login-button');
-    const registerButton = document.getElementById('register-button');
     const loginMessage = document.getElementById('login-message');
-    const registerMessage = document.getElementById('register-message');
 
     function showMessage(target, type, text) {
       target.className = `message ${type}`;
@@ -113,40 +86,9 @@
         loginButton.disabled = false;
       }
     });
-
-    registerForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      clearMessage(registerMessage);
-      registerButton.disabled = true;
-
-      const body = {
-        nome: registerForm.nome.value.trim(),
-        email: registerForm.email.value.trim(),
-        password: registerForm.password.value,
-        perfil: registerForm.perfil.value
-      };
-
-      try {
-        const response = await fetch(`${API_BASE}/api/registar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          showMessage(registerMessage, 'error', data.erro || 'Erro ao adicionar utilizador.');
-          return;
-        }
-
-        registerForm.reset();
-        showMessage(registerMessage, 'success', `Utilizador criado com ID ${data.dados.id}.`);
-      } catch {
-        showMessage(registerMessage, 'error', 'Nao foi possivel contactar o servidor em http://localhost/.');
-      } finally {
-        registerButton.disabled = false;
-      }
-    });
   </script>
 </body>
 </html>
+
+
+
