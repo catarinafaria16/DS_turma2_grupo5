@@ -1,4 +1,4 @@
 export enum SexoAnamnese {
-    MASCULINO = 'masculino',
-    FEMININO = 'feminino'
+    MASCULINO = 'MASCULINO',
+    FEMININO = 'FEMININO'
 }

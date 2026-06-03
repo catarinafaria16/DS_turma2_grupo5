@@ -5,7 +5,6 @@ import { Utente } from '../models/utente.entity.js';
 import type { CreateExameDto } from '../dtos/exame/create-exame.dto.js';
 import type { ExameResponseDto } from '../dtos/exame/exame-response.dto.js';
 import { EstadoExame } from '../enums/EstadoExame.enum.js';
-import { TipoExame } from '../enums/TipoExame.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { AuditoriaService } from './auditoria.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
@@ -74,7 +73,7 @@ export class ExameService {
 
     async criar(exameData: CreateExameDto, utilizador: UtilizadorAutenticado): Promise<ExameResponseDto> {
         try {
-            validarEnum(TipoExame, exameData.tipo_exame, 'tipo_exame');
+            if (!exameData.tipo_exame?.trim()) throw new Error('tipo_exame é obrigatório');
             validarEnum(EstadoExame, exameData.estado, 'estado');
             await this.validarAcessoPrescricao(exameData.prescricao_id, utilizador);
 
@@ -156,7 +155,7 @@ export class ExameService {
         utilizador: UtilizadorAutenticado
     ): Promise<ExameResponseDto> {
         try {
-            validarEnum(TipoExame, exameData.tipo_exame, 'tipo_exame');
+            if (!exameData.tipo_exame?.trim()) throw new Error('tipo_exame é obrigatório');
             validarEnum(EstadoExame, exameData.estado, 'estado');
             const anterior = await this.obterInterno(exameId);
             await this.validarAcessoPrescricao(anterior.prescricao_id, utilizador);

@@ -1,4 +1,4 @@
 export enum TipoAlerta {
-    SCORE_BAIXO = 'score baixo',
-    DETERIORACAO = 'deterioracao',
+    SCORE_BAIXO = 'SCORE BAIXO',
+    DETERIORACAO = 'DETERIORACAO',
 }

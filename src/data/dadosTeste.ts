@@ -4,7 +4,6 @@ import { RespostaCarat1a9 as R } from '../enums/RespostaCarat1a9.enum.js';
 import { RespostaCarat10 as R10 } from '../enums/RespostaCarat10.enum.js';
 import { TipoPrescricao } from '../enums/TipoPrescricao.enum.js';
 import { EstadoPrescricao } from '../enums/EstadoPrescricao.enum.js';
-import { TipoExame } from '../enums/TipoExame.enum.js';
 import { EstadoExame } from '../enums/EstadoExame.enum.js';
 import { IntensidadeSintoma } from '../enums/IntensidadeSintoma.enum.js';
 import { Tabagismo } from '../enums/Tabagismo.enum.js';
@@ -151,14 +150,14 @@ export const testeMedicacoes = [
 
 // ─── EXAMES ─── cobre todos os estados e vários tipos
 export const testeExames = [
-    { id: 7001, prescricao_id: 5002,  tipo_exame: TipoExame.ESPIROMETRIA,          consentimento: true,  estado: EstadoExame.PENDENTE  },
-    { id: 7002, prescricao_id: 5004,  tipo_exame: TipoExame.IGE_ESPECIFICA,        consentimento: true,  estado: EstadoExame.REALIZADO },
-    { id: 7003, prescricao_id: 5006,  tipo_exame: TipoExame.TESTE_BRONCODILATADOR, consentimento: true,  estado: EstadoExame.ANALISADO },
-    { id: 7004, prescricao_id: 5008,  tipo_exame: TipoExame.RADIOGRAFIA_TORACICA,  consentimento: true,  estado: EstadoExame.PENDENTE  },
-    { id: 7005, prescricao_id: 5010,  tipo_exame: TipoExame.PICO_FLUXO,            consentimento: true,  estado: EstadoExame.REALIZADO },
-    { id: 7006, prescricao_id: 5011,  tipo_exame: TipoExame.TAC_TORACICA,          consentimento: true,  estado: EstadoExame.ANALISADO },
-    { id: 7007, prescricao_id: 5015,  tipo_exame: TipoExame.OXIMETRIA_NOTURNA,     consentimento: true,  estado: EstadoExame.ANALISADO },
-    { id: 7008, prescricao_id: 5017,  tipo_exame: TipoExame.TESTE_ESFORCO,         consentimento: false, estado: EstadoExame.CANCELADO },
+    { id: 7001, prescricao_id: 5002,  tipo_exame: 'Espirometria',          consentimento: true,  estado: EstadoExame.PENDENTE  },
+    { id: 7002, prescricao_id: 5004,  tipo_exame: 'IgE específica',        consentimento: true,  estado: EstadoExame.REALIZADO },
+    { id: 7003, prescricao_id: 5006,  tipo_exame: 'Teste broncodilatador', consentimento: true,  estado: EstadoExame.ANALISADO },
+    { id: 7004, prescricao_id: 5008,  tipo_exame: 'Radiografia torácica',  consentimento: true,  estado: EstadoExame.PENDENTE  },
+    { id: 7005, prescricao_id: 5010,  tipo_exame: 'Pico de fluxo',         consentimento: true,  estado: EstadoExame.REALIZADO },
+    { id: 7006, prescricao_id: 5011,  tipo_exame: 'TAC torácica',          consentimento: true,  estado: EstadoExame.ANALISADO },
+    { id: 7007, prescricao_id: 5015,  tipo_exame: 'Oximetria noturna',     consentimento: true,  estado: EstadoExame.ANALISADO },
+    { id: 7008, prescricao_id: 5017,  tipo_exame: 'Teste de esforço',      consentimento: false, estado: EstadoExame.CANCELADO },
 ];
 
 // ─── SINTOMAS ─── cobre todas as intensidades

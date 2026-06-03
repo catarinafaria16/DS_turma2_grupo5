@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { EstadoExame } from '../enums/EstadoExame.enum.js';
-import { TipoExame } from '../enums/TipoExame.enum.js';
 
 @Entity()
 export class Exame {
@@ -11,8 +10,8 @@ export class Exame {
     @Column('int')
     prescricao_id!: number;
 
-    @Column({ type: 'simple-enum', enum: TipoExame })
-    tipo_exame!: TipoExame;
+    @Column('text')
+    tipo_exame!: string;
 
 
     @Column('boolean')

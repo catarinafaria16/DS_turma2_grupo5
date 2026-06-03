@@ -7,6 +7,7 @@
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
     /* ── variáveis ── */
     :root {
@@ -190,7 +191,7 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useEffect, useCallback } = React;
+    const { useState, useEffect, useCallback, useRef } = React;
     const API_BASE = '';
     function listaDados(dados) {
       if (Array.isArray(dados)) return dados;
@@ -3317,6 +3318,89 @@
     /* --------------------------------------------------------------------------
        DASHBOARD
        ---------------------------------------------------------------------- */
+    function GraficoScoreCarat({ dados }) {
+      const canvasRef = React.useRef(null);
+      const chartRef = React.useRef(null);
+      React.useEffect(() => {
+        if (!canvasRef.current || !dados?.length) return;
+        const sorted = [...dados].sort((a, b) => new Date(a.data) - new Date(b.data));
+        const labels = sorted.map(d => new Date(d.data).toLocaleDateString('pt-PT'));
+        const scores = sorted.map(d => d.score);
+        const pontoCor = scores.map(s => s >= 21 ? '#32CD32' : s >= 16 ? '#FFA500' : '#FF6B6B');
+        if (chartRef.current) chartRef.current.destroy();
+        chartRef.current = new window.Chart(canvasRef.current, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Score CARAT',
+                data: scores,
+                borderColor: '#3A6AAA',
+                backgroundColor: 'rgba(58,106,170,0.07)',
+                borderWidth: 2,
+                tension: 0.35,
+                pointRadius: 6,
+                pointBackgroundColor: pontoCor,
+                pointBorderColor: pontoCor,
+                fill: true,
+              },
+              {
+                label: 'Limiar (16)',
+                data: scores.map(() => 16),
+                borderColor: '#B8D4F0',
+                backgroundColor: 'transparent',
+                borderWidth: 1.5,
+                borderDash: [6, 3],
+                pointRadius: 0,
+                pointStyle: 'line',
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  color: '#1A3A6B', font: { size: 12, family: 'Arial' }, padding: 16, usePointStyle: true, boxWidth: 10,
+                  generateLabels: () => [
+                    { text: 'Score alto (≥ 21)',  fillStyle: '#32CD32', strokeStyle: '#32CD32', pointStyle: 'circle', lineWidth: 0 },
+                    { text: 'Score médio (16–21)', fillStyle: '#FFA500', strokeStyle: '#FFA500', pointStyle: 'circle', lineWidth: 0 },
+                    { text: 'Score baixo (< 16)',  fillStyle: '#FF6B6B', strokeStyle: '#FF6B6B', pointStyle: 'circle', lineWidth: 0 },
+                    { text: 'Limiar (16)', fillStyle: 'transparent', strokeStyle: '#B8D4F0', pointStyle: 'line', lineWidth: 2, lineDash: [6,3] },
+                  ]
+                }
+              },
+              tooltip: {
+                backgroundColor: '#fff', titleColor: '#1A3A6B', bodyColor: '#3A6AAA',
+                borderColor: '#D6E8FF', borderWidth: 1,
+                callbacks: {
+                  label: ctx => {
+                    const s = ctx.raw;
+                    const estado = s >= 21 ? 'Bem controlada' : s >= 16 ? 'Parcialmente controlada' : 'Mal controlada';
+                    return `Score: ${s}/30 — ${estado}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: { min: 0, max: 30, ticks: { stepSize: 5, font: { size: 11 }, color: '#3A6AAA' }, grid: { color: '#EEF4FF' }, border: { color: '#D6E8FF' } },
+              x: { ticks: { font: { size: 11 }, color: '#3A6AAA', maxRotation: 45 }, grid: { display: false }, border: { color: '#D6E8FF' } }
+            }
+          }
+        });
+        return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
+      }, [dados]);
+      if (!dados?.length) return null;
+      return (
+        <div style={{height:'220px', position:'relative'}}>
+          <canvas ref={canvasRef} />
+        </div>
+      );
+    }
+
     function SecaoDashboard({ apiFetch, user }) {
       const [utentes, setUtentes] = useState([]);
       const [utenteId, setUtenteId] = useState('');
@@ -3455,6 +3539,13 @@
                 )}
                 {!dashboard.estado_doenca && <p className="vazio">Sem avaliações CARAT registadas.</p>}
               </div>
+
+              {dashboard.historico_avaliacoes?.length >= 1 && (
+                <div className="card">
+                  <h2>Evolução do Score CARAT</h2>
+                  <GraficoScoreCarat dados={dashboard.historico_avaliacoes} />
+                </div>
+              )}
 
               <div className="card">
                 <h2 style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>

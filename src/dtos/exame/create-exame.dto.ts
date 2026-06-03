@@ -1,9 +1,8 @@
 import { EstadoExame } from '../../enums/EstadoExame.enum.js';
-import { TipoExame } from '../../enums/TipoExame.enum.js';
 
 export interface CreateExameDto {
     prescricao_id: number;
-    tipo_exame: TipoExame;
+    tipo_exame: string;
     consentimento: boolean;
     estado: EstadoExame;
 }

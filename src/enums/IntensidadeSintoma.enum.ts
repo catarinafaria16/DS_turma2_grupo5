@@ -1,5 +1,5 @@
 export enum IntensidadeSintoma {
-    LIGEIRA = 'ligeira',
-    MODERADA = 'moderada',
-    GRAVE = 'grave'
+    LIGEIRA = 'LIGEIRA',
+    MODERADA = 'MODERADA',
+    GRAVE = 'GRAVE'
 }

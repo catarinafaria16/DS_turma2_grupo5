@@ -1,10 +1,10 @@
 export enum EspecialidadeMedico {
-    PNEUMOLOGIA = 'pneumologia',
-    ALERGOLOGIA = 'alergologia',
-    IMUNOALERGOLOGIA = 'imunoalergologia',
-    MEDICINA_INTERNA = 'medicina interna',
-    MEDICINA_GERAL_FAMILIAR = 'medicina geral e familiar',
-    OTORRINOLARINGOLOGIA = 'otorrinolaringologia',
-    PEDIATRIA = 'pediatria',
-    CIRURGIA_TORACICA = 'cirurgia toracica',
+    PNEUMOLOGIA = 'PNEUMOLOGIA',
+    ALERGOLOGIA = 'ALERGOLOGIA',
+    IMUNOALERGOLOGIA = 'IMUNOALERGOLOGIA',
+    MEDICINA_INTERNA = 'MEDICINA INTERNA',
+    MEDICINA_GERAL_FAMILIAR = 'MEDICINA GERAL E FAMILIAR',
+    OTORRINOLARINGOLOGIA = 'OTORRINOLARINGOLOGIA',
+    PEDIATRIA = 'PEDIATRIA',
+    CIRURGIA_TORACICA = 'CIRURGIA TORACICA',
 }

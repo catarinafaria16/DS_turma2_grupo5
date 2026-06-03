@@ -1,6 +1,6 @@
 export enum EstadoPlanoAcompanhamento {
-    ATIVO = 'ativo',
-    CONCLUIDO = 'concluido',
-    SUSPENSO = 'suspenso',
-    CANCELADO = 'cancelado'
+    ATIVO = 'ATIVO',
+    CONCLUIDO = 'CONCLUIDO',
+    SUSPENSO = 'SUSPENSO',
+    CANCELADO = 'CANCELADO'
 }

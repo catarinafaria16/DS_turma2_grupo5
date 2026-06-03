@@ -1,4 +1,4 @@
 export enum CategoriaRegraAlerta {
-    LIMIAR_SCORE = 'limiar_score',
-    DETERIORACAO = 'deterioracao'
+    LIMIAR_SCORE = 'LIMIAR SCORE',
+    DETERIORACAO = 'DETERIORACAO'
 }
