@@ -8,6 +8,7 @@ import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export class UtenteService {
     private auditoriaService: AuditoriaService;
@@ -32,7 +33,7 @@ export class UtenteService {
         }
 
         if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-            if (utente.medico_id !== utilizador.id) {
+            if (utente.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: este utente nao pertence ao medico autenticado');
             }
             return utente;
@@ -71,7 +72,7 @@ export class UtenteService {
                 throw new Error('Contacto invalido');
             }
 
-            if (utilizador.perfil === PerfilUtilizador.MEDICO && utenteData.medico_id !== utilizador.id) {
+            if (utilizador.perfil === PerfilUtilizador.MEDICO && utenteData.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: medico so pode criar utentes para si');
             }
 
@@ -124,7 +125,7 @@ export class UtenteService {
             }
 
             if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-                return await this.repo.find({ where: { medico_id: utilizador.id } });
+                return await this.repo.find({ where: { medico_id: await obterMedicoIdAutenticado(utilizador) } });
             }
 
             if (utilizador.perfil === PerfilUtilizador.UTENTE) {
@@ -176,7 +177,7 @@ export class UtenteService {
             }
 
             if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-                if (utenteData.medico_id !== undefined && utenteData.medico_id !== utilizador.id) {
+                if (utenteData.medico_id !== undefined && utenteData.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                     throw new Error('Medico nao pode alterar o medico responsavel');
                 }
                 delete utenteData.medico_id;
@@ -210,7 +211,7 @@ export class UtenteService {
 
     async listarPorMedico(medicoId: number, utilizador: UtilizadorAutenticado): Promise<UtenteResponseDto[]> {
         try {
-            if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== utilizador.id) {
+            if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: nao pode ver utentes de outro medico');
             }
             return await this.repo.find({ where: { medico_id: medicoId } });

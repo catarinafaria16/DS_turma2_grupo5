@@ -90,6 +90,31 @@
     th { background: #D6E8FF; font-weight: 500; font-size: 13px; color: #3A6AAA; text-transform: uppercase; letter-spacing: 0.04em; }
     tr:hover td { background: var(--bg-secondary); }
 
+    .utentes-table { table-layout: fixed; width: 100%; max-width: 100%; }
+    .utentes-table th, .utentes-table td { padding: 8px 6px; vertical-align: middle; overflow: hidden; }
+    .utentes-table th { font-size: 12px; letter-spacing: 0.02em; }
+    .utentes-table input {
+      height: 34px;
+      padding: 6px 8px;
+      font-size: 13px;
+      min-width: 0;
+    }
+    .utentes-table .badge { font-size: 11px; padding: 2px 7px; }
+    .utentes-table .col-utente-id { width: 96px; }
+    .utentes-table .col-utilizador-id { width: 92px; }
+    .utentes-table .col-nr-utente { width: 88px; }
+    .utentes-table .col-morada { width: 160px; }
+    .utentes-table .col-contacto { width: 128px; }
+    .utentes-table .col-data { width: 90px; }
+    .utentes-table .col-medico-id { width: 110px; }
+    .utentes-table .col-acoes { width: 82px; }
+    .utentes-table .utente-address-input,
+    .utentes-table .utente-contact-input {
+      width: 100% !important;
+      max-width: 100%;
+    }
+    .utentes-table button { width: 74px; padding: 7px 8px; justify-content: center; font-size: 13px; }
+
     /* ── chips / badges ── */
     .badge { display: inline-block; font-size: 12px; font-weight: 500; border-radius: 99px; padding: 3px 9px; border: 0.5px solid; }
     .badge-blue   { background: #D6E8FF; color: #1A3A6B; border-color: #8AABCF; }
@@ -470,15 +495,15 @@
             <h2>Administradores Registados</h2>
             {administradores.length === 0 ? <p className="vazio">Nenhum administrador registado.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Nome</th><th>Email</th><th>Utilizador ID</th></tr></thead>
+                <thead><tr><th>Administrador ID</th><th>Utilizador ID</th><th>Nome</th><th>Email</th></tr></thead>
                 <tbody>{administradores.map(a => {
                   const utilizador = utilizadorDoAdmin(a);
                   return (
                     <tr key={a.id}>
                       <td>{a.id}</td>
+                      <td><span className="badge badge-brown">{a.utilizador_id}</span></td>
                       <td>{utilizador?.nome || '—'}</td>
                       <td>{utilizador?.email || '—'}</td>
-                      <td><span className="badge badge-brown">{a.utilizador_id}</span></td>
                     </tr>
                   );
                 })}</tbody>
@@ -697,9 +722,10 @@
             <h2>Médicos Registados</h2>
             {medicos.length === 0 ? <p className="vazio">Nenhum médico registado.</p> : (
               <table>
-                <thead><tr><th>#</th><th>Especialidade</th><th>Contacto</th><th>Utilizador ID</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Médico ID</th><th>Utilizador ID</th><th>Especialidade</th><th>Contacto</th><th>Ações</th></tr></thead>
                 <tbody>{medicos.map(m => (
                   <tr key={m.id}><td>{m.id}</td>
+                    <td><span className="badge badge-blue">{m.utilizador_id}</span></td>
                     <td>
                       <select value={edicoesMedicos[m.id]?.especialidade || m.especialidade} onChange={setEdicaoMedico(m.id, 'especialidade')}>
                         <option value="PNEUMOLOGIA">Pneumologia</option>
@@ -712,7 +738,6 @@
                       </select>
                     </td>
                     <td><input value={edicoesMedicos[m.id]?.contacto || ''} onChange={setEdicaoMedico(m.id, 'contacto')} /></td>
-                    <td><span className="badge badge-blue">{m.utilizador_id}</span></td>
                     <td><button type="button" onClick={() => guardarEdicaoMedico(m)}>Guardar</button></td>
                   </tr>
                 ))}</tbody>
@@ -983,9 +1008,9 @@
               <h2>Utentes Registados</h2>
               {utentes.length === 0 ? <p className="vazio">Nenhum utente associado a este medico.</p> : (
                 <table>
-                  <thead><tr><th>#</th><th>Nº Utente</th><th>Data Nasc.</th><th>Médico ID</th></tr></thead>
+                  <thead><tr><th>Utente ID</th><th>Utilizador ID</th><th>Nº Utente</th><th>Data Nasc.</th><th>Médico ID</th></tr></thead>
                   <tbody>{utentes.map(u => (
-                    <tr key={u.id}><td>{u.id}</td><td>{u.nr_utente}</td>
+                    <tr key={u.id}><td>{u.id}</td><td><span className="badge badge-brown">{u.utilizador_id}</span></td><td>{u.nr_utente}</td>
                       <td>{u.data_nascimento ? `${new Date(u.data_nascimento).toLocaleDateString('pt-PT')} (${calcularIdade(u.data_nascimento)} anos)` : '—'}</td>
                       <td><span className="badge badge-blue">{u.medico_id}</span></td>
                     </tr>
@@ -1035,12 +1060,22 @@
           <div className="card">
             <h2>Utentes Registados</h2>
             {utentes.length === 0 ? <p className="vazio">Nenhum utente registado.</p> : (
-              <table>
-                <thead><tr><th>#</th><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Médico ID</th><th>Ações</th></tr></thead>
+              <table className="utentes-table">
+                <colgroup>
+                  <col className="col-utente-id" />
+                  <col className="col-utilizador-id" />
+                  <col className="col-nr-utente" />
+                  <col className="col-morada" />
+                  <col className="col-contacto" />
+                  <col className="col-data" />
+                  <col className="col-medico-id" />
+                  <col className="col-acoes" />
+                </colgroup>
+                <thead><tr><th>Utente ID</th><th>Utilizador ID</th><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Médico ID</th><th>Ações</th></tr></thead>
                 <tbody>{utentes.map(u => (
-                  <tr key={u.id}><td>{u.id}</td><td>{u.nr_utente}</td>
-                    <td><input value={edicoesUtentes[u.id]?.morada || ''} onChange={setEdicaoUtente(u.id, 'morada')} /></td>
-                    <td><input value={edicoesUtentes[u.id]?.contacto || ''} onChange={setEdicaoUtente(u.id, 'contacto')} /></td>
+                  <tr key={u.id}><td>{u.id}</td><td><span className="badge badge-brown">{u.utilizador_id}</span></td><td>{u.nr_utente}</td>
+                    <td><input className="utente-address-input" value={edicoesUtentes[u.id]?.morada || ''} onChange={setEdicaoUtente(u.id, 'morada')} /></td>
+                    <td><input className="utente-contact-input" value={edicoesUtentes[u.id]?.contacto || ''} onChange={setEdicaoUtente(u.id, 'contacto')} /></td>
                     <td>{u.data_nascimento ? new Date(u.data_nascimento).toLocaleDateString('pt-PT') : '—'}</td>
                     <td><span className="badge badge-blue">{u.medico_id}</span></td>
                     <td><button type="button" onClick={() => guardarEdicaoUtente(u)}>Guardar</button></td>

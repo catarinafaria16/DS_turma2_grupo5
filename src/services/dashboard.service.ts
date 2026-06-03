@@ -6,6 +6,7 @@ import { Sintoma } from '../models/sintoma.entity.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
+import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export interface EvolucaoScore {
     data: Date;
@@ -67,7 +68,7 @@ export class DashboardService {
         }
 
         if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-            if (utente.medico_id !== utilizador.id) {
+            if (utente.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: este utente nao pertence ao medico autenticado');
             }
             return utente;

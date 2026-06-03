@@ -10,6 +10,7 @@ import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export class MedicacaoService {
     private auditoriaService: AuditoriaService;
@@ -103,7 +104,7 @@ export class MedicacaoService {
         }
 
         if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-            if (prescricao.medico_id !== utilizador.id || utente.medico_id !== utilizador.id) {
+            if (prescricao.medico_id !== await obterMedicoIdAutenticado(utilizador) || utente.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: esta prescricao nao pertence ao medico autenticado');
             }
             return prescricao;
@@ -271,7 +272,7 @@ export class MedicacaoService {
 
             let prescricoes: Prescricao[] = [];
             if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-                prescricoes = await this.prescricaoRepo.find({ where: { medico_id: utilizador.id } });
+                prescricoes = await this.prescricaoRepo.find({ where: { medico_id: await obterMedicoIdAutenticado(utilizador) } });
             } else {
                 const utente = await this.utenteRepo.findOne({ where: { utilizador_id: utilizador.id } });
                 if (!utente) {

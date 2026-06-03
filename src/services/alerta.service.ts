@@ -11,6 +11,7 @@ import { AuditoriaService } from './auditoria.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 import { validarEnum } from '../utils/validateEnum.js';
+import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export class AlertaService {
     private auditoriaService: AuditoriaService;
@@ -28,7 +29,7 @@ export class AlertaService {
 
         if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) return utente;
         if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-            if (utente.medico_id !== utilizador.id) {
+            if (utente.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: este utente nao pertence ao medico autenticado');
             }
             return utente;
@@ -64,7 +65,7 @@ export class AlertaService {
             const utente = await this.validarAcessoUtente(alertaData.utente_id, utilizador);
             if (
                 utilizador.perfil === PerfilUtilizador.MEDICO &&
-                (alertaData.medico_id !== utilizador.id || utente.medico_id !== utilizador.id)
+                (alertaData.medico_id !== await obterMedicoIdAutenticado(utilizador) || utente.medico_id !== await obterMedicoIdAutenticado(utilizador))
             ) {
                 throw new Error('Acesso negado: medico so pode criar alertas dos seus utentes');
             }
@@ -109,7 +110,7 @@ export class AlertaService {
                 return await this.repo.find() as AlertaResponseDto[];
             }
             if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-                return await this.repo.find({ where: { medico_id: utilizador.id } }) as AlertaResponseDto[];
+                return await this.repo.find({ where: { medico_id: await obterMedicoIdAutenticado(utilizador) } }) as AlertaResponseDto[];
             }
 
             const utente = await this.utenteRepo.findOne({ where: { utilizador_id: utilizador.id } });
@@ -135,7 +136,7 @@ export class AlertaService {
     async listarPorMedico(medicoId: number, utilizador: UtilizadorAutenticado): Promise<AlertaResponseDto[]> {
         try {
             if (medicoId <= 0) throw new Error('ID do medico invalido');
-            if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== utilizador.id) {
+            if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: nao pode consultar alertas de outro medico');
             }
             if (utilizador.perfil === PerfilUtilizador.UTENTE) {

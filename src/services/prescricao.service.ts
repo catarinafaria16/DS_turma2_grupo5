@@ -10,6 +10,7 @@ import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 import { validarEnum } from '../utils/validateEnum.js';
+import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export class PrescricaoService {
     private auditoriaService: AuditoriaService;
@@ -27,7 +28,7 @@ export class PrescricaoService {
 
         if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) return utente;
         if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-            if (utente.medico_id !== utilizador.id) {
+            if (utente.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: este utente nao pertence ao medico autenticado');
             }
             return utente;
@@ -65,7 +66,7 @@ export class PrescricaoService {
             const utente = await this.validarAcessoUtente(prescricaoData.utente_id, utilizador);
             if (
                 utilizador.perfil === PerfilUtilizador.MEDICO &&
-                (prescricaoData.medico_id !== utilizador.id || utente.medico_id !== utilizador.id)
+                (prescricaoData.medico_id !== await obterMedicoIdAutenticado(utilizador) || utente.medico_id !== await obterMedicoIdAutenticado(utilizador))
             ) {
                 throw new Error('Acesso negado: medico so pode criar prescricoes para os seus utentes');
             }
@@ -110,7 +111,7 @@ export class PrescricaoService {
                 if (!utente) return [];
                 return await this.repo.find({ where: { utente_id: utente.id } }) as PrescricaoResponseDto[];
             }
-            return await this.repo.find({ where: { medico_id: utilizador.id } }) as PrescricaoResponseDto[];
+            return await this.repo.find({ where: { medico_id: await obterMedicoIdAutenticado(utilizador) } }) as PrescricaoResponseDto[];
         } catch (error) {
             console.error('Erro ao listar prescricoes:', error);
             throw error;
@@ -131,7 +132,7 @@ export class PrescricaoService {
     async listarPorMedico(medicoId: number, utilizador: UtilizadorAutenticado): Promise<PrescricaoResponseDto[]> {
         try {
             if (medicoId <= 0) throw new Error('ID do medico invalido');
-            if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== utilizador.id) {
+            if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: nao pode consultar prescricoes de outro medico');
             }
             return await this.repo.find({ where: { medico_id: medicoId } }) as PrescricaoResponseDto[];
@@ -158,7 +159,7 @@ export class PrescricaoService {
 
             if (
                 utilizador.perfil === PerfilUtilizador.MEDICO &&
-                (prescricaoData.medico_id !== utilizador.id || utente.medico_id !== utilizador.id)
+                (prescricaoData.medico_id !== await obterMedicoIdAutenticado(utilizador) || utente.medico_id !== await obterMedicoIdAutenticado(utilizador))
             ) {
                 throw new Error('Acesso negado: nao pode alterar prescricoes de outro medico');
             }

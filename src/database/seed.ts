@@ -44,7 +44,7 @@ const AVALIACAO_CARAT_V1 = {
     r9: OPTS_1_9, r10: OPTS_10,
 };
 
-async function seedTable<T extends { id?: any }>(
+async function seedTable<T extends Record<string, any>>(
     repo: any,
     dados: T[],
     label: string,

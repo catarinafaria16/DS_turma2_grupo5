@@ -8,6 +8,7 @@ import { AuditoriaService } from './auditoria.service.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export class MedicacaoHabitualService {
     private auditoriaService: AuditoriaService;
@@ -40,7 +41,7 @@ export class MedicacaoHabitualService {
         }
 
         if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-            if (utente.medico_id !== utilizador.id) {
+            if (utente.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: este utente nao pertence ao medico autenticado');
             }
             return anamnese;
@@ -109,7 +110,7 @@ export class MedicacaoHabitualService {
                 return await this.repo.find() as MedicacaoHabitualResponseDto[];
             }
 
-            const utentes = await this.utenteRepo.find({ where: { medico_id: utilizador.id } });
+            const utentes = await this.utenteRepo.find({ where: { medico_id: await obterMedicoIdAutenticado(utilizador) } });
             const utenteIds = utentes.map((utente) => utente.id);
             if (utenteIds.length === 0) {
                 return [];

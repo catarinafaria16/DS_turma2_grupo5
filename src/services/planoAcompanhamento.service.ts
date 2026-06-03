@@ -9,6 +9,7 @@ import { AuditoriaService } from './auditoria.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 import { validarEnum } from '../utils/validateEnum.js';
+import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export class PlanoAcompanhamentoService {
     private auditoriaService: AuditoriaService;
@@ -35,7 +36,7 @@ export class PlanoAcompanhamentoService {
         }
 
         if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-            if (utente.medico_id !== utilizador.id) {
+            if (utente.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: este utente nao pertence ao medico autenticado');
             }
             return utente;
@@ -79,7 +80,7 @@ export class PlanoAcompanhamentoService {
             const utente = await this.validarAcessoUtente(planoData.utente_id, utilizador);
             if (
                 utilizador.perfil === PerfilUtilizador.MEDICO &&
-                (planoData.medico_id !== utilizador.id || utente.medico_id !== utilizador.id)
+                (planoData.medico_id !== await obterMedicoIdAutenticado(utilizador) || utente.medico_id !== await obterMedicoIdAutenticado(utilizador))
             ) {
                 throw new Error('Acesso negado: medico so pode criar planos para os seus utentes');
             }
@@ -129,7 +130,7 @@ export class PlanoAcompanhamentoService {
                 return await this.repo.find({ where: { utente_id: utente.id } }) as PlanoAcompanhamentoResponseDto[];
             }
 
-            return await this.repo.find({ where: { medico_id: utilizador.id } }) as PlanoAcompanhamentoResponseDto[];
+            return await this.repo.find({ where: { medico_id: await obterMedicoIdAutenticado(utilizador) } }) as PlanoAcompanhamentoResponseDto[];
         } catch (error) {
             console.error('Erro ao listar planos de acompanhamento:', error);
             throw error;
@@ -151,7 +152,7 @@ export class PlanoAcompanhamentoService {
             if (medicoId <= 0) {
                 throw new Error('ID do medico invalido');
             }
-            if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== utilizador.id) {
+            if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: nao pode consultar planos de outro medico');
             }
 
@@ -181,10 +182,10 @@ export class PlanoAcompanhamentoService {
             if (
                 utilizador.perfil === PerfilUtilizador.MEDICO &&
                 (
-                    anterior.medico_id !== utilizador.id ||
-                    planoData.medico_id !== utilizador.id ||
-                    utenteAnterior.medico_id !== utilizador.id ||
-                    utenteNovo.medico_id !== utilizador.id
+                    anterior.medico_id !== await obterMedicoIdAutenticado(utilizador) ||
+                    planoData.medico_id !== await obterMedicoIdAutenticado(utilizador) ||
+                    utenteAnterior.medico_id !== await obterMedicoIdAutenticado(utilizador) ||
+                    utenteNovo.medico_id !== await obterMedicoIdAutenticado(utilizador)
                 )
             ) {
                 throw new Error('Acesso negado: nao pode alterar planos de outro medico');
@@ -222,7 +223,7 @@ export class PlanoAcompanhamentoService {
             const anterior = await this.obterInterno(planoId);
             await this.validarAcessoUtente(anterior.utente_id, utilizador);
 
-            if (utilizador.perfil === PerfilUtilizador.MEDICO && anterior.medico_id !== utilizador.id) {
+            if (utilizador.perfil === PerfilUtilizador.MEDICO && anterior.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: nao pode alterar planos de outro medico');
             }
 

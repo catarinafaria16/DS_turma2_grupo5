@@ -9,6 +9,7 @@ import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 import { validarEnum } from '../utils/validateEnum.js';
+import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export class RegraAlertaService {
     private auditoriaService: AuditoriaService;
@@ -19,10 +20,10 @@ export class RegraAlertaService {
 
     private get repo() { return AppDataSource.getRepository(RegraAlerta); }
 
-    private validarAcessoMedico(medicoId: number | undefined, utilizador: UtilizadorAutenticado): void {
+    private async validarAcessoMedico(medicoId: number | undefined, utilizador: UtilizadorAutenticado): Promise<void> {
         if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) return;
         if (!medicoId || medicoId <= 0) throw new Error('Acesso negado');
-        if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== utilizador.id) {
+        if (utilizador.perfil === PerfilUtilizador.MEDICO && medicoId !== await obterMedicoIdAutenticado(utilizador)) {
             throw new Error('Acesso negado: nao pode gerir regras de outro medico');
         }
     }
@@ -49,7 +50,7 @@ export class RegraAlertaService {
                 throw new Error('ID do administrador invalido');
             }
 
-            this.validarAcessoMedico(regraData.medico_id, utilizador);
+            await this.validarAcessoMedico(regraData.medico_id, utilizador);
 
             validarEnum(CategoriaRegraAlerta, regraData.categoria, 'categoria');
             validarEnum(PrioridadeRegraAlerta, regraData.prioridade, 'prioridade');
@@ -83,7 +84,7 @@ export class RegraAlertaService {
     async obter(regraId: number, utilizador: UtilizadorAutenticado): Promise<RegraAlertaResponseDto> {
         try {
             const regra = await this.obterInterna(regraId);
-            this.validarAcessoMedico(regra.medico_id, utilizador);
+            await this.validarAcessoMedico(regra.medico_id, utilizador);
             return regra as RegraAlertaResponseDto;
         } catch (error) {
             console.error('Erro ao obter regra de alerta:', error);
@@ -99,7 +100,7 @@ export class RegraAlertaService {
             }
 
             // Medico ve e ajusta apenas os valores das regras ligadas aos seus proprios utentes.
-            return await this.repo.find({ where: { medico_id: utilizador.id } }) as RegraAlertaResponseDto[];
+            return await this.repo.find({ where: { medico_id: await obterMedicoIdAutenticado(utilizador) } }) as RegraAlertaResponseDto[];
         } catch (error) {
             console.error('Erro ao listar regras de alerta:', error);
             throw error;
@@ -108,7 +109,7 @@ export class RegraAlertaService {
 
     async listarPorMedico(medicoId: number, utilizador: UtilizadorAutenticado): Promise<RegraAlertaResponseDto[]> {
         try {
-            this.validarAcessoMedico(medicoId, utilizador);
+            await this.validarAcessoMedico(medicoId, utilizador);
             return await this.repo.find({ where: { medico_id: medicoId } }) as RegraAlertaResponseDto[];
         } catch (error) {
             console.error('Erro ao listar regras por medico:', error);
@@ -123,8 +124,8 @@ export class RegraAlertaService {
     ): Promise<RegraAlertaResponseDto> {
         try {
             const anterior = await this.obterInterna(regraId);
-            this.validarAcessoMedico(anterior.medico_id, utilizador);
-            this.validarAcessoMedico(regraData.medico_id, utilizador);
+            await this.validarAcessoMedico(anterior.medico_id, utilizador);
+            await this.validarAcessoMedico(regraData.medico_id, utilizador);
 
             validarEnum(CategoriaRegraAlerta, regraData.categoria, 'categoria');
             validarEnum(PrioridadeRegraAlerta, regraData.prioridade, 'prioridade');
@@ -157,7 +158,7 @@ export class RegraAlertaService {
     async apagar(regraId: number, utilizador: UtilizadorAutenticado): Promise<void> {
         try {
             const anterior = await this.obterInterna(regraId);
-            this.validarAcessoMedico(anterior.medico_id, utilizador);
+            await this.validarAcessoMedico(anterior.medico_id, utilizador);
             await this.repo.softDelete(regraId);
 
             this.auditoriaService.registarAuditoria(

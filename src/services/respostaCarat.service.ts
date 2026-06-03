@@ -13,6 +13,7 @@ import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
+import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export class RespostaCaratService {
     private auditoriaService: AuditoriaService;
@@ -32,7 +33,7 @@ export class RespostaCaratService {
 
         if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) return utente;
         if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-            if (utente.medico_id !== utilizador.id) {
+            if (utente.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: este utente nao pertence ao medico autenticado');
             }
             return utente;
@@ -207,7 +208,7 @@ export class RespostaCaratService {
                 return await this.repo.find() as RespostaCaratResponseDto[];
             }
             if (utilizador.perfil === PerfilUtilizador.MEDICO) {
-                const utentes = await this.utenteRepo.find({ where: { medico_id: utilizador.id } });
+                const utentes = await this.utenteRepo.find({ where: { medico_id: await obterMedicoIdAutenticado(utilizador) } });
                 const utenteIds = utentes.map((u) => u.id);
                 if (utenteIds.length === 0) return [];
                 return await this.repo

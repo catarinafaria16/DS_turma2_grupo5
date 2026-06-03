@@ -87,8 +87,8 @@ export class FhirService {
         const resposta = await fetch(url);
         if (!resposta.ok) throw new Error(`Erro servidor FHIR externo: ${resposta.status}`);
 
-        const bundle = await resposta.json();
-        const resources = (bundle.entry ?? []).map((e: any) => mapToExternalObservation(e.resource));
+        const bundle = await resposta.json() as { entry?: Array<{ resource?: any }> };
+        const resources = (bundle.entry ?? []).map((e) => mapToExternalObservation(e.resource));
         return toBundle(resources);
     }
 }
