@@ -7,7 +7,6 @@
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
     /* ── variáveis ── */
     :root {
@@ -143,7 +142,7 @@
     .audit-user   { display: inline-block; min-width: 44px; color: var(--color-primary); font-weight: 500; }
     .audit-record { color: var(--color-secondary); font-weight: 500; }
     .audit-op { display: inline-flex; align-items: center; justify-content: center; min-width: 96px; height: 26px; padding: 0 12px; border: 0.5px solid transparent; border-radius: 99px; font-size: 12px; font-weight: 500; cursor: default; }
-    .audit-op-create { background: var(--bg-success); color: var(--color-success); border-color: #C0DD97; cursor: pointer; }
+    .audit-op-create { background: var(--bg-success); color: var(--color-success); border-color: #C0DD97; }
     .audit-op-update { background: #FFFACD; color: #3D2600; border-color: #CCCC00; cursor: pointer; }
     .audit-op-delete { background: var(--bg-danger);  color: var(--color-danger);  border-color: #F09595; cursor: pointer; }
     .audit-op-close  { background: var(--bg-secondary); color: var(--color-secondary); border-color: var(--border-secondary); cursor: pointer; }
@@ -159,7 +158,7 @@
     .audit-after  { color: var(--color-success); }
 
     /* ── footer ── */
-    footer { text-align: center; padding: 10px; font-size: 13px; color: var(--color-tertiary); border-top: 0.5px solid var(--border-tertiary); background: var(--bg-primary); flex-shrink: 0; }
+    footer { text-align: center; padding: 14px; font-size: 13px; color: var(--color-tertiary); border-top: 0.5px solid var(--border-tertiary); background: var(--bg-primary); margin-top: 8px; border-radius: 8px; }
 
     /* ── login (componente embutido) ── */
     .login-container { max-width: 420px; margin: 60px auto; padding: 0 16px; }
@@ -301,7 +300,7 @@
       const [passwordForm, setPasswordForm] = useState({ password: '', confirmar: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
-      const perfilBadge = { utente: 'badge-pink', medico: 'badge-blue', administrador: 'badge-brown' };
+      const perfilBadge = { UTENTE: 'badge-pink', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-brown' };
       function setPassword(f) { return e => setPasswordForm(p => ({ ...p, [f]: e.target.value })); }
       async function atualizarPassword(e) {
         e.preventDefault(); setErro(''); setSucesso('');
@@ -352,7 +351,7 @@
 
     function SecaoUtilizadores({ apiFetch }) {
       const [utilizadores, setUtilizadores] = useState([]);
-      const [form, setForm] = useState({ nome: '', email: '', password: '', perfil: 'utente', genero: '' });
+      const [form, setForm] = useState({ nome: '', email: '', password: '', perfil: 'UTENTE', genero: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
@@ -365,10 +364,10 @@
         if (!form.genero) { setErro('Género é obrigatório.'); return; }
         const body = { nome: form.nome, email: form.email, password: form.password, perfil: form.perfil, genero: form.genero };
         const r = await apiFetch('/api/utilizadores', { method: 'POST', body });
-        if (r.ok) { setForm({ nome: '', email: '', password: '', perfil: 'utente', genero: '' }); setSucesso(`Utilizador criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
+        if (r.ok) { setForm({ nome: '', email: '', password: '', perfil: 'UTENTE', genero: '' }); setSucesso(`Utilizador criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar utilizador.');
       }
-      const perfilBadge = { utente: 'badge-pink', medico: 'badge-blue', administrador: 'badge-brown' };
+      const perfilBadge = { UTENTE: 'badge-pink', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-brown' };
       return (
         <>
           <div className="card">
@@ -378,15 +377,15 @@
               <input value={form.email} onChange={set('email')} placeholder="Email" type="email" required />
               <input value={form.password} onChange={set('password')} placeholder="Password (mín. 6 caracteres)" type="password" required />
               <select value={form.perfil} onChange={set('perfil')}>
-                <option value="utente">Utente</option>
-                <option value="medico">Médico</option>
-                <option value="administrador">Administrador</option>
+                <option value="UTENTE">Utente</option>
+                <option value="MEDICO">Médico</option>
+                <option value="ADMINISTRADOR">Administrador</option>
               </select>
               <select value={form.genero} onChange={set('genero')} required>
                 <option value="">-- Selecionar género --</option>
-                <option value="feminino">Feminino</option>
-                <option value="masculino">Masculino</option>
-                <option value="outro">Outro</option>
+                <option value="FEMININO">Feminino</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="OUTRO">Outro</option>
               </select>
               <button type="submit">Criar utilizador</button>
               {erro && <p className="erro">{erro}</p>}
@@ -432,7 +431,7 @@
       }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const ru = await apiFetch('/api/utilizadores', { method: 'POST', body: { nome: form.nome, email: form.email, password: form.password, perfil: 'administrador', genero: form.genero } });
+        const ru = await apiFetch('/api/utilizadores', { method: 'POST', body: { nome: form.nome, email: form.email, password: form.password, perfil: 'ADMINISTRADOR', genero: form.genero } });
         if (!ru.ok) {
           setErro(ru.data.erro || 'Erro ao criar utilizador administrador.');
           return;
@@ -457,9 +456,9 @@
               <input value={form.password} onChange={set('password')} placeholder="Password (mín. 6 caracteres)" type="password" required />
               <select value={form.genero} onChange={set('genero')} required>
                 <option value="">-- Selecionar género --</option>
-                <option value="feminino">Feminino</option>
-                <option value="masculino">Masculino</option>
-                <option value="outro">Outro</option>
+                <option value="FEMININO">Feminino</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="OUTRO">Outro</option>
               </select>
               <button type="submit">Registar administrador</button>
               {erro && <p className="erro">{erro}</p>}
@@ -492,7 +491,7 @@
     function SecaoMedicos({ apiFetch, user }) {
       const [medicos, setMedicos] = useState([]);
       const [utilizadores, setUtilizadores] = useState([]);
-      const [form, setForm] = useState({ nome: '', email: '', password: '', genero: '', especialidade: 'pneumologia', contacto: '' });
+      const [form, setForm] = useState({ nome: '', email: '', password: '', genero: '', especialidade: 'PNEUMOLOGIA', contacto: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       const [contactoEditavel, setContactoEditavel] = useState('');
@@ -517,7 +516,7 @@
           if (r.ok) {
             const dados = listaDados(r.data.dados);
             setMedicos(dados);
-            setEdicoesMedicos(Object.fromEntries(dados.map(m => [m.id, { especialidade: m.especialidade || 'pneumologia', contacto: m.contacto || '' }])));
+            setEdicoesMedicos(Object.fromEntries(dados.map(m => [m.id, { especialidade: m.especialidade || 'PNEUMOLOGIA', contacto: m.contacto || '' }])));
           }
         } catch {}
       }
@@ -534,13 +533,13 @@
       }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const ru = await apiFetch('/api/utilizadores', { method: 'POST', body: { nome: form.nome, email: form.email, password: form.password, perfil: 'medico', genero: form.genero } });
+        const ru = await apiFetch('/api/utilizadores', { method: 'POST', body: { nome: form.nome, email: form.email, password: form.password, perfil: 'MEDICO', genero: form.genero } });
         if (!ru.ok) {
           setErro(ru.data.erro || 'Erro ao criar utilizador medico.');
           return;
         }
         const r = await apiFetch('/api/medicos', { method: 'POST', body: { utilizador_id: Number(ru.data.dados?.id), especialidade: form.especialidade, contacto: form.contacto } });
-        if (r.ok) { setForm({ nome: '', email: '', password: '', genero: '', especialidade: 'pneumologia', contacto: '' }); setSucesso('Medico registado com sucesso.'); buscar(); buscarUtilizadores(); }
+        if (r.ok) { setForm({ nome: '', email: '', password: '', genero: '', especialidade: 'PNEUMOLOGIA', contacto: '' }); setSucesso('Medico registado com sucesso.'); buscar(); buscarUtilizadores(); }
         else setErro(r.data.erro || 'Erro ao registar médico.');
       }
       async function guardarEdicaoMedico(medico) {
@@ -561,7 +560,7 @@
           setErro(r.data.erro || 'Erro ao atualizar médico.');
         }
       }
-      const medicoAutenticado = user?.perfil === 'medico'
+      const medicoAutenticado = user?.perfil === 'MEDICO'
         ? medicos.find(m => m.utilizador_id === user.id) ?? null
         : null;
 
@@ -609,7 +608,7 @@
         }
       }
 
-      if (user?.perfil === 'medico') {
+      if (user?.perfil === 'MEDICO') {
         return (
           <>
             <div className="card">
@@ -674,18 +673,18 @@
               <input value={form.password} onChange={set('password')} placeholder="Password (min. 6 caracteres)" type="password" required />
               <select value={form.genero} onChange={set('genero')} required>
                 <option value="">-- Selecionar género --</option>
-                <option value="feminino">Feminino</option>
-                <option value="masculino">Masculino</option>
-                <option value="outro">Outro</option>
+                <option value="FEMININO">Feminino</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="OUTRO">Outro</option>
               </select>
               <select value={form.especialidade} onChange={set('especialidade')} required>
-                <option value="pneumologia">Pneumologia</option>
-                <option value="alergologia">Alergologia</option>
-                <option value="imunoalergologia">Imunoalergologia</option>
-                <option value="medicina interna">Medicina Interna</option>
-                <option value="medicina geral e familiar">Medicina Geral e Familiar</option>
-                <option value="otorrinolaringologia">Otorrinolaringologia</option>
-                <option value="pediatria">Pediatria</option>
+                <option value="PNEUMOLOGIA">Pneumologia</option>
+                <option value="ALERGOLOGIA">Alergologia</option>
+                <option value="IMUNOALERGOLOGIA">Imunoalergologia</option>
+                <option value="MEDICINA INTERNA">Medicina Interna</option>
+                <option value="MEDICINA GERAL E FAMILIAR">Medicina Geral e Familiar</option>
+                <option value="OTORRINOLARINGOLOGIA">Otorrinolaringologia</option>
+                <option value="PEDIATRIA">Pediatria</option>
               </select>
               <input value={form.contacto} onChange={set('contacto')} placeholder="Contacto" required />
               <button type="submit">Registar médico</button>
@@ -702,13 +701,13 @@
                   <tr key={m.id}><td>{m.id}</td>
                     <td>
                       <select value={edicoesMedicos[m.id]?.especialidade || m.especialidade} onChange={setEdicaoMedico(m.id, 'especialidade')}>
-                        <option value="pneumologia">Pneumologia</option>
-                        <option value="alergologia">Alergologia</option>
-                        <option value="imunoalergologia">Imunoalergologia</option>
-                        <option value="medicina interna">Medicina Interna</option>
-                        <option value="medicina geral e familiar">Medicina Geral e Familiar</option>
-                        <option value="otorrinolaringologia">Otorrinolaringologia</option>
-                        <option value="pediatria">Pediatria</option>
+                        <option value="PNEUMOLOGIA">Pneumologia</option>
+                        <option value="ALERGOLOGIA">Alergologia</option>
+                        <option value="IMUNOALERGOLOGIA">Imunoalergologia</option>
+                        <option value="MEDICINA INTERNA">Medicina Interna</option>
+                        <option value="MEDICINA GERAL E FAMILIAR">Medicina Geral e Familiar</option>
+                        <option value="OTORRINOLARINGOLOGIA">Otorrinolaringologia</option>
+                        <option value="PEDIATRIA">Pediatria</option>
                       </select>
                     </td>
                     <td><input value={edicoesMedicos[m.id]?.contacto || ''} onChange={setEdicaoMedico(m.id, 'contacto')} /></td>
@@ -795,7 +794,7 @@
       }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const ru = await apiFetch('/api/utilizadores', { method: 'POST', body: { nome: form.nome, email: form.email, password: form.password, perfil: 'utente', genero: form.genero } });
+        const ru = await apiFetch('/api/utilizadores', { method: 'POST', body: { nome: form.nome, email: form.email, password: form.password, perfil: 'UTENTE', genero: form.genero } });
         if (!ru.ok) {
           setErro(ru.data.erro || 'Erro ao criar utilizador utente.');
           return;
@@ -805,11 +804,11 @@
         if (r.ok) { setForm({ nome: '', email: '', password: '', genero: '', medico_id: '', nr_utente: '', data_nascimento: '', morada: '', contacto: '', nr_faturacao: '' }); setSucesso('Utente criado com sucesso.'); buscar(); buscarDeps(); }
         else setErro(r.data.erro || 'Erro ao criar utente.');
       }
-      const utenteAutenticado = user?.perfil === 'utente'
+      const utenteAutenticado = user?.perfil === 'UTENTE'
         ? utentes.find(u => u.utilizador_id === user.id) ?? null
         : null;
       useEffect(() => {
-        if (user?.perfil === 'utente' && utenteAutenticado) {
+        if (user?.perfil === 'UTENTE' && utenteAutenticado) {
           setDadosEditaveis({
             email: user.email || '',
             morada: utenteAutenticado.morada || '',
@@ -922,7 +921,7 @@
         }
       }
 
-      if (user?.perfil === 'utente') {
+      if (user?.perfil === 'UTENTE') {
         return (
           <>
             <div className="card">
@@ -976,7 +975,7 @@
         );
       }
 
-      if (user?.perfil === 'medico') {
+      if (user?.perfil === 'MEDICO') {
         return (
           <>
             <div className="card">
@@ -1007,9 +1006,9 @@
                 <input value={form.password} onChange={set('password')} placeholder="Password (min. 6 caracteres)" type="password" required />
                 <select value={form.genero} onChange={set('genero')} required>
                   <option value="">-- Selecionar género --</option>
-                  <option value="feminino">Feminino</option>
-                  <option value="masculino">Masculino</option>
-                  <option value="outro">Outro</option>
+                  <option value="FEMININO">Feminino</option>
+                  <option value="MASCULINO">Masculino</option>
+                  <option value="OUTRO">Outro</option>
                 </select>
                 <select value={form.medico_id} onChange={set('medico_id')} required>
                   <option value="">-- Selecionar médico --</option>
@@ -1060,14 +1059,14 @@
       const [utentes, setUtentes] = useState([]);
       const [utenteSelecionado, setUtenteSelecionado] = useState('');
       const [tipoFiltro, setTipoFiltro] = useState('');
-      const [form, setForm] = useState({ medico_id: '', utente_id: '', tipo: 'medicacao', data_validade: '' });
+      const [form, setForm] = useState({ medico_id: '', utente_id: '', tipo: 'MEDICACAO', data_validade: '' });
       const [showConfirm, setShowConfirm] = useState(false);
       const [confirmPass, setConfirmPass] = useState('');
       const [confirmErro, setConfirmErro] = useState('');
       const [confirmLoading, setConfirmLoading] = useState(false);
       const [formMed, setFormMed] = useState({ nome: '', dose: '', duracao: '', periodicidade: '' });
       const [periodicidadeOpcao, setPeriodicidadeOpcao] = useState('');
-      const [formExame, setFormExame] = useState({ tipo_exame: 'espirometria', consentimento: 'true' });
+      const [formExame, setFormExame] = useState({ tipo_exame: 'ESPIROMETRIA', consentimento: 'true' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       const medicamentosSugeridos = [
@@ -1120,15 +1119,15 @@
         'Doxiciclina':             ['50 mg','100 mg'],
       };
       const examesSugeridos = [
-        'espirometria', 'pico fluxo', 'pletismografia', 'pressoes respiratorias maximas',
-        'teste broncodilatador', 'teste broncoprovocacao', 'teste de esforco',
-        'oximetria de pulso', 'oximetria noturna', 'gasometria arterial',
-        'radiografia toracica', 'tac toracica', 'ecografia toracica', 'broncoscopia',
-        'lavagem broncoalveolar', 'biopsia bronquica', 'intradermorreacao',
-        'teste de provocacao oral', 'teste de provocacao nasal',
-        'teste de provocacao bronquica com alergeno', 'ige serica', 'ige especifica',
-        'triptase serica', 'histamina serica', 'hemograma', 'analises de sangue',
-        'citologia nasal', 'rinoscopia', 'nasofibroscopia', 'audiograma'
+        'ESPIROMETRIA', 'PICO FLUXO', 'PLETISMOGRAFIA', 'PRESSOES RESPIRATORIAS MAXIMAS',
+        'TESTE BRONCODILATADOR', 'TESTE BRONCOPROVOCACAO', 'TESTE DE ESFORCO',
+        'OXIMETRIA DE PULSO', 'OXIMETRIA NOTURNA', 'GASOMETRIA ARTERIAL',
+        'RADIOGRAFIA TORACICA', 'TAC TORACICA', 'ECOGRAFIA TORACICA', 'BRONCOSCOPIA',
+        'LAVAGEM BRONCOALVEOLAR', 'BIOPSIA BRONQUICA', 'INTRADERMORREACAO',
+        'TESTE DE PROVOCACAO ORAL', 'TESTE DE PROVOCACAO NASAL',
+        'TESTE DE PROVOCACAO BRONQUICA COM ALERGENO', 'IGE SERICA', 'IGE ESPECIFICA',
+        'TRIPTASE SERICA', 'HISTAMINA SERICA', 'HEMOGRAMA', 'ANALISES DE SANGUE',
+        'CITOLOGIA NASAL', 'RINOSCOPIA', 'NASOFIBROSCOPIA', 'AUDIOGRAMA'
       ];
       async function buscar() {
         try { const r = await apiFetch('/api/prescricoes'); if (r.ok) setPrescricoes(r.data.dados ?? []); } catch {}
@@ -1141,11 +1140,11 @@
         } catch {}
       }
       useEffect(() => { buscar(); buscarDeps(); }, []);
-      const medicoAutenticado = user?.perfil === 'medico'
+      const medicoAutenticado = user?.perfil === 'MEDICO'
         ? medicos.find(m => m.utilizador_id === user.id) ?? null
         : null;
       useEffect(() => {
-        if (user?.perfil === 'medico' && medicoAutenticado) {
+        if (user?.perfil === 'MEDICO' && medicoAutenticado) {
           setForm(p => ({ ...p, medico_id: String(medicoAutenticado.id) }));
         }
       }, [user?.perfil, medicoAutenticado]);
@@ -1170,11 +1169,11 @@
         'Cetirizina': 6, 'Loratadina': 6, 'Desloratadina': 6, 'Levocetirizina': 6, 'Bilastina': 6, 'Rupatadina': 6, 'Fexofenadina': 6, 'Ebastina': 6,
       };
       const validadeExames = {
-        'hemograma': 1, 'analises de sangue': 1, 'oximetria de pulso': 1, 'oximetria noturna': 1, 'gasometria arterial': 1,
-        'espirometria': 3, 'pico fluxo': 3, 'teste broncodilatador': 3, 'ige serica': 3, 'ige especifica': 3, 'triptase serica': 3, 'histamina serica': 3,
-        'radiografia toracica': 3, 'ecografia toracica': 3, 'broncoscopia': 3, 'lavagem broncoalveolar': 3, 'biopsia bronquica': 3, 'citologia nasal': 3, 'rinoscopia': 3, 'nasofibroscopia': 3,
-        'pletismografia': 6, 'pressoes respiratorias maximas': 6, 'teste broncoprovocacao': 6, 'teste de esforco': 6, 'tac toracica': 6, 'audiograma': 6,
-        'intradermorreacao': 6, 'teste de provocacao oral': 6, 'teste de provocacao nasal': 6, 'teste de provocacao bronquica com alergeno': 6,
+        'HEMOGRAMA': 1, 'ANALISES DE SANGUE': 1, 'OXIMETRIA DE PULSO': 1, 'OXIMETRIA NOTURNA': 1, 'GASOMETRIA ARTERIAL': 1,
+        'ESPIROMETRIA': 3, 'PICO FLUXO': 3, 'TESTE BRONCODILATADOR': 3, 'IGE SERICA': 3, 'IGE ESPECIFICA': 3, 'TRIPTASE SERICA': 3, 'HISTAMINA SERICA': 3,
+        'RADIOGRAFIA TORACICA': 3, 'ECOGRAFIA TORACICA': 3, 'BRONCOSCOPIA': 3, 'LAVAGEM BRONCOALVEOLAR': 3, 'BIOPSIA BRONQUICA': 3, 'CITOLOGIA NASAL': 3, 'RINOSCOPIA': 3, 'NASOFIBROSCOPIA': 3,
+        'PLETISMOGRAFIA': 6, 'PRESSOES RESPIRATORIAS MAXIMAS': 6, 'TESTE BRONCOPROVOCACAO': 6, 'TESTE DE ESFORCO': 6, 'TAC TORACICA': 6, 'AUDIOGRAMA': 6,
+        'INTRADERMORREACAO': 6, 'TESTE DE PROVOCACAO ORAL': 6, 'TESTE DE PROVOCACAO NASAL': 6, 'TESTE DE PROVOCACAO BRONQUICA COM ALERGENO': 6,
       };
       function adicionarMeses(meses) {
         const d = new Date();
@@ -1207,37 +1206,37 @@
         await criarPrescricao();
       }
       async function criarPrescricao() {
-        const medicoIdPrescricao = user?.perfil === 'medico'
+        const medicoIdPrescricao = user?.perfil === 'MEDICO'
           ? Number(medicoAutenticado?.id ?? user.id)
           : Number(form.medico_id);
-        const rp = await apiFetch('/api/prescricoes', { method: 'POST', body: { medico_id: medicoIdPrescricao, utente_id: Number(form.utente_id), tipo: form.tipo, data_validade: form.data_validade, estado: 'ativa' } });
+        const rp = await apiFetch('/api/prescricoes', { method: 'POST', body: { medico_id: medicoIdPrescricao, utente_id: Number(form.utente_id), tipo: form.tipo, data_validade: form.data_validade, estado: 'ATIVA' } });
         if (!rp.ok) { setErro(rp.data.erro || 'Erro ao criar prescrição.'); return; }
         const prescricaoId = rp.data.dados?.id;
-        if (form.tipo === 'medicacao') {
+        if (form.tipo === 'MEDICACAO') {
           const rm = await apiFetch('/api/medicacoes', { method: 'POST', body: { prescricao_id: prescricaoId, nome: formMed.nome, dose: formMed.dose, duracao: formMed.duracao, periodicidade: formMed.periodicidade } });
           if (!rm.ok) { setErro(rm.data.erro || 'Prescrição criada mas erro ao registar medicação.'); buscar(); return; }
         } else {
-          const re = await apiFetch('/api/exames', { method: 'POST', body: { prescricao_id: prescricaoId, tipo_exame: formExame.tipo_exame, consentimento: formExame.consentimento === 'true', estado: 'pendente' } });
+          const re = await apiFetch('/api/exames', { method: 'POST', body: { prescricao_id: prescricaoId, tipo_exame: formExame.tipo_exame, consentimento: formExame.consentimento === 'true', estado: 'PENDENTE' } });
           if (!re.ok) { setErro(re.data.erro || 'Prescrição criada mas erro ao registar exame.'); buscar(); return; }
         }
-        setForm({ medico_id: user?.perfil === 'medico' ? String(medicoAutenticado?.id ?? user.id) : '', utente_id: '', tipo: 'medicacao', data_validade: '' });
+        setForm({ medico_id: user?.perfil === 'MEDICO' ? String(medicoAutenticado?.id ?? user.id) : '', utente_id: '', tipo: 'MEDICACAO', data_validade: '' });
         setFormMed({ nome: '', dose: '', duracao: '', periodicidade: '' });
         setPeriodicidadeOpcao('');
-        setFormExame({ tipo_exame: 'espirometria', consentimento: 'true' });
+        setFormExame({ tipo_exame: 'ESPIROMETRIA', consentimento: 'true' });
         setSucesso('Prescrição criada com sucesso.'); buscar();
       }
-      const estadoBadge = { ativa: 'badge-green', dispensada: 'badge-yellow', cancelada: 'badge-red' };
+      const estadoBadge = { ATIVA: 'badge-green', DISPENSADA: 'badge-yellow', CANCELADA: 'badge-red' };
       const prescricoesFiltradas = prescricoes.filter(p => {
         const matchUtente = !utenteSelecionado || String(p.utente_id) === String(utenteSelecionado);
         const matchTipo = !tipoFiltro || p.tipo === tipoFiltro;
         return matchUtente && matchTipo;
       });
-      const utenteAutenticado = user?.perfil === 'utente'
+      const utenteAutenticado = user?.perfil === 'UTENTE'
         ? utentes.find(u => u.utilizador_id === user.id) ?? null
         : null;
       const dosesParaMedAtual = dosesSugeridas[formMed.nome] ?? [];
 
-      if (user?.perfil === 'utente') {
+      if (user?.perfil === 'UTENTE') {
         const prescricoesDoUtente = utenteAutenticado
           ? prescricoes.filter(p => p.utente_id === utenteAutenticado.id)
           : [];
@@ -1252,8 +1251,8 @@
               <div className="filtro-row" style={{maxWidth:'260px', marginTop:'0.5rem'}}>
                 <select value={tipoFiltro} onChange={e => setTipoFiltro(e.target.value)}>
                   <option value="">Todos os tipos</option>
-                  <option value="exame">Só Exames</option>
-                  <option value="medicacao">Só Medicação</option>
+                  <option value="EXAME">Só Exames</option>
+                  <option value="MEDICACAO">Só Medicação</option>
                 </select>
               </div>
               {prescricoesDoUtenteFiltradas.length === 0 ? <p className="vazio">{tipoFiltro ? 'Nenhuma prescrição encontrada para o tipo selecionado.' : 'Nenhuma prescrição registada para este utente.'}</p> : (
@@ -1276,12 +1275,12 @@
 
       return (
         <>
-          {user?.perfil !== 'administrador' && (
+          {user?.perfil !== 'ADMINISTRADOR' && (
           <div className="card">
             <h2>Nova Prescrição</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                {user?.perfil === 'medico' ? (
+                {user?.perfil === 'MEDICO' ? (
                   <input
                     value={medicoAutenticado ? `Médico #${medicoAutenticado.id} — ${medicoAutenticado.especialidade}` : 'Médico autenticado'}
                     readOnly
@@ -1299,8 +1298,8 @@
               </div>
               <div className="row">
                 <select value={form.tipo} onChange={set('tipo')}>
-                  <option value="medicacao">Medicação</option>
-                  <option value="exame">Exame</option>
+                  <option value="MEDICACAO">Medicação</option>
+                  <option value="EXAME">Exame</option>
                 </select>
               </div>
               <div className="row">
@@ -1313,7 +1312,7 @@
                   <input type="date" value={form.data_validade} onChange={set('data_validade')} required />
                 </div>
               </div>
-              {form.tipo === 'medicacao' && (<>
+              {form.tipo === 'MEDICACAO' && (<>
                 <hr style={{margin:'12px 0', border:'none', borderTop:'0.5px solid var(--border-tertiary)'}} />
                 <input
                   list="sugestoes-medicamentos"
@@ -1365,7 +1364,7 @@
                 )}
                 <input value={formMed.duracao} onChange={setMed('duracao')} placeholder="Duração (ex: 7 dias)" required />
               </>)}
-              {form.tipo === 'exame' && (<>
+              {form.tipo === 'EXAME' && (<>
                 <hr style={{margin:'12px 0', border:'none', borderTop:'0.5px solid var(--border-tertiary)'}} />
                 <input
                   list="sugestoes-exames"
@@ -1426,8 +1425,8 @@
               </select>
               <select value={tipoFiltro} onChange={e => setTipoFiltro(e.target.value)}>
                 <option value="">Todos os tipos</option>
-                <option value="exame">Só Exames</option>
-                <option value="medicacao">Só Medicação</option>
+                <option value="EXAME">Só Exames</option>
+                <option value="MEDICACAO">Só Medicação</option>
               </select>
             </div>
             {prescricoesFiltradas.length === 0 ? <p className="vazio">{utenteSelecionado || tipoFiltro ? 'Nenhuma prescrição encontrada para os filtros selecionados.' : 'Nenhuma prescrição registada.'}</p> : (
@@ -1453,9 +1452,9 @@
     function SecaoAnamneses({ apiFetch, user }) {
       const [anamneses, setAnamneses] = useState([]);
       const [utentes, setUtentes] = useState([]);
-      const [form, setForm] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'nao fumador', sexo: '' });
+      const [form, setForm] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' });
       const [anamneseEdicaoId, setAnamneseEdicaoId] = useState('');
-      const [formEdicao, setFormEdicao] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'nao fumador', sexo: '' });
+      const [formEdicao, setFormEdicao] = useState({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       // Ficha (detalhe) de anamnese com alergias, comorbidades e medicação habitual
@@ -1463,7 +1462,7 @@
       const [alergiasFicha, setAlergiasFicha] = useState([]);
       const [comorbidadesFicha, setComorbidadesFicha] = useState([]);
       const [medicacoesFicha, setMedicacoesFicha] = useState([]);
-      const [formAlergia, setFormAlergia] = useState({ descricao: '', intensidade_crise: 'leve', frequencia_crise: '' });
+      const [formAlergia, setFormAlergia] = useState({ descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' });
       const [formComorbidade, setFormComorbidade] = useState({ descricao: '' });
       const [formMedicacao, setFormMedicacao] = useState({ nome: '', dose: '', duracao: '', periodicidade: '' });
       const [erroFicha, setErroFicha] = useState('');
@@ -1483,7 +1482,7 @@
         if (!form.sexo) { setErro('Sexo é obrigatório.'); return; }
         const body = { utente_id: Number(form.utente_id), historico_familiar: form.historico_familiar, tabagismo: form.tabagismo, sexo: form.sexo };
         const r = await apiFetch('/api/anamneses', { method: 'POST', body });
-        if (r.ok) { setForm({ utente_id: '', historico_familiar: '', tabagismo: 'nao fumador', sexo: '' }); setSucesso(`Anamnese criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
+        if (r.ok) { setForm({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' }); setSucesso(`Anamnese criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar anamnese.');
       }
       function iniciarEdicao(anamnese) {
@@ -1492,7 +1491,7 @@
         setFormEdicao({
           utente_id: String(anamnese.utente_id || ''),
           historico_familiar: anamnese.historico_familiar || '',
-          tabagismo: anamnese.tabagismo || 'nao fumador',
+          tabagismo: anamnese.tabagismo || 'NAO FUMADOR',
           sexo: anamnese.sexo || '',
         });
       }
@@ -1503,7 +1502,7 @@
         const r = await apiFetch(`/api/anamneses/${anamneseEdicaoId}`, { method: 'PUT', body });
         if (r.ok) {
           setAnamneseEdicaoId('');
-          setFormEdicao({ utente_id: '', historico_familiar: '', tabagismo: 'nao fumador', sexo: '' });
+          setFormEdicao({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' });
           setSucesso('Anamnese atualizada com sucesso.');
           buscar();
         } else {
@@ -1527,7 +1526,7 @@
       async function adicionarAlergia(e) {
         e.preventDefault(); setErroFicha(''); setSucessoFicha('');
         const r = await apiFetch('/api/alergias', { method: 'POST', body: { anamnese_id: Number(fichaId), descricao: formAlergia.descricao, intensidade_crise: formAlergia.intensidade_crise, frequencia_crise: formAlergia.frequencia_crise } });
-        if (r.ok) { setFormAlergia({ descricao: '', intensidade_crise: 'leve', frequencia_crise: '' }); setSucessoFicha('Alergia adicionada.'); abrirFicha(fichaId); }
+        if (r.ok) { setFormAlergia({ descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' }); setSucessoFicha('Alergia adicionada.'); abrirFicha(fichaId); }
         else setErroFicha(r.data.erro || 'Erro ao adicionar alergia.');
       }
       async function adicionarComorbidade(e) {
@@ -1542,11 +1541,11 @@
         if (r.ok) { setFormMedicacao({ nome: '', dose: '', duracao: '', periodicidade: '' }); setSucessoFicha('Medicação habitual adicionada.'); abrirFicha(fichaId); }
         else setErroFicha(r.data.erro || 'Erro ao adicionar medicação habitual.');
       }
-      const ib = { leve: 'badge-green', moderada: 'badge-yellow', grave: 'badge-red' };
+      const ib = { LEVE: 'badge-green', MODERADA: 'badge-yellow', GRAVE: 'badge-red' };
       const utentesSemAnamnese = utentes.filter(u => !anamneses.some(a => a.utente_id === u.id));
       return (
         <>
-          {user?.perfil !== 'administrador' && (
+          {user?.perfil !== 'ADMINISTRADOR' && (
           <div className="card">
             <h2>Nova Anamnese</h2>
             <form onSubmit={handleSubmit}>
@@ -1556,18 +1555,18 @@
               </select>
               <textarea value={form.historico_familiar} onChange={set('historico_familiar')} placeholder="Histórico familiar" required />
               <select value={form.tabagismo} onChange={set('tabagismo')}>
-                <option value="nao fumador">Não Fumador</option>
-                <option value="ex-fumador">Ex-Fumador</option>
-                <option value="exposicao passiva">Exposição Passiva</option>
-                <option value="ocasional">Ocasional</option>
-                <option value="menos de 10 cigarros/dia">Menos de 10 cigarros/dia</option>
-                <option value="10 a 20 cigarros/dia">10 a 20 cigarros/dia</option>
-                <option value="mais de 20 cigarros/dia">Mais de 20 cigarros/dia</option>
+                <option value="NAO FUMADOR">Não Fumador</option>
+                <option value="EX-FUMADOR">Ex-Fumador</option>
+                <option value="EXPOSICAO PASSIVA">Exposição Passiva</option>
+                <option value="OCASIONAL">Ocasional</option>
+                <option value="MENOS DE 10 CIGARROS/DIA">Menos de 10 cigarros/dia</option>
+                <option value="10 A 20 CIGARROS/DIA">10 a 20 cigarros/dia</option>
+                <option value="MAIS DE 20 CIGARROS/DIA">Mais de 20 cigarros/dia</option>
               </select>
               <select value={form.sexo} onChange={set('sexo')} required>
                 <option value="">-- Selecionar sexo --</option>
-                <option value="masculino">Masculino</option>
-                <option value="feminino">Feminino</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="FEMININO">Feminino</option>
               </select>
               <button type="submit">Criar anamnese</button>
               {erro && <p className="erro">{erro}</p>}
@@ -1585,22 +1584,22 @@
                 </select>
                 <textarea value={formEdicao.historico_familiar} onChange={setEdicao('historico_familiar')} placeholder="Histórico familiar" required />
                 <select value={formEdicao.tabagismo} onChange={setEdicao('tabagismo')}>
-                  <option value="nao fumador">Não Fumador</option>
-                  <option value="ex-fumador">Ex-Fumador</option>
-                  <option value="exposicao passiva">Exposição Passiva</option>
-                  <option value="ocasional">Ocasional</option>
-                  <option value="menos de 10 cigarros/dia">Menos de 10 cigarros/dia</option>
-                  <option value="10 a 20 cigarros/dia">10 a 20 cigarros/dia</option>
-                  <option value="mais de 20 cigarros/dia">Mais de 20 cigarros/dia</option>
+                  <option value="NAO FUMADOR">Não Fumador</option>
+                  <option value="EX-FUMADOR">Ex-Fumador</option>
+                  <option value="EXPOSICAO PASSIVA">Exposição Passiva</option>
+                  <option value="OCASIONAL">Ocasional</option>
+                  <option value="MENOS DE 10 CIGARROS/DIA">Menos de 10 cigarros/dia</option>
+                  <option value="10 A 20 CIGARROS/DIA">10 a 20 cigarros/dia</option>
+                  <option value="MAIS DE 20 CIGARROS/DIA">Mais de 20 cigarros/dia</option>
                 </select>
                 <select value={formEdicao.sexo} onChange={setEdicao('sexo')} required>
                   <option value="">-- Selecionar sexo --</option>
-                  <option value="masculino">Masculino</option>
-                  <option value="feminino">Feminino</option>
+                  <option value="MASCULINO">Masculino</option>
+                  <option value="FEMININO">Feminino</option>
                 </select>
                 <div className="row">
                   <button type="submit">Guardar alterações</button>
-                  <button type="button" className="btn-sec" onClick={() => { setAnamneseEdicaoId(''); setFormEdicao({ utente_id: '', historico_familiar: '', tabagismo: 'nao fumador', sexo: '' }); }}>
+                  <button type="button" className="btn-sec" onClick={() => { setAnamneseEdicaoId(''); setFormEdicao({ utente_id: '', historico_familiar: '', tabagismo: 'NAO FUMADOR', sexo: '' }); }}>
                     Cancelar
                   </button>
                 </div>
@@ -1633,14 +1632,14 @@
                     </table>
                   )
                 }
-                {user?.perfil !== 'administrador' && (
+                {user?.perfil !== 'ADMINISTRADOR' && (
                   <form onSubmit={adicionarAlergia} style={{marginTop:'0.75rem'}}>
                     <div className="row" style={{flexWrap:'wrap'}}>
                       <input list="sugestoes-alg-ficha" value={formAlergia.descricao} onChange={e => setFormAlergia(p => ({...p, descricao: e.target.value}))} placeholder="Nova alergia" required />
                       <select value={formAlergia.intensidade_crise} onChange={e => setFormAlergia(p => ({...p, intensidade_crise: e.target.value}))}>
-                        <option value="leve">Leve</option>
-                        <option value="moderada">Moderada</option>
-                        <option value="grave">Grave</option>
+                        <option value="LEVE">Leve</option>
+                        <option value="MODERADA">Moderada</option>
+                        <option value="GRAVE">Grave</option>
                       </select>
                       <input list="sugestoes-freq-ficha" value={formAlergia.frequencia_crise} onChange={e => setFormAlergia(p => ({...p, frequencia_crise: e.target.value}))} placeholder="Frequência de crise" required />
                       <button type="submit">+ Alergia</button>
@@ -1672,7 +1671,7 @@
                     </table>
                   )
                 }
-                {user?.perfil !== 'administrador' && (
+                {user?.perfil !== 'ADMINISTRADOR' && (
                   <form onSubmit={adicionarComorbidade} style={{marginTop:'0.75rem'}}>
                     <div className="row">
                       <input list="sugestoes-comrb-ficha" value={formComorbidade.descricao} onChange={e => setFormComorbidade(p => ({...p, descricao: e.target.value}))} placeholder="Nova comorbidade" required />
@@ -1702,7 +1701,7 @@
                     </table>
                   )
                 }
-                {user?.perfil !== 'administrador' && (
+                {user?.perfil !== 'ADMINISTRADOR' && (
                   <form onSubmit={adicionarMedicacao} style={{marginTop:'0.75rem'}}>
                     <div className="row" style={{flexWrap:'wrap'}}>
                       <input list="sugestoes-med-ficha" value={formMedicacao.nome} onChange={e => setFormMedicacao(p => ({...p, nome: e.target.value}))} placeholder="Nome do medicamento" required />
@@ -1760,7 +1759,7 @@
       const [alergias, setAlergias] = useState([]);
       const [anamneses, setAnamneses] = useState([]);
       const [filtro, setFiltro] = useState('');
-      const [form, setForm] = useState({ anamnese_id: '', descricao: '', intensidade_crise: 'leve', frequencia_crise: '' });
+      const [form, setForm] = useState({ anamnese_id: '', descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       const alergiasPrincipais = [
@@ -1789,13 +1788,13 @@
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
         const r = await apiFetch('/api/alergias', { method: 'POST', body: { anamnese_id: Number(form.anamnese_id), descricao: form.descricao, intensidade_crise: form.intensidade_crise, frequencia_crise: form.frequencia_crise } });
-        if (r.ok) { setForm({ anamnese_id: '', descricao: '', intensidade_crise: 'leve', frequencia_crise: '' }); setSucesso(`Alergia criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
+        if (r.ok) { setForm({ anamnese_id: '', descricao: '', intensidade_crise: 'LEVE', frequencia_crise: '' }); setSucesso(`Alergia criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
         else setErro(r.data.erro || 'Erro ao criar alergia.');
       }
-      const ib = { leve: 'badge-green', moderada: 'badge-yellow', grave: 'badge-red' };
+      const ib = { LEVE: 'badge-green', MODERADA: 'badge-yellow', GRAVE: 'badge-red' };
       return (
         <>
-          {user?.perfil !== 'administrador' && (
+          {user?.perfil !== 'ADMINISTRADOR' && (
           <div className="card">
             <h2>Nova Alergia</h2>
             <form onSubmit={handleSubmit}>
@@ -1819,9 +1818,9 @@
               </datalist>
               <div className="row">
                 <select value={form.intensidade_crise} onChange={set('intensidade_crise')}>
-                  <option value="leve">Leve</option>
-                  <option value="moderada">Moderada</option>
-                  <option value="grave">Grave</option>
+                  <option value="LEVE">Leve</option>
+                  <option value="MODERADA">Moderada</option>
+                  <option value="GRAVE">Grave</option>
                 </select>
                 <input list="sugestoes-frequencia-crise" value={form.frequencia_crise} onChange={set('frequencia_crise')} placeholder="Frequência de crise" required />
                 <datalist id="sugestoes-frequencia-crise">
@@ -1910,7 +1909,7 @@
       }
       return (
         <>
-          {user?.perfil !== 'administrador' && (
+          {user?.perfil !== 'ADMINISTRADOR' && (
           <div className="card">
             <h2>Nova Comorbidade</h2>
             <form onSubmit={handleSubmit}>
@@ -1973,7 +1972,7 @@
       const [filtro, setFiltro] = useState('');
       const [filtroIntensidade, setFiltroIntensidade] = useState('');
       const [filtroRecentes, setFiltroRecentes] = useState('');
-      const [form, setForm] = useState({ utente_id: '', descricao: '', intensidade: 'ligeira', duracao: '' });
+      const [form, setForm] = useState({ utente_id: '', descricao: '', intensidade: 'LIGEIRA', duracao: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       const sintomasSugeridos = [
@@ -2008,17 +2007,17 @@
       function set(f) { return e => setForm(p => ({ ...p, [f]: e.target.value })); }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const utenteDoUtilizador = user?.perfil === 'utente'
+        const utenteDoUtilizador = user?.perfil === 'UTENTE'
           ? utentes.find(u => u.utilizador_id === user.id)
           : null;
-        const utenteId = user?.perfil === 'utente'
+        const utenteId = user?.perfil === 'UTENTE'
           ? Number(utenteDoUtilizador?.id)
           : Number(form.utente_id);
         const r = await apiFetch('/api/sintomas', { method: 'POST', body: { utente_id: utenteId, descricao: form.descricao, intensidade: form.intensidade, duracao: form.duracao } });
-        if (r.ok) { setForm({ utente_id: '', descricao: '', intensidade: 'ligeira', duracao: '' }); setSucesso(`Sintoma registado com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
+        if (r.ok) { setForm({ utente_id: '', descricao: '', intensidade: 'LIGEIRA', duracao: '' }); setSucesso(`Sintoma registado com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
         else setErro(r.data.erro || 'Erro ao registar sintoma.');
       }
-      const ib = { ligeira: 'badge-green', moderada: 'badge-yellow', grave: 'badge-red' };
+      const ib = { LIGEIRA: 'badge-green', MODERADA: 'badge-yellow', GRAVE: 'badge-red' };
       function dataSintoma(sintoma) {
         const data = sintoma.data_registo ? new Date(sintoma.data_registo).getTime() : 0;
         return Number.isNaN(data) ? 0 : data;
@@ -2030,7 +2029,7 @@
       const sintomasFiltrados = [...sintomasPorIntensidade]
         .sort((a, b) => dataSintoma(b) - dataSintoma(a) || b.id - a.id)
         .slice(0, filtroRecentes ? Number(filtroRecentes) : sintomasPorIntensidade.length);
-      if (user?.perfil === 'utente') {
+      if (user?.perfil === 'UTENTE') {
         return (
           <>
             <div className="card">
@@ -2038,9 +2037,9 @@
               <div className="filtro-row" style={{maxWidth:'640px', flexWrap:'wrap'}}>
                 <select value={filtroIntensidade} onChange={e => setFiltroIntensidade(e.target.value)}>
                   <option value="">Todas as intensidades</option>
-                  <option value="ligeira">Ligeira</option>
-                  <option value="moderada">Moderada</option>
-                  <option value="grave">Grave</option>
+                  <option value="LIGEIRA">Ligeira</option>
+                  <option value="MODERADA">Moderada</option>
+                  <option value="GRAVE">Grave</option>
                 </select>
                 <select value={filtroRecentes} onChange={e => setFiltroRecentes(e.target.value)}>
                   <option value="">Todos os registos</option>
@@ -2070,7 +2069,7 @@
 
       return (
         <>
-          {user?.perfil !== 'administrador' && (
+          {user?.perfil !== 'ADMINISTRADOR' && (
           <div className="card">
             <h2>Novo Sintoma</h2>
             <form onSubmit={handleSubmit}>
@@ -2086,9 +2085,9 @@
               </datalist>
               <div className="row">
                 <select value={form.intensidade} onChange={set('intensidade')}>
-                  <option value="ligeira">Ligeira</option>
-                  <option value="moderada">Moderada</option>
-                  <option value="grave">Grave</option>
+                  <option value="LIGEIRA">Ligeira</option>
+                  <option value="MODERADA">Moderada</option>
+                  <option value="GRAVE">Grave</option>
                 </select>
                 <input list="sugestoes-duracao-sintoma" value={form.duracao} onChange={set('duracao')} placeholder="Duração (ex: 3 dias)" required />
               </div>
@@ -2115,9 +2114,9 @@
               <button type="button" onClick={() => buscar(filtro)}>Filtrar</button>
               <select value={filtroIntensidade} onChange={e => setFiltroIntensidade(e.target.value)}>
                 <option value="">Todas as intensidades</option>
-                <option value="ligeira">Ligeira</option>
-                <option value="moderada">Moderada</option>
-                <option value="grave">Grave</option>
+                <option value="LIGEIRA">Ligeira</option>
+                <option value="MODERADA">Moderada</option>
+                <option value="GRAVE">Grave</option>
               </select>
               <select value={filtroRecentes} onChange={e => setFiltroRecentes(e.target.value)}>
                 <option value="">Todos os registos</option>
@@ -2196,7 +2195,7 @@
     function SecaoExames({ apiFetch }) {
       const [exames, setExames] = useState([]);
       const [filtro, setFiltro] = useState('');
-      const [form, setForm] = useState({ prescricao_id: '', tipo_exame: '', resultado: '{}', consentimento: 'true', estado: 'pendente' });
+      const [form, setForm] = useState({ prescricao_id: '', tipo_exame: '', resultado: '{}', consentimento: 'true', estado: 'PENDENTE' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar(id) {
@@ -2209,10 +2208,10 @@
         let resultadoObj;
         try { resultadoObj = JSON.parse(form.resultado); } catch { setErro('Resultado deve ser JSON válido (ex: {} ou {"valor": 42}).'); return; }
         const r = await apiFetch('/api/exames', { method: 'POST', body: { prescricao_id: Number(form.prescricao_id), tipo_exame: form.tipo_exame, resultado: resultadoObj, consentimento: form.consentimento === 'true', estado: form.estado } });
-        if (r.ok) { setForm({ prescricao_id: '', tipo_exame: '', resultado: '{}', consentimento: 'true', estado: 'pendente' }); setSucesso(`Exame criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
+        if (r.ok) { setForm({ prescricao_id: '', tipo_exame: '', resultado: '{}', consentimento: 'true', estado: 'PENDENTE' }); setSucesso(`Exame criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(filtro); }
         else setErro(r.data.erro || 'Erro ao criar exame.');
       }
-      const eb = { pendente: 'badge-orange', realizado: 'badge-green', analisado: 'badge-yellow', cancelado: 'badge-red' };
+      const eb = { PENDENTE: 'badge-orange', REALIZADO: 'badge-green', ANALISADO: 'badge-yellow', CANCELADO: 'badge-red' };
       return (
         <>
           <div className="card">
@@ -2227,10 +2226,10 @@
                   <option value="false">Consentimento: Não</option>
                 </select>
                 <select value={form.estado} onChange={set('estado')}>
-                  <option value="pendente">Pendente</option>
-                  <option value="realizado">Realizado</option>
-                  <option value="analisado">Analisado</option>
-                  <option value="cancelado">Cancelado</option>
+                  <option value="PENDENTE">Pendente</option>
+                  <option value="REALIZADO">Realizado</option>
+                  <option value="ANALISADO">Analisado</option>
+                  <option value="CANCELADO">Cancelado</option>
                 </select>
               </div>
               <button type="submit">Registar exame</button>
@@ -2269,7 +2268,7 @@
       const [alertas, setAlertas] = useState([]);
       const [utentes, setUtentes] = useState([]);
       const [medicos, setMedicos] = useState([]);
-      const [form, setForm] = useState({ utente_id: '', medico_id: '', regra_id: '', tipo: 'score baixo', estado: 'novo', prioridade: 'media', notas: '' });
+      const [form, setForm] = useState({ utente_id: '', medico_id: '', regra_id: '', tipo: 'SCORE BAIXO', estado: 'NOVO', prioridade: 'MEDIA', notas: '' });
       const [edicoesAlertas, setEdicoesAlertas] = useState({});
       const [filtroUtente, setFiltroUtente] = useState('');
       const [filtroTipo, setFiltroTipo] = useState('');
@@ -2281,7 +2280,7 @@
           if (r.ok) {
             const dados = r.data.dados ?? [];
             setAlertas(dados);
-            setEdicoesAlertas(Object.fromEntries(dados.map(a => [a.id, { estado: a.estado || 'novo', nota: '' }])));
+            setEdicoesAlertas(Object.fromEntries(dados.map(a => [a.id, { estado: a.estado || 'NOVO', nota: '' }])));
           }
         } catch {}
       }
@@ -2293,11 +2292,11 @@
         } catch {}
       }
       useEffect(() => { buscar(); buscarDeps(); }, []);
-      const medicoAutenticado = user?.perfil === 'medico'
+      const medicoAutenticado = user?.perfil === 'MEDICO'
         ? medicos.find(m => m.utilizador_id === user.id) ?? null
         : null;
       useEffect(() => {
-        if (user?.perfil === 'medico' && medicoAutenticado) {
+        if (user?.perfil === 'MEDICO' && medicoAutenticado) {
           setForm(p => ({ ...p, medico_id: String(medicoAutenticado.id) }));
         }
       }, [user?.perfil, medicoAutenticado]);
@@ -2310,11 +2309,11 @@
       }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const medicoIdAlerta = user?.perfil === 'medico'
+        const medicoIdAlerta = user?.perfil === 'MEDICO'
           ? Number(medicoAutenticado?.id ?? user.id)
           : Number(form.medico_id);
-        const r = await apiFetch('/api/alertas', { method: 'POST', body: { utente_id: Number(form.utente_id), medico_id: medicoIdAlerta, regra_id: Number(form.regra_id), tipo: form.tipo, estado: form.estado, prioridade: form.prioridade, notas: form.notas || undefined } });
-        if (r.ok) { setForm({ utente_id: '', medico_id: user?.perfil === 'medico' ? String(medicoAutenticado?.id ?? user.id) : '', regra_id: '', tipo: 'score baixo', estado: 'novo', prioridade: 'media', notas: '' }); setSucesso(`Alerta criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
+        const r = await apiFetch('/api/alertas', { method: 'POST', body: { utente_id: Number(form.utente_id), medico_id: medicoIdAlerta, regra_id: Number(form.regra_id), tipo: form.tipo, estado: form.estado, prioridade: form.prioridade, notas: form.notas || undefined, data_atualizacao_estado: new Date().toISOString() } });
+        if (r.ok) { setForm({ utente_id: '', medico_id: user?.perfil === 'MEDICO' ? String(medicoAutenticado?.id ?? user.id) : '', regra_id: '', tipo: 'SCORE BAIXO', estado: 'NOVO', prioridade: 'MEDIA', notas: '' }); setSucesso(`Alerta criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar alerta.');
       }
       async function guardarEdicaoAlerta(alertaId) {
@@ -2336,10 +2335,10 @@
         setSucesso(`Alerta #${alertaId} atualizado com sucesso.`);
         buscar();
       }
-      const eb = { novo: 'badge-green', visto: 'badge-yellow', 'em seguimento': 'badge-orange', fechado: 'badge-red' };
-      const pb = { baixa: 'badge-green', media: 'badge-yellow', alta: 'badge-orange', 'muito alta': 'badge-red' };
-      const podeCriarAlerta = user?.perfil !== 'medico' && user?.perfil !== 'administrador';
-      const podeEditarAlertas = user?.perfil === 'medico';
+      const eb = { NOVO: 'badge-green', VISTO: 'badge-yellow', 'EM SEGUIMENTO': 'badge-orange', FECHADO: 'badge-red' };
+      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-yellow', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
+      const podeCriarAlerta = user?.perfil !== 'MEDICO' && user?.perfil !== 'ADMINISTRADOR';
+      const podeEditarAlertas = user?.perfil === 'MEDICO';
       const alertasFiltrados = alertas.filter(a => {
         const matchUtente = !filtroUtente || String(a.utente_id) === filtroUtente;
         const matchTipo = !filtroTipo || a.tipo === filtroTipo;
@@ -2363,16 +2362,16 @@
                 </div>
                 <div className="row">
                   <select value={form.tipo} onChange={set('tipo')}>
-                    <option value="score baixo">Score Baixo</option>
-                    <option value="deterioracao">Deterioração</option>
+                    <option value="SCORE BAIXO">Score Baixo</option>
+                    <option value="DETERIORACAO">Deterioração</option>
                     <option value="EXAME NECESSARIO">Exame Necessário</option>
                   </select>
                 </div>
                 <select value={form.prioridade} onChange={set('prioridade')}>
-                  <option value="baixa">Baixa</option>
-                  <option value="media">Média</option>
-                  <option value="alta">Alta</option>
-                  <option value="muito alta">Muito Alta</option>
+                  <option value="BAIXA">Baixa</option>
+                  <option value="MEDIA">Média</option>
+                  <option value="ALTA">Alta</option>
+                  <option value="MUITO ALTA">Muito Alta</option>
                 </select>
                 <input value={form.notas} onChange={set('notas')} placeholder="Notas (opcional)" />
                 <button type="submit">Criar alerta</button>
@@ -2394,8 +2393,8 @@
               </select>
               <select value={filtroTipo} onChange={e => setFiltroTipo(e.target.value)}>
                 <option value="">Todos os tipos</option>
-                <option value="score baixo">Score Baixo</option>
-                <option value="deterioracao">Deterioração</option>
+                <option value="SCORE BAIXO">Score Baixo</option>
+                <option value="DETERIORACAO">Deterioração</option>
                 <option value="EXAME NECESSARIO">Exame Necessário</option>
               </select>
               <button type="button" className="btn-sec" onClick={() => { setFiltroUtente(''); setFiltroTipo(''); }}>Limpar filtros</button>
@@ -2410,10 +2409,10 @@
                     <td>{a.tipo}</td>
                     <td>{podeEditarAlertas ? (
                       <select value={edicoesAlertas[a.id]?.estado || a.estado} onChange={setEdicaoAlerta(a.id, 'estado')}>
-                        <option value="novo">Novo</option>
-                        <option value="visto">Visto</option>
-                        <option value="em seguimento">Em Seguimento</option>
-                        <option value="fechado">Fechado</option>
+                        <option value="NOVO">Novo</option>
+                        <option value="VISTO">Visto</option>
+                        <option value="EM SEGUIMENTO">Em Seguimento</option>
+                        <option value="FECHADO">Fechado</option>
                       </select>
                     ) : (
                       <span className={`badge ${eb[a.estado] || 'badge-blue'}`}>{a.estado}</span>
@@ -2438,12 +2437,12 @@
     function SecaoRegrasAlerta({ apiFetch, user }) {
       const [regras, setRegras] = useState([]);
       const [utentes, setUtentes] = useState([]);
-      const isAdmin = user?.perfil === 'administrador';
-      const isMedico = user?.perfil === 'medico';
+      const isAdmin = user?.perfil === 'ADMINISTRADOR';
+      const isMedico = user?.perfil === 'MEDICO';
       const initForm = () => ({
         medico_id: isMedico ? String(user.id) : '',
         administrador_id: isAdmin ? String(user.id) : '',
-        utente_id: '', categoria: 'limiar_score', limiar_score: '', valor_deterioracao: '', prioridade: 'media'
+        utente_id: '', categoria: 'LIMIAR_SCORE', limiar_score: '', valor_deterioracao: '', prioridade: 'MEDIA'
       });
       const [form, setForm] = useState(initForm);
       const [erro, setErro] = useState('');
@@ -2462,8 +2461,8 @@
           categoria: form.categoria,
           prioridade: form.prioridade
         };
-        if (form.categoria === 'limiar_score') body.limiar_score = Number(form.limiar_score);
-        if (form.categoria === 'deterioracao') body.valor_deterioracao = Number(form.valor_deterioracao);
+        if (form.categoria === 'LIMIAR_SCORE') body.limiar_score = Number(form.limiar_score);
+        if (form.categoria === 'DETERIORACAO') body.valor_deterioracao = Number(form.valor_deterioracao);
         if (isMedico) body.medico_id = Number(form.medico_id);
         if (isAdmin) body.administrador_id = Number(form.administrador_id);
         if (form.utente_id) body.utente_id = Number(form.utente_id);
@@ -2471,7 +2470,7 @@
         if (r.ok) { setForm(initForm()); setSucesso(`Regra criada com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar regra de alerta.');
       }
-      const pb = { baixa: 'badge-green', media: 'badge-yellow', alta: 'badge-orange', 'muito alta': 'badge-red' };
+      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-yellow', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
       return (
         <>
           <div className="card">
@@ -2492,37 +2491,37 @@
                 <div style={{flex:1}}>
                   <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>Tipo de alerta</label>
                   <select value={form.categoria} onChange={set('categoria')} style={{width:'100%'}}>
-                    <option value="limiar_score">Limiar de Score</option>
-                    <option value="deterioracao">Valor de Deterioração</option>
+                    <option value="LIMIAR_SCORE">Limiar de Score</option>
+                    <option value="DETERIORACAO">Valor de Deterioração</option>
                   </select>
                   <span style={{fontSize:'0.74rem',color:'#a0aec0',marginTop:'3px',display:'block'}}>
-                    {form.categoria === 'limiar_score' && 'Alerta quando o score CARAT atingir o limiar definido.'}
-                    {form.categoria === 'deterioracao' && 'Alerta quando houver deterioração em relação à última avaliação.'}
+                    {form.categoria === 'LIMIAR_SCORE' && 'Alerta quando o score CARAT atingir o limiar definido.'}
+                    {form.categoria === 'DETERIORACAO' && 'Alerta quando houver deterioração em relação à última avaliação.'}
                   </span>
                 </div>
                 <div style={{flex:1}}>
                   <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>Prioridade</label>
                   <select value={form.prioridade} onChange={set('prioridade')} style={{width:'100%'}}>
-                    <option value="baixa">Baixa</option>
-                    <option value="media">Média</option>
-                    <option value="alta">Alta</option>
-                    <option value="muito alta">Muito Alta</option>
+                    <option value="BAIXA">Baixa</option>
+                    <option value="MEDIA">Média</option>
+                    <option value="ALTA">Alta</option>
+                    <option value="MUITO ALTA">Muito Alta</option>
                   </select>
                   <span style={{fontSize:'0.74rem',color:'#a0aec0',marginTop:'3px',display:'block'}}>
-                    {form.prioridade === 'baixa' && 'Situação a monitorizar sem urgência.'}
-                    {form.prioridade === 'media' && 'Situação que requer atenção.'}
-                    {form.prioridade === 'alta' && 'Situação que requer atenção prioritária.'}
-                    {form.prioridade === 'muito alta' && 'Situação urgente.'}
+                    {form.prioridade === 'BAIXA' && 'Situação a monitorizar sem urgência.'}
+                    {form.prioridade === 'MEDIA' && 'Situação que requer atenção.'}
+                    {form.prioridade === 'ALTA' && 'Situação que requer atenção prioritária.'}
+                    {form.prioridade === 'MUITO ALTA' && 'Situação urgente.'}
                   </span>
                 </div>
               </div>
-              {form.categoria === 'limiar_score' && (
+              {form.categoria === 'LIMIAR_SCORE' && (
               <div style={{marginBottom:'10px'}}>
                 <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>Limiar score — alerta se score ≤ este valor</label>
                 <input type="number" value={form.limiar_score} onChange={set('limiar_score')} placeholder="Ex: 20 (parcialmente controlada)" required style={{width:'100%'}} />
               </div>
               )}
-              {form.categoria === 'deterioracao' && (
+              {form.categoria === 'DETERIORACAO' && (
               <div style={{marginBottom:'10px'}}>
                 <label style={{fontSize:'0.78rem',color:'var(--color-secondary)',display:'block',marginBottom:'2px'}}>Valor de deterioração — alerta se a diferença entre avaliações for ≥ este valor</label>
                 <input type="number" value={form.valor_deterioracao} onChange={set('valor_deterioracao')} placeholder="Ex: 5" required style={{width:'100%'}} />
@@ -2595,7 +2594,7 @@
       }
       return (
         <>
-          {user?.perfil !== 'medico' && user?.perfil !== 'utente' && (
+          {user?.perfil !== 'MEDICO' && user?.perfil !== 'UTENTE' && (
           <div className="card">
             <h2>Nova Avaliação CARAT (Template de Questionário)</h2>
             <form onSubmit={handleSubmit}>
@@ -2661,7 +2660,7 @@
       }
       useEffect(() => {
         buscar('');
-        if (user?.perfil === 'utente') {
+        if (user?.perfil === 'UTENTE') {
           apiFetch('/api/utentes').then(r => {
             if (r.ok) {
               const utente = (r.data.dados ?? []).find(u => u.utilizador_id === user.id);
@@ -2669,7 +2668,7 @@
             }
           }).catch(() => {});
         }
-        if (user?.perfil === 'medico' || user?.perfil === 'administrador') {
+        if (user?.perfil === 'MEDICO' || user?.perfil === 'ADMINISTRADOR') {
           apiFetch('/api/utentes').then(r => {
             if (r.ok) setUtentes(r.data.dados ?? []);
           }).catch(() => {});
@@ -2693,7 +2692,7 @@
         return true;
       });
 
-      if (user?.perfil === 'utente') {
+      if (user?.perfil === 'UTENTE') {
         return (
           <>
             <div className="card">
@@ -2758,7 +2757,7 @@
         );
       }
 
-      if (user?.perfil === 'medico' || user?.perfil === 'administrador') {
+      if (user?.perfil === 'MEDICO' || user?.perfil === 'ADMINISTRADOR') {
         return (
           <div className="card">
             <h2>Respostas CARAT</h2>
@@ -2885,7 +2884,7 @@
             setPlanos(dados);
             setEdicoesPlanos(Object.fromEntries(dados.map(p => [p.id, {
               frequencia_avaliacao: p.frequencia_avaliacao || '',
-              estado: p.estado || 'ativo',
+              estado: p.estado || 'ATIVO',
               data_inicio: dataInput(p.data_inicio),
               data_fim: dataInput(p.data_fim),
               recomendacao_medica: p.recomendacao_medica || ''
@@ -2901,11 +2900,11 @@
         } catch {}
       }
       useEffect(() => { buscar(); buscarDeps(); }, []);
-      const medicoAutenticado = user?.perfil === 'medico'
+      const medicoAutenticado = user?.perfil === 'MEDICO'
         ? medicos.find(m => m.utilizador_id === user.id) ?? null
         : null;
       useEffect(() => {
-        if (user?.perfil === 'medico' && medicoAutenticado) {
+        if (user?.perfil === 'MEDICO' && medicoAutenticado) {
           setForm(p => ({ ...p, medico_id: String(medicoAutenticado.id) }));
         }
       }, [user?.perfil, medicoAutenticado]);
@@ -2918,11 +2917,11 @@
       }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const medicoIdPlano = user?.perfil === 'medico'
+        const medicoIdPlano = user?.perfil === 'MEDICO'
           ? Number(medicoAutenticado?.id ?? user.id)
           : Number(form.medico_id);
         const r = await apiFetch('/api/planos-acompanhamento', { method: 'POST', body: { medico_id: medicoIdPlano, utente_id: Number(form.utente_id), frequencia_avaliacao: form.frequencia_avaliacao, data_inicio: form.data_inicio, data_fim: form.data_fim, recomendacao_medica: form.recomendacao_medica } });
-        if (r.ok) { setForm({ medico_id: user?.perfil === 'medico' ? String(medicoAutenticado?.id ?? user.id) : '', utente_id: '', frequencia_avaliacao: '', data_inicio: '', data_fim: '', recomendacao_medica: '' }); setSucesso(`Plano criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
+        if (r.ok) { setForm({ medico_id: user?.perfil === 'MEDICO' ? String(medicoAutenticado?.id ?? user.id) : '', utente_id: '', frequencia_avaliacao: '', data_inicio: '', data_fim: '', recomendacao_medica: '' }); setSucesso(`Plano criado com ID ${r.data.dados?.id ?? '?'}.`); buscar(); }
         else setErro(r.data.erro || 'Erro ao criar plano.');
       }
       async function guardarEdicaoPlano(plano) {
@@ -2948,12 +2947,12 @@
           setErro(r.data.erro || 'Erro ao atualizar plano.');
         }
       }
-      const eb = { ativo: 'badge-yellow', concluido: 'badge-green', suspenso: 'badge-orange', cancelado: 'badge-red' };
-      const utenteAutenticado = user?.perfil === 'utente'
+      const eb = { ATIVO: 'badge-yellow', CONCLUIDO: 'badge-green', SUSPENSO: 'badge-orange', CANCELADO: 'badge-red' };
+      const utenteAutenticado = user?.perfil === 'UTENTE'
         ? utentes.find(u => u.utilizador_id === user.id) ?? null
         : null;
 
-      if (user?.perfil === 'utente') {
+      if (user?.perfil === 'UTENTE') {
         const planosDoUtente = utenteAutenticado
           ? planos.filter(p => p.utente_id === utenteAutenticado.id)
           : [];
@@ -2981,7 +2980,7 @@
         );
       }
 
-      if (user?.perfil === 'administrador') {
+      if (user?.perfil === 'ADMINISTRADOR') {
         return (
           <div className="card">
             <h2>Planos de Acompanhamento</h2>
@@ -3011,7 +3010,7 @@
             <h2>Novo Plano de Acompanhamento</h2>
             <form onSubmit={handleSubmit}>
               <div className="row">
-                {user?.perfil === 'medico' ? (
+                {user?.perfil === 'MEDICO' ? (
                   <input
                     value={medicoAutenticado ? `Médico #${medicoAutenticado.id} — ${medicoAutenticado.especialidade}` : 'Médico autenticado'}
                     readOnly
@@ -3070,10 +3069,10 @@
                         <td><input value={ed.frequencia_avaliacao || ''} onChange={setEdicaoPlano(p.id, 'frequencia_avaliacao')} /></td>
                         <td>
                           <select value={ed.estado || p.estado} onChange={setEdicaoPlano(p.id, 'estado')}>
-                            <option value="ativo">Ativo</option>
-                            <option value="suspenso">Suspenso</option>
-                            <option value="concluido">Concluído</option>
-                            <option value="cancelado">Cancelado</option>
+                            <option value="ATIVO">Ativo</option>
+                            <option value="SUSPENSO">Suspenso</option>
+                            <option value="CONCLUIDO">Concluído</option>
+                            <option value="CANCELADO">Cancelado</option>
                           </select>
                         </td>
                         <td><input type="date" value={ed.data_inicio || ''} onChange={setEdicaoPlano(p.id, 'data_inicio')} /></td>
@@ -3318,73 +3317,6 @@
     /* --------------------------------------------------------------------------
        DASHBOARD
        ---------------------------------------------------------------------- */
-    function GraficoScoreCarat({ dados }) {
-      const canvasRef = React.useRef(null);
-      const chartRef  = React.useRef(null);
-
-      React.useEffect(() => {
-        if (!canvasRef.current || !dados?.length) return;
-        const sorted = [...dados].sort((a, b) => new Date(a.data) - new Date(b.data));
-        const labels = sorted.map(d => new Date(d.data).toLocaleDateString('pt-PT'));
-        const scores = sorted.map(d => d.score);
-        const pontoCor = scores.map(s => s >= 21 ? '#32CD32' : s >= 16 ? '#FFA500' : '#FF6B6B');
-
-        if (chartRef.current) chartRef.current.destroy();
-        chartRef.current = new Chart(canvasRef.current, {
-          type: 'line',
-          data: {
-            labels,
-            datasets: [{
-              label: 'Score CARAT',
-              data: scores,
-              borderColor: '#1a3352',
-              backgroundColor: 'rgba(26,51,82,0.08)',
-              borderWidth: 2,
-              pointRadius: 6,
-              pointBackgroundColor: pontoCor,
-              pointBorderColor: '#fff',
-              pointBorderWidth: 2,
-              tension: 0.3,
-              fill: true,
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: ctx => `Score: ${ctx.parsed.y}/30`
-                }
-              }
-            },
-            scales: {
-              y: {
-                min: 0, max: 30,
-                ticks: { stepSize: 5 },
-                grid: { color: 'rgba(0,0,0,0.06)' }
-              },
-              x: { grid: { display: false } }
-            }
-          }
-        });
-        return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
-      }, [dados]);
-
-      if (!dados?.length) return null;
-      return (
-        <div style={{position:'relative', height:'200px'}}>
-          <canvas ref={canvasRef} />
-          <div style={{display:'flex', gap:'16px', justifyContent:'center', marginTop:'8px', fontSize:'11px', color:'var(--color-secondary)'}}>
-            <span><span style={{display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', background:'#32CD32', marginRight:'4px'}} />Bem controlada (≥21)</span>
-            <span><span style={{display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', background:'#FFA500', marginRight:'4px'}} />Parcialmente controlada (≥16)</span>
-            <span><span style={{display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', background:'#FF6B6B', marginRight:'4px'}} />Mal controlada (&lt;16)</span>
-          </div>
-        </div>
-      );
-    }
-
     function SecaoDashboard({ apiFetch, user }) {
       const [utentes, setUtentes] = useState([]);
       const [utenteId, setUtenteId] = useState('');
@@ -3392,9 +3324,9 @@
       const [loading, setLoading] = useState(false);
       const [erro, setErro] = useState('');
       // Sintomas — adicionar/editar
-      const [formSintoma, setFormSintoma] = useState({ descricao: '', intensidade: 'ligeira', duracao: '' });
+      const [formSintoma, setFormSintoma] = useState({ descricao: '', intensidade: 'LIGEIRA', duracao: '' });
       const [sintomaEditId, setSintomaEditId] = useState('');
-      const [formSintomaEdit, setFormSintomaEdit] = useState({ descricao: '', intensidade: 'ligeira', duracao: '' });
+      const [formSintomaEdit, setFormSintomaEdit] = useState({ descricao: '', intensidade: 'LIGEIRA', duracao: '' });
       const [erroSintoma, setErroSintoma] = useState('');
       const [sucessoSintoma, setSucessoSintoma] = useState('');
       const [ordemCarat, setOrdemCarat] = useState('desc');
@@ -3433,7 +3365,7 @@
       useEffect(() => {
         carregarUtentes().then(dados => {
           setUtentes(dados);
-          if (user?.perfil === 'utente') {
+          if (user?.perfil === 'UTENTE') {
             const meuUtente = dados.find(u => u.utilizador_id === user.id);
             if (meuUtente) { setUtenteId(String(meuUtente.id)); carregarDashboard(meuUtente.id); }
           }
@@ -3443,7 +3375,7 @@
       async function adicionarSintoma(e) {
         e.preventDefault(); setErroSintoma(''); setSucessoSintoma('');
         const r = await apiFetch('/api/sintomas', { method: 'POST', body: { utente_id: Number(utenteId), descricao: formSintoma.descricao, intensidade: formSintoma.intensidade, duracao: formSintoma.duracao } });
-        if (r.ok) { setFormSintoma({ descricao: '', intensidade: 'ligeira', duracao: '' }); setSucessoSintoma('Sintoma registado.'); carregarDashboard(utenteId); }
+        if (r.ok) { setFormSintoma({ descricao: '', intensidade: 'LIGEIRA', duracao: '' }); setSucessoSintoma('Sintoma registado.'); carregarDashboard(utenteId); }
         else setErroSintoma(r.data.erro || 'Erro ao registar sintoma.');
       }
       function iniciarEdicaoSintoma(s) {
@@ -3468,13 +3400,13 @@
         'Doenca parcialmente controlada': 'Parcialmente controlada',
         'Doenca mal controlada': 'Mal controlada'
       };
-      const eb = { novo: 'badge-green', visto: 'badge-yellow', 'em seguimento': 'badge-orange', fechado: 'badge-red' };
-      const pb = { baixa: 'badge-green', media: 'badge-yellow', alta: 'badge-orange', 'muito alta': 'badge-red' };
-      const ib = { ligeira: 'badge-green', moderada: 'badge-yellow', grave: 'badge-red' };
+      const eb = { NOVO: 'badge-green', VISTO: 'badge-yellow', 'EM SEGUIMENTO': 'badge-orange', FECHADO: 'badge-red' };
+      const pb = { BAIXA: 'badge-green', MEDIA: 'badge-yellow', ALTA: 'badge-orange', 'MUITO ALTA': 'badge-red' };
+      const ib = { LIGEIRA: 'badge-green', MODERADA: 'badge-yellow', GRAVE: 'badge-red' };
 
       return (
         <>
-          {user?.perfil !== 'utente' && (
+          {user?.perfil !== 'UTENTE' && (
             <div className="card">
               <h2>Dashboard do Utente</h2>
               <div className="row" style={{maxWidth:'500px'}}>
@@ -3492,10 +3424,10 @@
             </div>
           )}
 
-          {user?.perfil === 'utente' && loading && (
+          {user?.perfil === 'UTENTE' && loading && (
             <div className="card"><p className="vazio">A carregar dashboard...</p></div>
           )}
-          {user?.perfil === 'utente' && erro && (
+          {user?.perfil === 'UTENTE' && erro && (
             <div className="card"><p className="erro">{erro}</p></div>
           )}
 
@@ -3523,13 +3455,6 @@
                 )}
                 {!dashboard.estado_doenca && <p className="vazio">Sem avaliações CARAT registadas.</p>}
               </div>
-
-              {dashboard.historico_avaliacoes?.length > 1 && (
-                <div className="card">
-                  <h2>Evolução do Score CARAT</h2>
-                  <GraficoScoreCarat dados={dashboard.historico_avaliacoes} />
-                </div>
-              )}
 
               <div className="card">
                 <h2 style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
@@ -3614,9 +3539,9 @@
                       <div className="row" style={{flexWrap:'wrap'}}>
                         <input list="sugestoes-sint-edit" value={formSintomaEdit.descricao} onChange={e => setFormSintomaEdit(p => ({...p, descricao: e.target.value}))} placeholder="Descrição" required />
                         <select value={formSintomaEdit.intensidade} onChange={e => setFormSintomaEdit(p => ({...p, intensidade: e.target.value}))}>
-                          <option value="ligeira">Ligeira</option>
-                          <option value="moderada">Moderada</option>
-                          <option value="grave">Grave</option>
+                          <option value="LIGEIRA">Ligeira</option>
+                          <option value="MODERADA">Moderada</option>
+                          <option value="GRAVE">Grave</option>
                         </select>
                         <input value={formSintomaEdit.duracao} onChange={e => setFormSintomaEdit(p => ({...p, duracao: e.target.value}))} placeholder="Duração (ex: 3 dias)" required />
                         <button type="submit">Guardar</button>
@@ -3655,9 +3580,9 @@
                     <div className="row" style={{flexWrap:'wrap'}}>
                       <input list="sugestoes-sint-dash" value={formSintoma.descricao} onChange={e => setFormSintoma(p => ({...p, descricao: e.target.value}))} placeholder="Descrição do sintoma" required />
                       <select value={formSintoma.intensidade} onChange={e => setFormSintoma(p => ({...p, intensidade: e.target.value}))}>
-                        <option value="ligeira">Ligeira</option>
-                        <option value="moderada">Moderada</option>
-                        <option value="grave">Grave</option>
+                        <option value="LIGEIRA">Ligeira</option>
+                        <option value="MODERADA">Moderada</option>
+                        <option value="GRAVE">Grave</option>
                       </select>
                       <input value={formSintoma.duracao} onChange={e => setFormSintoma(p => ({...p, duracao: e.target.value}))} placeholder="Duração (ex: 2 dias)" required />
                       <button type="submit" disabled={!utenteId}>+ Sintoma</button>
@@ -3719,42 +3644,28 @@
       async function verDetalheAuditoria(log) {
         if (detalhe?.id === log.log_id) { setDetalhe(null); return; }
 
-        if (log.operacao === 'alteracao') {
+        if (log.operacao === 'ALTERACAO') {
           const r = await apiFetch(`/api/auditoria/${log.log_id}/diferencas`);
-          if (r.ok) setDetalhe({ id: log.log_id, tipo: 'alteracao', alteracoes: r.data.dados?.diferenças ?? [] });
+          if (r.ok) setDetalhe({ id: log.log_id, tipo: 'ALTERACAO', alteracoes: r.data.dados?.diferenças ?? [] });
           return;
         }
 
-        if (log.operacao === 'eliminacao') {
+        if (log.operacao === 'ELIMINACAO') {
           const r = await apiFetch(`/api/auditoria/${log.log_id}`);
           if (r.ok) {
             const auditoria = r.data.dados;
             setDetalhe({
               id: log.log_id,
-              tipo: 'eliminacao',
+              tipo: 'ELIMINACAO',
               tabela: log.tabela,
               tabelaId: log.tabela_id,
               eliminado: normalizarValorAuditoria(auditoria?.valor_anterior)
             });
           }
         }
-
-        if (log.operacao === 'criacao') {
-          const r = await apiFetch(`/api/auditoria/${log.log_id}`);
-          if (r.ok) {
-            const auditoria = r.data.dados;
-            setDetalhe({
-              id: log.log_id,
-              tipo: 'criacao',
-              tabela: log.tabela,
-              tabelaId: log.tabela_id,
-              criado: normalizarValorAuditoria(auditoria?.valor_novo)
-            });
-          }
-        }
       }
 
-      const OPERACAO_LABEL = { criacao: 'Criado', alteracao: 'Alterado', eliminacao: 'Eliminado' };
+      const OPERACAO_LABEL = { CRIACAO: 'Criado', ALTERACAO: 'Alterado', ELIMINACAO: 'Eliminado' };
 
       return (
         <>
@@ -3778,9 +3689,9 @@
                 <label>Operação</label>
                 <select value={filtros.operacao} onChange={e => setFiltros(p => ({...p, operacao: e.target.value}))}>
                   <option value="">Todas as operações</option>
-                  <option value="criacao">Criação</option>
-                  <option value="alteracao">Alteração</option>
-                  <option value="eliminacao">Eliminação</option>
+                  <option value="CRIACAO">Criação</option>
+                  <option value="ALTERACAO">Alteração</option>
+                  <option value="ELIMINACAO">Eliminação</option>
                 </select>
               </div>
               <div className="audit-filter">
@@ -3819,11 +3730,15 @@
                             <td><code className="audit-code">{l.tabela}</code></td>
                             <td><span className="audit-record">#{l.tabela_id}</span></td>
                             <td>
-                              <button
-                                className={`audit-op ${detalhe?.id === l.log_id ? 'audit-op-close' : l.operacao === 'alteracao' ? 'audit-op-update' : l.operacao === 'eliminacao' ? 'audit-op-delete' : 'audit-op-create'}`}
-                                onClick={() => verDetalheAuditoria(l)}>
-                                {detalhe?.id === l.log_id ? 'Fechar' : OPERACAO_LABEL[l.operacao] || l.operacao}
-                              </button>
+                              {l.operacao === 'ALTERACAO' || l.operacao === 'ELIMINACAO' ? (
+                                <button
+                                  className={`audit-op ${detalhe?.id === l.log_id ? 'audit-op-close' : l.operacao === 'ALTERACAO' ? 'audit-op-update' : 'audit-op-delete'}`}
+                                  onClick={() => verDetalheAuditoria(l)}>
+                                  {detalhe?.id === l.log_id ? 'Fechar' : OPERACAO_LABEL[l.operacao]}
+                                </button>
+                              ) : (
+                                <span className="audit-op audit-op-create">{OPERACAO_LABEL[l.operacao] || l.operacao}</span>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -3833,7 +3748,7 @@
                 )
             }
           </div>
-          {detalhe?.tipo === 'alteracao' && detalhe.alteracoes?.length > 0 && (
+          {detalhe?.tipo === 'ALTERACAO' && detalhe.alteracoes?.length > 0 && (
             <div className="card audit-detail">
               <h3>Alterações</h3>
               <p className="audit-detail-meta">Log #{detalhe.id}</p>
@@ -3853,30 +3768,7 @@
             </div>
           )}
 
-          {detalhe?.tipo === 'criacao' && (
-            <div className="card audit-detail">
-              <h3>Registo criado</h3>
-              <p className="audit-detail-meta">Log #{detalhe.id} · {detalhe.tabela} #{detalhe.tabelaId}</p>
-              {detalhe.criado && typeof detalhe.criado === 'object' ? (
-                <table className="audit-detail-table">
-                  <thead><tr><th>Campo</th><th>Valor criado</th></tr></thead>
-                  <tbody>
-                    {Object.entries(detalhe.criado).map(([campo, valor]) => (
-                      <tr key={campo}>
-                        <td><code className="audit-code">{campo}</code></td>
-                        <td className="audit-after">{JSON.stringify(valor)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <pre className="json-box">{JSON.stringify(detalhe.criado, null, 2)}</pre>
-              )}
-              <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
-            </div>
-          )}
-
-          {detalhe?.tipo === 'eliminacao' && (
+          {detalhe?.tipo === 'ELIMINACAO' && (
             <div className="card audit-detail">
               <h3>Registo eliminado</h3>
               <p className="audit-detail-meta">Log #{detalhe.id} · {detalhe.tabela} #{detalhe.tabelaId}</p>
@@ -3903,89 +3795,13 @@
     }
 
     /* --------------------------------------------------------------------------
-       DASHBOARD ADMINISTRADOR
-       ---------------------------------------------------------------------- */
-    function SecaoDashboardAdmin({ apiFetch }) {
-      const [stats, setStats] = useState({ utentes: null, medicos: null, logs: null });
-      const [recentes, setRecentes] = useState([]);
-      const [loading, setLoading] = useState(true);
-
-      useEffect(() => {
-        async function carregar() {
-          setLoading(true);
-          try {
-            const [ru, rm, ra] = await Promise.all([
-              apiFetch('/api/utentes'),
-              apiFetch('/api/medicos'),
-              apiFetch('/api/auditoria?limite=200'),
-            ]);
-            const utentes = ru.ok ? listaDados(ru.data.dados).length : null;
-            const medicos = rm.ok ? listaDados(rm.data.dados).length : null;
-            const logs    = ra.ok ? listaDados(ra.data.dados) : [];
-            setStats({ utentes, medicos, logs: logs.length });
-            setRecentes([...logs].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 8));
-          } finally { setLoading(false); }
-        }
-        carregar();
-      }, []);
-
-      const OPERACAO_COR   = { criacao: 'badge-green', alteracao: 'badge-yellow', eliminacao: 'badge-red' };
-      const OPERACAO_LABEL = { criacao: 'Criado', alteracao: 'Alterado', eliminacao: 'Eliminado' };
-
-      const statCards = [
-        { label: 'Total de Utentes',   valor: stats.utentes, classe: 'badge-blue'  },
-        { label: 'Médicos Ativos',     valor: stats.medicos, classe: 'badge-green' },
-        { label: 'Logs de Auditoria',  valor: stats.logs,    classe: 'badge-yellow' },
-      ];
-
-      return (
-        <>
-          <div className="card">
-            <h2>Dashboard</h2>
-            {loading ? <p className="vazio">A carregar...</p> : (
-              <div style={{display:'flex', gap:'16px', flexWrap:'wrap'}}>
-                {statCards.map(({ label, valor, classe }) => (
-                  <div key={label} className={`badge ${classe}`} style={{flex:'1 1 160px', display:'block', borderRadius:'12px', padding:'20px 16px', textAlign:'center'}}>
-                    <div style={{fontSize:'36px', fontWeight:'700'}}>{valor ?? '—'}</div>
-                    <div style={{fontSize:'13px', marginTop:'4px'}}>{label}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="card">
-            <h2>Eventos Recentes</h2>
-            {loading ? <p className="vazio">A carregar...</p> : recentes.length === 0 ? (
-              <p className="vazio">Sem eventos registados.</p>
-            ) : (
-              <table>
-                <thead><tr><th>#</th><th>Data</th><th>Utilizador</th><th>Tabela</th><th>Registo</th><th>Operação</th></tr></thead>
-                <tbody>{recentes.map(l => (
-                  <tr key={l.log_id}>
-                    <td><span className="audit-id">{l.log_id}</span></td>
-                    <td className="audit-date">{new Date(l.timestamp).toLocaleString('pt-PT')}</td>
-                    <td><span className="audit-user">{l.utilizador_id ? `#${l.utilizador_id}` : '—'}</span></td>
-                    <td><code className="audit-code">{l.tabela}</code></td>
-                    <td><span className="audit-record">#{l.tabela_id}</span></td>
-                    <td><span className={`badge ${OPERACAO_COR[l.operacao] || 'badge-blue'}`}>{OPERACAO_LABEL[l.operacao] || l.operacao}</span></td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            )}
-          </div>
-        </>
-      );
-    }
-
-    /* --------------------------------------------------------------------------
        APP PRINCIPAL
        ---------------------------------------------------------------------- */
     const TODAS_TABS = ['Dashboard','Administradores','Médicos','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
     const TABS_POR_PERFIL = {
-      administrador: ['Perfil','Administradores','Médicos','Utentes','Regras Alerta','Aval. CARAT','Auditoria'],
-      medico: ['Perfil','Dashboard','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos'],
-      utente: ['Perfil','Dashboard','Prescrições','Aval. CARAT','Resp. CARAT','Planos'],
+      ADMINISTRADOR: ['Perfil','Administradores','Médicos','Utentes','Regras Alerta','Aval. CARAT','Auditoria'],
+      MEDICO: ['Perfil','Dashboard','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos'],
+      UTENTE: ['Perfil','Dashboard','Prescrições','Aval. CARAT','Resp. CARAT','Planos'],
     };
 
     function App() {
@@ -3998,7 +3814,7 @@
         return null;
       }
 
-      const perfilBadge = { utente: 'badge-pink', medico: 'badge-blue', administrador: 'badge-brown' };
+      const perfilBadge = { UTENTE: 'badge-pink', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-brown' };
       const tabAtiva = tabs.includes(tab) ? tab : tabs[0];
 
       return (
@@ -4023,9 +3839,9 @@
               {tabAtiva === 'Utilizadores'   && <SecaoUtilizadores apiFetch={apiFetch} />}
               {tabAtiva === 'Administradores' && <SecaoAdministradores apiFetch={apiFetch} />}
               {tabAtiva === 'Médicos'        && <SecaoMedicos apiFetch={apiFetch} user={user} />}
-              {tabAtiva === 'Perfil'         && (user?.perfil === 'utente'
+              {tabAtiva === 'Perfil'         && (user?.perfil === 'UTENTE'
                 ? <SecaoUtentes apiFetch={apiFetch} user={user} />
-                : user?.perfil === 'medico'
+                : user?.perfil === 'MEDICO'
                   ? <SecaoMedicos apiFetch={apiFetch} user={user} />
                   : <SecaoUtilizadorAutenticado apiFetch={apiFetch} user={user} />)}
               {tabAtiva === 'Dashboard'      && <SecaoDashboard apiFetch={apiFetch} user={user} />}
@@ -4043,9 +3859,9 @@
               {tabAtiva === 'Planos'         && <SecaoPlanos apiFetch={apiFetch} user={user} />}
               {tabAtiva === 'FHIR'           && <SecaoFhir apiFetch={apiFetch} />}
               {tabAtiva === 'Auditoria'      && <SecaoAuditoria apiFetch={apiFetch} />}
+              <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema de avaliação CARAT &nbsp;&bull;&nbsp; Autenticado como <strong>{user.perfil}</strong></footer>
             </main>
           </div>
-          <footer>DS Turma 2 &mdash; Grupo 5 &nbsp;&bull;&nbsp; Sistema de avaliação CARAT &nbsp;&bull;&nbsp; Autenticado como <strong>{user.perfil}</strong></footer>
         </div>
       );
     }
