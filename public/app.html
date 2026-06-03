@@ -2613,6 +2613,7 @@
       const initForm = { versao: '1', q1: QS_DEFAULT[0], q2: QS_DEFAULT[1], q3: QS_DEFAULT[2], q4: QS_DEFAULT[3], q5: QS_DEFAULT[4], q6: QS_DEFAULT[5], q7: QS_DEFAULT[6], q8: QS_DEFAULT[7], q9: QS_DEFAULT[8], q10: QS_DEFAULT[9] };
       const [form, setForm] = useState(initForm);
       const [mostrar, setMostrar] = useState(false);
+      const [expandida, setExpandida] = useState(null);
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       async function buscar() {
@@ -2654,13 +2655,53 @@
                 <thead><tr><th>#</th><th>Versão</th><th>Q1 (resumo)</th><th>Data Criação</th></tr></thead>
                 <tbody>{avaliacoes.map(a => (
                   <tr key={a.id}><td>{a.id}</td>
-                    <td><span className="badge badge-blue">v{a.versao}</span></td>
+                    <td>
+                      <span
+                        className="badge badge-blue"
+                        style={{cursor:'pointer', userSelect:'none'}}
+                        title="Clique para ver as questões e opções"
+                        onClick={() => setExpandida(expandida === a.id ? null : a.id)}
+                      >v{a.versao} {expandida === a.id ? '▲' : '▼'}</span>
+                    </td>
                     <td style={{maxWidth:'280px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.q1}</td>
                     <td>{a.data_criacao ? new Date(a.data_criacao).toLocaleDateString('pt-PT') : '—'}</td>
                   </tr>
                 ))}</tbody>
               </table>
             )}
+            {expandida && (() => {
+              const a = avaliacoes.find(x => x.id === expandida);
+              if (!a) return null;
+              const opts1_9 = Array.isArray(a.r1) ? a.r1 : (typeof a.r1 === 'string' ? JSON.parse(a.r1) : OPTS_1_9);
+              const opts10  = Array.isArray(a.r10) ? a.r10 : (typeof a.r10 === 'string' ? JSON.parse(a.r10) : OPTS_10);
+              const perguntas = [a.q1,a.q2,a.q3,a.q4,a.q5,a.q6,a.q7,a.q8,a.q9,a.q10];
+              return (
+                <div style={{marginTop:'14px', borderTop:'0.5px solid var(--border-tertiary)', paddingTop:'14px'}}>
+                  <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'10px'}}>
+                    <p style={{fontWeight:500, fontSize:'14px', color:'var(--color-primary)'}}>Questionário CARAT — versão {a.versao}</p>
+                    <button type="button" className="btn-sec" style={{fontSize:'12px', padding:'3px 10px'}} onClick={() => setExpandida(null)}>Fechar</button>
+                  </div>
+                  {[1,2,3,4,5,6,7,8,9].map(n => (
+                    <div key={n} style={{marginBottom:'10px', paddingLeft:'8px', borderLeft:'2px solid var(--border-tertiary)'}}>
+                      <p style={{fontSize:'13px', fontWeight:500, color:'var(--color-primary)', marginBottom:'4px'}}>{n}. {perguntas[n-1]}</p>
+                      <div style={{display:'flex', gap:'6px', flexWrap:'wrap'}}>
+                        {opts1_9.map((op, i) => (
+                          <span key={i} style={{fontSize:'12px', background:'var(--bg-secondary)', border:'0.5px solid var(--border-secondary)', borderRadius:'6px', padding:'2px 8px', color:'var(--color-secondary)'}}>{i} — {op}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{marginBottom:'4px', paddingLeft:'8px', borderLeft:'2px solid var(--border-tertiary)'}}>
+                    <p style={{fontSize:'13px', fontWeight:500, color:'var(--color-primary)', marginBottom:'4px'}}>10. {perguntas[9]}</p>
+                    <div style={{display:'flex', gap:'6px', flexWrap:'wrap'}}>
+                      {opts10.map((op, i) => (
+                        <span key={i} style={{fontSize:'12px', background:'var(--bg-secondary)', border:'0.5px solid var(--border-secondary)', borderRadius:'6px', padding:'2px 8px', color:'var(--color-secondary)'}}>{i} — {op}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </>
       );
@@ -3789,6 +3830,20 @@
             });
           }
         }
+
+        if (log.operacao === 'CRIACAO') {
+          const r = await apiFetch(`/api/auditoria/${log.log_id}`);
+          if (r.ok) {
+            const auditoria = r.data.dados;
+            setDetalhe({
+              id: log.log_id,
+              tipo: 'CRIACAO',
+              tabela: log.tabela,
+              tabelaId: log.tabela_id,
+              criado: normalizarValorAuditoria(auditoria?.valor_novo)
+            });
+          }
+        }
       }
 
       const OPERACAO_LABEL = { CRIACAO: 'Criado', ALTERACAO: 'Alterado', ELIMINACAO: 'Eliminado' };
@@ -3856,15 +3911,11 @@
                             <td><code className="audit-code">{l.tabela}</code></td>
                             <td><span className="audit-record">#{l.tabela_id}</span></td>
                             <td>
-                              {l.operacao === 'ALTERACAO' || l.operacao === 'ELIMINACAO' ? (
-                                <button
-                                  className={`audit-op ${detalhe?.id === l.log_id ? 'audit-op-close' : l.operacao === 'ALTERACAO' ? 'audit-op-update' : 'audit-op-delete'}`}
-                                  onClick={() => verDetalheAuditoria(l)}>
-                                  {detalhe?.id === l.log_id ? 'Fechar' : OPERACAO_LABEL[l.operacao]}
-                                </button>
-                              ) : (
-                                <span className="audit-op audit-op-create">{OPERACAO_LABEL[l.operacao] || l.operacao}</span>
-                              )}
+                              <button
+                                className={`audit-op ${detalhe?.id === l.log_id ? 'audit-op-close' : l.operacao === 'ALTERACAO' ? 'audit-op-update' : l.operacao === 'ELIMINACAO' ? 'audit-op-delete' : 'audit-op-create'}`}
+                                onClick={() => verDetalheAuditoria(l)}>
+                                {detalhe?.id === l.log_id ? 'Fechar' : OPERACAO_LABEL[l.operacao] || l.operacao}
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -3916,6 +3967,29 @@
               <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
             </div>
           )}
+
+          {detalhe?.tipo === 'CRIACAO' && (
+            <div className="card audit-detail">
+              <h3>Registo criado</h3>
+              <p className="audit-detail-meta">Log #{detalhe.id} · {detalhe.tabela} #{detalhe.tabelaId}</p>
+              {detalhe.criado && typeof detalhe.criado === 'object' ? (
+                <table className="audit-detail-table">
+                  <thead><tr><th>Campo</th><th>Valor criado</th></tr></thead>
+                  <tbody>
+                    {Object.entries(detalhe.criado).map(([campo, valor]) => (
+                      <tr key={campo}>
+                        <td><code className="audit-code">{campo}</code></td>
+                        <td className="audit-after">{JSON.stringify(valor)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <pre className="json-box">{JSON.stringify(detalhe.criado, null, 2)}</pre>
+              )}
+              <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
+            </div>
+          )}
         </>
       );
     }
@@ -3928,6 +4002,22 @@
       ADMINISTRADOR: ['Perfil','Administradores','Médicos','Utentes','Regras Alerta','Aval. CARAT','Auditoria'],
       MEDICO: ['Perfil','Dashboard','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos'],
       UTENTE: ['Perfil','Dashboard','Prescrições','Aval. CARAT','Resp. CARAT','Planos'],
+    };
+    const SECOES_SIDEBAR = {
+      ADMINISTRADOR: [
+        { titulo: 'GESTÃO',  tabs: ['Perfil','Administradores','Médicos','Utentes'] },
+        { titulo: 'SISTEMA', tabs: ['Regras Alerta','Aval. CARAT','Auditoria'] },
+      ],
+      MEDICO: [
+        { titulo: 'PRINCIPAL',   tabs: ['Perfil','Dashboard','Utentes','Alertas'] },
+        { titulo: 'CLÍNICO',     tabs: ['Prescrições','Anamneses','Regras Alerta'] },
+        { titulo: 'AVALIAÇÕES',  tabs: ['Aval. CARAT','Resp. CARAT','Planos'] },
+      ],
+      UTENTE: [
+        { titulo: 'O MEU ESPAÇO',  tabs: ['Dashboard','Aval. CARAT','Resp. CARAT'] },
+        { titulo: 'SAÚDE',         tabs: ['Prescrições','Planos'] },
+        { titulo: 'OS MEUS DADOS', tabs: ['Perfil'] },
+      ],
     };
 
     function App() {
@@ -3956,9 +4046,19 @@
           <div className="body-row">
             <aside className="sidebar">
               <nav className="sidebar-nav">
-                {tabs.map(t => (
-                  <div key={t} className={`sidebar-item${tabAtiva === t ? ' active' : ''}`} onClick={() => setTab(t)}>{t}</div>
-                ))}
+                {SECOES_SIDEBAR[user?.perfil]
+                  ? SECOES_SIDEBAR[user.perfil].map(secao => (
+                      <React.Fragment key={secao.titulo}>
+                        <div style={{fontSize:'11px',fontWeight:700,color:'#4a4a4a',letterSpacing:'0.07em',padding:'12px 10px 4px',textTransform:'uppercase'}}>{secao.titulo}</div>
+                        {secao.tabs.map(t => (
+                          <div key={t} className={`sidebar-item${tabAtiva === t ? ' active' : ''}`} onClick={() => setTab(t)}>{t}</div>
+                        ))}
+                      </React.Fragment>
+                    ))
+                  : tabs.map(t => (
+                      <div key={t} className={`sidebar-item${tabAtiva === t ? ' active' : ''}`} onClick={() => setTab(t)}>{t}</div>
+                    ))
+                }
               </nav>
             </aside>
             <main className="main-content">
