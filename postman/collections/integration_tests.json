@@ -1,0 +1,801 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Testes Integração - Sintomas, Prescrições, Planos, CARAT, Alertas e FHIR",
+    "description": "Todas as respostas têm formato { dados: ..., total?: N }. Executar por ordem — cada POST guarda o ID criado para os requests seguintes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",      "value": "http://localhost:3000" },
+    { "key": "adminToken",   "value": "" },
+    { "key": "medicoToken",  "value": "" },
+    { "key": "utenteToken",  "value": "" },
+    { "key": "avaliacaoId",  "value": "" },
+    { "key": "respostaId",   "value": "" },
+    { "key": "alertaId",     "value": "" },
+    { "key": "auditoriaId",  "value": "" },
+    { "key": "sintomaId",    "value": "" },
+    { "key": "prescricaoId", "value": "" },
+    { "key": "planoId",      "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "POST Login Admin",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('Content-Type application/json', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'));",
+            "pm.test('Tempo < 3000ms', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
+            "pm.test('Token admin guardado', () => { var j = pm.response.json(); pm.expect(j.token).to.be.a('string'); pm.collectionVariables.set('adminToken', j.token); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"id\": 1001, \"password\": \"pass1001\"}" },
+            "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api", "login"] }
+          }, "response": []
+        },
+        {
+          "name": "POST Login Médico",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('Tempo < 3000ms', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
+            "pm.test('Token médico guardado', () => { var j = pm.response.json(); pm.expect(j.token).to.be.a('string'); pm.collectionVariables.set('medicoToken', j.token); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"id\": 2001, \"password\": \"pass2001\"}" },
+            "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api", "login"] }
+          }, "response": []
+        },
+        {
+          "name": "POST Login Utente",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('Tempo < 3000ms', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
+            "pm.test('Token utente guardado', () => { var j = pm.response.json(); pm.expect(j.token).to.be.a('string'); pm.collectionVariables.set('utenteToken', j.token); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"id\": 3001, \"password\": \"pass3001\"}" },
+            "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api", "login"] }
+          }, "response": []
+        },
+        {
+          "name": "POST Login Inválido (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 401', () => pm.response.to.have.status(401));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"id\": 1001, \"password\": \"senha_errada\"}" },
+            "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api", "login"] }
+          }, "response": []
+        }
+      ]
+    },
+    {
+      "name": "Avaliação CARAT",
+      "item": [
+        {
+          "name": "GET Listar Avaliações (Admin)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Resposta tem dados e total', () => { var j = pm.response.json(); pm.expect(j).to.have.property('dados'); pm.expect(j).to.have.property('total'); });",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Tem avaliação seed (versão 1) e guarda ID', () => { var j = pm.response.json(); var v1 = j.dados.find(a => a.versao === 1); pm.expect(v1).to.exist; pm.collectionVariables.set('avaliacaoId', v1.id); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes-carat", "host": ["{{baseUrl}}"], "path": ["api", "avaliacoes-carat"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Avaliação por ID",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('Contém perguntas', () => { var d = pm.response.json().dados; pm.expect(d.q1).to.be.a('string'); pm.expect(d.q10).to.be.a('string'); });",
+            "pm.test('Contém opções de resposta', () => pm.expect(pm.response.json().dados.r1).to.be.an('object'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes-carat/{{avaliacaoId}}", "host": ["{{baseUrl}}"], "path": ["api", "avaliacoes-carat", "{{avaliacaoId}}"] }
+          }, "response": []
+        },
+        {
+          "name": "POST Criar Nova Avaliação (versão 2)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('Versão correta', () => pm.expect(pm.response.json().dados.versao).to.equal(2));",
+            "pm.test('ID da nova avaliação guardado', () => { var d = pm.response.json().dados; pm.expect(d.id).to.be.a('number'); pm.collectionVariables.set('avaliacaoId', d.id); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"versao\": 2,\n  \"q1\": \"Teve nariz entupido?\",\n  \"q2\": \"Espirros frequentes?\",\n  \"q3\": \"Comichão no nariz?\",\n  \"q4\": \"Corrimento nasal?\",\n  \"q5\": \"Falta de ar?\",\n  \"q6\": \"Chiadeira no peito?\",\n  \"q7\": \"Aperto no peito com esforço?\",\n  \"q8\": \"Cansaço nas atividades do dia-a-dia?\",\n  \"q9\": \"Acordou durante a noite devido a sintomas?\",\n  \"q10\": \"Aumentou a utilização de medicamentos?\",\n  \"r1\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r2\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r3\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r4\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r5\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r6\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r7\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r8\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r9\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r10\": {\"0\": \"Não toma medicamentos\", \"1\": \"Nunca\", \"2\": \"Menos de 7 dias\", \"3\": \"7 ou mais dias\"}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes-carat", "host": ["{{baseUrl}}"], "path": ["api", "avaliacoes-carat"] }
+          }, "response": []
+        },
+        {
+          "name": "PUT Atualizar Avaliação",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('q1 atualizada', () => pm.expect(pm.response.json().dados.q1).to.equal('Sentiu o nariz entupido?'));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"versao\": 2,\n  \"q1\": \"Sentiu o nariz entupido?\",\n  \"q2\": \"Espirros frequentes?\",\n  \"q3\": \"Comichão no nariz?\",\n  \"q4\": \"Corrimento nasal?\",\n  \"q5\": \"Falta de ar?\",\n  \"q6\": \"Chiadeira no peito?\",\n  \"q7\": \"Aperto no peito com esforço?\",\n  \"q8\": \"Cansaço nas atividades do dia-a-dia?\",\n  \"q9\": \"Acordou durante a noite devido a sintomas?\",\n  \"q10\": \"Aumentou a utilização de medicamentos?\",\n  \"r1\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r2\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r3\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r4\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r5\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r6\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r7\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r8\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r9\": {\"0\": \"Nunca\", \"1\": \"Até 2 dias\", \"2\": \"Mais de 2 dias\", \"3\": \"Quase todos os dias\"},\n  \"r10\": {\"0\": \"Não toma medicamentos\", \"1\": \"Nunca\", \"2\": \"Menos de 7 dias\", \"3\": \"7 ou mais dias\"}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes-carat/{{avaliacaoId}}", "host": ["{{baseUrl}}"], "path": ["api", "avaliacoes-carat", "{{avaliacaoId}}"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Avaliações - Sem Token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 401', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes-carat", "host": ["{{baseUrl}}"], "path": ["api", "avaliacoes-carat"] }
+          }, "response": []
+        }
+      ]
+    },
+    {
+      "name": "Resposta CARAT",
+      "item": [
+        {
+          "name": "POST Criar Resposta CARAT (Utente)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('utente_id correto', () => pm.expect(pm.response.json().dados.utente_id).to.equal(20263000));",
+            "pm.test('Score calculado presente', () => pm.expect(pm.response.json().dados.score_total).to.be.a('number'));",
+            "pm.test('ID guardado', () => { var d = pm.response.json().dados; pm.expect(d.id).to.be.a('number'); pm.collectionVariables.set('respostaId', d.id); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{utenteToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"avaliacao_id\": {{avaliacaoId}},\n  \"utente_id\": 20263000,\n  \"r1\": 1,\n  \"r2\": 2,\n  \"r3\": 1,\n  \"r4\": 2,\n  \"r5\": 1,\n  \"r6\": 0,\n  \"r7\": 1,\n  \"r8\": 2,\n  \"r9\": 1,\n  \"r10\": 0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/respostas-carat", "host": ["{{baseUrl}}"], "path": ["api", "respostas-carat"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Resposta por ID",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('ID corresponde', () => { var id = parseInt(pm.collectionVariables.get('respostaId')); pm.expect(pm.response.json().dados.id).to.equal(id); });",
+            "pm.test('Tem score_total calculado', () => pm.expect(pm.response.json().dados.score_total).to.be.a('number'));",
+            "pm.test('Tem interpretação', () => pm.expect(pm.response.json().dados.interpretacao).to.be.a('string'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/respostas-carat/{{respostaId}}", "host": ["{{baseUrl}}"], "path": ["api", "respostas-carat", "{{respostaId}}"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Respostas por Utente (Médico)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Contém respostas do utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/respostas-carat/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "respostas-carat", "utente", "20263000"] }
+          }, "response": []
+        },
+        {
+          "name": "PUT Atualizar Resposta CARAT",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Score recalculado', () => pm.expect(pm.response.json().dados.score_total).to.be.a('number'));",
+            "pm.test('r5 atualizado para 3', () => pm.expect(pm.response.json().dados.r5).to.equal(3));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{utenteToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"avaliacao_id\": {{avaliacaoId}},\n  \"utente_id\": 20263000,\n  \"r1\": 2,\n  \"r2\": 3,\n  \"r3\": 2,\n  \"r4\": 3,\n  \"r5\": 3,\n  \"r6\": 2,\n  \"r7\": 2,\n  \"r8\": 3,\n  \"r9\": 2,\n  \"r10\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/respostas-carat/{{respostaId}}", "host": ["{{baseUrl}}"], "path": ["api", "respostas-carat", "{{respostaId}}"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Respostas - Sem Token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 401', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": { "raw": "{{baseUrl}}/api/respostas-carat", "host": ["{{baseUrl}}"], "path": ["api", "respostas-carat"] }
+          }, "response": []
+        }
+      ]
+    },
+    {
+      "name": "Alertas",
+      "item": [
+        {
+          "name": "GET Listar Alertas (Admin)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Tem alertas seed', () => pm.expect(pm.response.json().total).to.be.above(0));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/alertas", "host": ["{{baseUrl}}"], "path": ["api", "alertas"] }
+          }, "response": []
+        },
+        {
+          "name": "POST Criar Alerta (Médico)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('Estado NOVO', () => pm.expect(pm.response.json().dados.estado).to.equal('NOVO'));",
+            "pm.test('Tipo DETERIORACAO', () => pm.expect(pm.response.json().dados.tipo).to.equal('DETERIORACAO'));",
+            "pm.test('ID guardado', () => { var d = pm.response.json().dados; pm.expect(d.id).to.be.a('number'); pm.collectionVariables.set('alertaId', d.id); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"utente_id\": 20263000,\n  \"medico_id\": 20262000,\n  \"tipo\": \"DETERIORACAO\",\n  \"estado\": \"NOVO\",\n  \"prioridade\": \"ALTA\",\n  \"notas\": \"Deterioração observada após última resposta CARAT.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/alertas", "host": ["{{baseUrl}}"], "path": ["api", "alertas"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Alerta por ID",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('ID corresponde', () => { var id = parseInt(pm.collectionVariables.get('alertaId')); pm.expect(pm.response.json().dados.id).to.equal(id); });",
+            "pm.test('medico_id correto', () => pm.expect(pm.response.json().dados.medico_id).to.equal(20262000));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/alertas/{{alertaId}}", "host": ["{{baseUrl}}"], "path": ["api", "alertas", "{{alertaId}}"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Alertas por Utente (Médico)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Pertence ao utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/alertas/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "alertas", "utente", "20263000"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Alertas por Estado - NOVO",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Todos com estado NOVO', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); j.dados.forEach(a => pm.expect(a.estado).to.equal('NOVO')); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/alertas/estado/NOVO", "host": ["{{baseUrl}}"], "path": ["api", "alertas", "estado", "NOVO"] }
+          }, "response": []
+        },
+        {
+          "name": "PATCH Marcar Alerta como Lido",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Estado atualizado para VISTO', () => pm.expect(pm.response.json().dados.estado).to.equal('VISTO'));"
+          ]}}],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/alertas/{{alertaId}}/lido", "host": ["{{baseUrl}}"], "path": ["api", "alertas", "{{alertaId}}", "lido"] }
+          }, "response": []
+        },
+        {
+          "name": "PATCH Adicionar Nota ao Alerta",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Nota adicionada', () => pm.expect(pm.response.json().dados.notas).to.include('Agendada consulta'));"
+          ]}}],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"nota\": \"Agendada consulta para reavaliação clínica.\"}" },
+            "url": { "raw": "{{baseUrl}}/api/alertas/{{alertaId}}/nota", "host": ["{{baseUrl}}"], "path": ["api", "alertas", "{{alertaId}}", "nota"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Resumo de Alertas (Admin)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('Tem dados de resumo', () => pm.expect(pm.response.json().dados).to.be.an('object'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/alertas/resumo", "host": ["{{baseUrl}}"], "path": ["api", "alertas", "resumo"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Alertas - Sem Token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 401', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": { "raw": "{{baseUrl}}/api/alertas", "host": ["{{baseUrl}}"], "path": ["api", "alertas"] }
+          }, "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auditoria",
+      "item": [
+        {
+          "name": "GET Listar Auditoria (Admin)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Tem registos', () => pm.expect(pm.response.json().total).to.be.above(0));",
+            "pm.test('Primeiro log_id guardado', () => { var j = pm.response.json(); pm.expect(j.dados[0].log_id).to.be.a('number'); pm.collectionVariables.set('auditoriaId', j.dados[0].log_id); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auditoria", "host": ["{{baseUrl}}"], "path": ["api", "auditoria"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Auditoria por ID",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Tem tabela e operação', () => { var d = pm.response.json().dados; pm.expect(d.tabela).to.be.a('string'); pm.expect(d.operacao).to.be.a('string'); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auditoria/{{auditoriaId}}", "host": ["{{baseUrl}}"], "path": ["api", "auditoria", "{{auditoriaId}}"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Auditoria por Utilizador",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Tem total', () => pm.expect(pm.response.json()).to.have.property('total'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auditoria/utilizador/1001", "host": ["{{baseUrl}}"], "path": ["api", "auditoria", "utilizador", "1001"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Auditoria por Tabela",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Resposta tem formato correto', () => { var j = pm.response.json(); pm.expect(j).to.have.property('dados'); pm.expect(j).to.have.property('total'); pm.expect(j.dados).to.be.an('array'); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auditoria/tabela/alerta/9901", "host": ["{{baseUrl}}"], "path": ["api", "auditoria", "tabela", "alerta", "9901"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Auditoria - Sem Token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 401', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auditoria", "host": ["{{baseUrl}}"], "path": ["api", "auditoria"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Auditoria - Acesso Negado Médico (403)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 403', () => pm.response.to.have.status(403));",
+            "pm.test('Médico não pode aceder à auditoria', () => pm.response.to.be.json);"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auditoria", "host": ["{{baseUrl}}"], "path": ["api", "auditoria"] }
+          }, "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sintomas",
+      "item": [
+        {
+          "name": "GET Listar Sintomas (Admin)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Tempo < 3000ms', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
+            "pm.test('Tem sintomas seed', () => pm.expect(pm.response.json().total).to.be.above(0));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/sintomas", "host": ["{{baseUrl}}"], "path": ["api", "sintomas"] }
+          }, "response": []
+        },
+        {
+          "name": "POST Criar Sintoma (Médico)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('ID guardado', () => { var d = pm.response.json().dados; pm.expect(d.id).to.be.a('number'); pm.collectionVariables.set('sintomaId', d.id); });",
+            "pm.test('Intensidade MODERADA', () => pm.expect(pm.response.json().dados.intensidade).to.equal('MODERADA'));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"utente_id\": 20263000,\n  \"descricao\": \"Tosse persistente com agravamento nocturno\",\n  \"intensidade\": \"MODERADA\",\n  \"duracao\": \"5 dias\",\n  \"data_registo\": \"2026-06-04T10:00:00.000Z\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sintomas", "host": ["{{baseUrl}}"], "path": ["api", "sintomas"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Sintoma por ID",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('ID corresponde', () => { var id = parseInt(pm.collectionVariables.get('sintomaId')); pm.expect(pm.response.json().dados.id).to.equal(id); });",
+            "pm.test('utente_id presente', () => pm.expect(pm.response.json().dados.utente_id).to.equal(20263000));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/sintomas/{{sintomaId}}", "host": ["{{baseUrl}}"], "path": ["api", "sintomas", "{{sintomaId}}"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Sintomas por Utente",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Contém sintomas do utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/sintomas/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "sintomas", "utente", "20263000"] }
+          }, "response": []
+        },
+        {
+          "name": "PUT Atualizar Sintoma",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Intensidade atualizada para GRAVE', () => pm.expect(pm.response.json().dados.intensidade).to.equal('GRAVE'));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"utente_id\": 20263000,\n  \"descricao\": \"Tosse persistente com agravamento nocturno\",\n  \"intensidade\": \"GRAVE\",\n  \"duracao\": \"7 dias\",\n  \"data_registo\": \"2026-06-04T10:00:00.000Z\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sintomas/{{sintomaId}}", "host": ["{{baseUrl}}"], "path": ["api", "sintomas", "{{sintomaId}}"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Sintomas - Sem Token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 401', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": { "raw": "{{baseUrl}}/api/sintomas", "host": ["{{baseUrl}}"], "path": ["api", "sintomas"] }
+          }, "response": []
+        }
+      ]
+    },
+    {
+      "name": "Prescrições",
+      "item": [
+        {
+          "name": "GET Listar Prescrições (Admin)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Tem prescrições seed', () => pm.expect(pm.response.json().total).to.be.above(0));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/prescricoes", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes"] }
+          }, "response": []
+        },
+        {
+          "name": "POST Criar Prescrição (Médico)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('ID guardado', () => { var d = pm.response.json().dados; pm.expect(d.id).to.be.a('number'); pm.collectionVariables.set('prescricaoId', d.id); });",
+            "pm.test('Estado ATIVA', () => pm.expect(pm.response.json().dados.estado).to.equal('ATIVA'));",
+            "pm.test('Tipo MEDICACAO', () => pm.expect(pm.response.json().dados.tipo).to.equal('MEDICACAO'));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medico_id\": 20262000,\n  \"utente_id\": 20263000,\n  \"tipo\": \"MEDICACAO\",\n  \"data_emissao\": \"2026-06-04\",\n  \"data_validade\": \"2026-09-04\",\n  \"estado\": \"ATIVA\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/prescricoes", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Prescrição por ID",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('ID corresponde', () => { var id = parseInt(pm.collectionVariables.get('prescricaoId')); pm.expect(pm.response.json().dados.id).to.equal(id); });",
+            "pm.test('medico_id correto', () => pm.expect(pm.response.json().dados.medico_id).to.equal(20262000));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/prescricoes/{{prescricaoId}}", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes", "{{prescricaoId}}"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Prescrições por Utente",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Pertence ao utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/prescricoes/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes", "utente", "20263000"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Prescrições por Médico",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Pertence ao médico', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].medico_id).to.equal(20262000); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/prescricoes/medico/20262000", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes", "medico", "20262000"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Prescrições - Sem Token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 401', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": { "raw": "{{baseUrl}}/api/prescricoes", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes"] }
+          }, "response": []
+        }
+      ]
+    },
+    {
+      "name": "Planos de Acompanhamento",
+      "item": [
+        {
+          "name": "GET Listar Planos (Admin)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Tem planos seed', () => pm.expect(pm.response.json().total).to.be.above(0));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/planos-acompanhamento", "host": ["{{baseUrl}}"], "path": ["api", "planos-acompanhamento"] }
+          }, "response": []
+        },
+        {
+          "name": "POST Criar Plano (Médico)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('ID guardado', () => { var d = pm.response.json().dados; pm.expect(d.id).to.be.a('number'); pm.collectionVariables.set('planoId', d.id); });",
+            "pm.test('Estado ATIVO', () => pm.expect(pm.response.json().dados.estado).to.equal('ATIVO'));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medico_id\": 20262000,\n  \"utente_id\": 20263001,\n  \"frequencia_avaliacao\": \"Quinzenal\",\n  \"data_inicio\": \"2026-06-04\",\n  \"data_fim\": \"2026-12-04\",\n  \"estado\": \"ATIVO\",\n  \"recomendacao_medica\": \"Monitorizar sintomas e reavaliar adesão à medicação de forma quinzenal.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/planos-acompanhamento", "host": ["{{baseUrl}}"], "path": ["api", "planos-acompanhamento"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Planos por Utente",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
+            "pm.test('Pertence ao utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/planos-acompanhamento/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "planos-acompanhamento", "utente", "20263000"] }
+          }, "response": []
+        },
+        {
+          "name": "PATCH Atualizar Estado do Plano",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Estado atualizado para SUSPENSO', () => pm.expect(pm.response.json().dados.estado).to.equal('SUSPENSO'));"
+          ]}}],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"novoEstado\": \"SUSPENSO\"}" },
+            "url": { "raw": "{{baseUrl}}/api/planos-acompanhamento/{{planoId}}/estado", "host": ["{{baseUrl}}"], "path": ["api", "planos-acompanhamento", "{{planoId}}", "estado"] }
+          }, "response": []
+        },
+        {
+          "name": "GET Planos - Sem Token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 401', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": { "raw": "{{baseUrl}}/api/planos-acompanhamento", "host": ["{{baseUrl}}"], "path": ["api", "planos-acompanhamento"] }
+          }, "response": []
+        }
+      ]
+    },
+    {
+      "name": "FHIR",
+      "item": [
+        {
+          "name": "GET FHIR Patient (lista)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('resourceType Bundle', () => pm.expect(pm.response.json().resourceType).to.equal('Bundle'));",
+            "pm.test('Tem entradas', () => pm.expect(pm.response.json().total).to.be.above(0));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/fhir/Patient", "host": ["{{baseUrl}}"], "path": ["fhir", "Patient"] }
+          }, "response": []
+        },
+        {
+          "name": "GET FHIR Patient por ID",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('resourceType Patient', () => pm.expect(pm.response.json().resourceType).to.equal('Patient'));",
+            "pm.test('ID correto', () => pm.expect(pm.response.json().id).to.equal('20263000'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": { "raw": "{{baseUrl}}/fhir/Patient/20263000", "host": ["{{baseUrl}}"], "path": ["fhir", "Patient", "20263000"] }
+          }, "response": []
+        },
+        {
+          "name": "GET FHIR AllergyIntolerance por utente",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('resourceType Bundle', () => pm.expect(pm.response.json().resourceType).to.equal('Bundle'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/fhir/AllergyIntolerance?patient=20263000",
+              "host": ["{{baseUrl}}"], "path": ["fhir", "AllergyIntolerance"],
+              "query": [{ "key": "patient", "value": "20263000" }]
+            }
+          }, "response": []
+        },
+        {
+          "name": "GET FHIR MedicationRequest por utente",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('JSON válido', () => pm.response.to.be.json);",
+            "pm.test('resourceType Bundle', () => pm.expect(pm.response.json().resourceType).to.equal('Bundle'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/fhir/MedicationRequest?patient=20263000",
+              "host": ["{{baseUrl}}"], "path": ["fhir", "MedicationRequest"],
+              "query": [{ "key": "patient", "value": "20263000" }]
+            }
+          }, "response": []
+        },
+        {
+          "name": "GET FHIR Patient - Sem Token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 401', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": { "raw": "{{baseUrl}}/fhir/Patient", "host": ["{{baseUrl}}"], "path": ["fhir", "Patient"] }
+          }, "response": []
+        }
+      ]
+    }
+  ]
+}
