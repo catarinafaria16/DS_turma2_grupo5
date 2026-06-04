@@ -1358,7 +1358,7 @@
                   required
                 />
                 <datalist id="sugestoes-medicamentos">
-                  {medicamentosSugeridos.map(medicamento => (
+                  {[...medicamentosSugeridos].sort().map(medicamento => (
                     <option key={medicamento} value={medicamento} />
                   ))}
                 </datalist>
@@ -3776,6 +3776,10 @@
       const [loading, setLoading] = useState(false);
       const [filtros, setFiltros] = useState({ tabela: '', operacao: '', utilizador_id: '', dataInicio: '', dataFim: '' });
       const [detalhe, setDetalhe] = useState(null);
+      const detalheRef = useRef(null);
+      useEffect(() => {
+        if (detalhe) detalheRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, [detalhe]);
 
       useEffect(() => { carregar(); }, []);
 
@@ -3925,71 +3929,73 @@
                 )
             }
           </div>
-          {detalhe?.tipo === 'ALTERACAO' && detalhe.alteracoes?.length > 0 && (
-            <div className="card audit-detail">
-              <h3>Alterações</h3>
-              <p className="audit-detail-meta">Log #{detalhe.id}</p>
-              <table className="audit-detail-table">
-                <thead><tr><th>Campo</th><th>Antes</th><th>Depois</th></tr></thead>
-                <tbody>
-                  {detalhe.alteracoes.map((d, i) => (
-                    <tr key={i}>
-                      <td><code className="audit-code">{d.campo}</code></td>
-                      <td className="audit-before">{JSON.stringify(d.anterior)}</td>
-                      <td className="audit-after">{JSON.stringify(d.novo)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
-            </div>
-          )}
-
-          {detalhe?.tipo === 'ELIMINACAO' && (
-            <div className="card audit-detail">
-              <h3>Registo eliminado</h3>
-              <p className="audit-detail-meta">Log #{detalhe.id} · {detalhe.tabela} #{detalhe.tabelaId}</p>
-              {detalhe.eliminado && typeof detalhe.eliminado === 'object' ? (
+          <div ref={detalheRef}>
+            {detalhe?.tipo === 'ALTERACAO' && detalhe.alteracoes?.length > 0 && (
+              <div className="card audit-detail">
+                <h3>Alterações</h3>
+                <p className="audit-detail-meta">Log #{detalhe.id}</p>
                 <table className="audit-detail-table">
-                  <thead><tr><th>Campo</th><th>Valor eliminado</th></tr></thead>
+                  <thead><tr><th>Campo</th><th>Antes</th><th>Depois</th></tr></thead>
                   <tbody>
-                    {Object.entries(detalhe.eliminado).map(([campo, valor]) => (
-                      <tr key={campo}>
-                        <td><code className="audit-code">{campo}</code></td>
-                        <td className="audit-before">{JSON.stringify(valor)}</td>
+                    {detalhe.alteracoes.map((d, i) => (
+                      <tr key={i}>
+                        <td><code className="audit-code">{d.campo}</code></td>
+                        <td className="audit-before">{JSON.stringify(d.anterior)}</td>
+                        <td className="audit-after">{JSON.stringify(d.novo)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              ) : (
-                <pre className="json-box">{JSON.stringify(detalhe.eliminado, null, 2)}</pre>
-              )}
-              <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
-            </div>
-          )}
+                <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
+              </div>
+            )}
 
-          {detalhe?.tipo === 'CRIACAO' && (
-            <div className="card audit-detail">
-              <h3>Registo criado</h3>
-              <p className="audit-detail-meta">Log #{detalhe.id} · {detalhe.tabela} #{detalhe.tabelaId}</p>
-              {detalhe.criado && typeof detalhe.criado === 'object' ? (
-                <table className="audit-detail-table">
-                  <thead><tr><th>Campo</th><th>Valor criado</th></tr></thead>
-                  <tbody>
-                    {Object.entries(detalhe.criado).map(([campo, valor]) => (
-                      <tr key={campo}>
-                        <td><code className="audit-code">{campo}</code></td>
-                        <td className="audit-after">{JSON.stringify(valor)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <pre className="json-box">{JSON.stringify(detalhe.criado, null, 2)}</pre>
-              )}
-              <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
-            </div>
-          )}
+            {detalhe?.tipo === 'ELIMINACAO' && (
+              <div className="card audit-detail">
+                <h3>Registo eliminado</h3>
+                <p className="audit-detail-meta">Log #{detalhe.id} · {detalhe.tabela} #{detalhe.tabelaId}</p>
+                {detalhe.eliminado && typeof detalhe.eliminado === 'object' ? (
+                  <table className="audit-detail-table">
+                    <thead><tr><th>Campo</th><th>Valor eliminado</th></tr></thead>
+                    <tbody>
+                      {Object.entries(detalhe.eliminado).map(([campo, valor]) => (
+                        <tr key={campo}>
+                          <td><code className="audit-code">{campo}</code></td>
+                          <td className="audit-before">{JSON.stringify(valor)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <pre className="json-box">{JSON.stringify(detalhe.eliminado, null, 2)}</pre>
+                )}
+                <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
+              </div>
+            )}
+
+            {detalhe?.tipo === 'CRIACAO' && (
+              <div className="card audit-detail">
+                <h3>Registo criado</h3>
+                <p className="audit-detail-meta">Log #{detalhe.id} · {detalhe.tabela} #{detalhe.tabelaId}</p>
+                {detalhe.criado && typeof detalhe.criado === 'object' ? (
+                  <table className="audit-detail-table">
+                    <thead><tr><th>Campo</th><th>Valor criado</th></tr></thead>
+                    <tbody>
+                      {Object.entries(detalhe.criado).map(([campo, valor]) => (
+                        <tr key={campo}>
+                          <td><code className="audit-code">{campo}</code></td>
+                          <td className="audit-after">{JSON.stringify(valor)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <pre className="json-box">{JSON.stringify(detalhe.criado, null, 2)}</pre>
+                )}
+                <button className="btn-sec" style={{marginTop:'0.5rem'}} onClick={() => setDetalhe(null)}>Fechar</button>
+              </div>
+            )}
+          </div>
         </>
       );
     }
@@ -4023,7 +4029,12 @@
     function App() {
       const { token, user, login, registar, logout, apiFetch } = useApi();
       const tabs = TABS_POR_PERFIL[user?.perfil] ?? TODAS_TABS;
-      const [tab, setTab] = useState(() => tabs[0] ?? 'Utentes');
+      const DEFAULT_TAB_BY_PROFILE = {
+        ADMINISTRADOR: 'Auditoria',
+        MEDICO:        'Aval. CARAT',
+        UTENTE:        'Dashboard',
+      };
+      const [tab, setTab] = useState(() => DEFAULT_TAB_BY_PROFILE[user?.perfil] ?? tabs[0] ?? 'Utentes');
 
       if (!token || !user) {
         window.location.href = '/index.html';
