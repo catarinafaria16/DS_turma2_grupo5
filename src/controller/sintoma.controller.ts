@@ -1,3 +1,13 @@
+/*
+ * ============================================================
+ * sintoma.controller.ts — Controller de sintomas clínicos
+ * ============================================================
+ *
+ * Gere o registo e consulta de sintomas reportados pelos utentes.
+ * Utentes podem registar os seus próprios sintomas.
+ * Médicos podem ver sintomas dos seus utentes.
+ * Administradores têm acesso a todos os sintomas.
+ */
 import type { Request, Response } from 'express';
 import { SintomaService } from '../services/sintoma.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';

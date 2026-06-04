@@ -1,9 +1,28 @@
+<!--
+  ============================================================
+  index.html — Página de login do Sistema CARAT
+  ============================================================
+
+  Esta é a primeira página que o utilizador vê. Apresenta um formulário
+  de autenticação onde o utilizador introduz o seu ID e password.
+
+  Como funciona o login:
+    1. O utilizador escreve o seu ID (número de utilizador ou cédula médica) e password
+    2. A página envia esses dados para a API (/api/login)
+    3. Se correto, o servidor devolve um "token" (crachá digital)
+    4. O token é guardado no localStorage (memória do browser)
+    5. O utilizador é redirecionado para a página principal (app.html)
+
+  Nota para testes: existem utilizadores de exemplo pré-criados
+  (IDs 20261001-20261005 para admin, 20262001-20262005 para médico, 20263001-20263030 para utente)
+-->
 <!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - Sistema de avaliação CARAT</title>
+  <!-- Estilos CSS da página de login -->
   <style>
     :root {
       --bg-primary:   #ffffff;
@@ -198,7 +217,7 @@
 
       <form id="login-form">
         <div class="field">
-          <label for="login-id">Nº de utilizador</label>
+          <label for="login-id">Nº de utilizador / Nº de cédula médica</label>
           <input id="login-id" name="id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="username" required />
         </div>
         <div class="field">
@@ -227,64 +246,82 @@
   </div>
 
   <script>
+    // URL base da API (vazio = mesmo servidor que serve a página)
     const API_BASE = '';
+    // URL da página principal após login bem-sucedido
     const APP_URL = '/app.html';
+    // Versão da sessão guardada — muda se o formato de login mudar
     const CARAT_STORAGE_VERSION = 'login-medico-cedula-2026';
+
+    // Referências aos elementos HTML do formulário
     const loginForm = document.getElementById('login-form');
     const loginButton = document.getElementById('login-button');
-    const loginMessage = document.getElementById('login-message');
-    const passwordInput = document.getElementById('login-password');
-    const togglePassword = document.querySelector('.toggle-password');
+    const loginMessage = document.getElementById('login-message');     // Área para mensagens de erro/sucesso
+    const passwordInput = document.getElementById('login-password');   // Campo de password
+    const togglePassword = document.querySelector('.toggle-password'); // Botão para mostrar/ocultar password
 
+    // Mostra uma mensagem de feedback ao utilizador (sucesso ou erro)
     function showMessage(target, type, text) {
       target.className = `message ${type}`;
       target.textContent = text;
     }
 
+    // Limpa a mensagem de feedback
     function clearMessage(target) {
       target.className = '';
       target.textContent = '';
     }
 
+    // Ao clicar no ícone do olho: alterna entre mostrar e ocultar a password
     togglePassword.addEventListener('click', () => {
       const isVisible = passwordInput.type === 'text';
-      passwordInput.type = isVisible ? 'password' : 'text';
+      passwordInput.type = isVisible ? 'password' : 'text'; // Troca o tipo do input
       togglePassword.classList.toggle('is-visible', !isVisible);
       togglePassword.setAttribute('aria-label', isVisible ? 'Mostrar password' : 'Ocultar password');
-      passwordInput.focus();
+      passwordInput.focus(); // Mantém o foco no campo de password
     });
 
+    // Quando o formulário é submetido (utilizador clica "Entrar" ou carrega Enter)
     loginForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
+      event.preventDefault(); // Evita que a página recarregue (comportamento padrão de formulários HTML)
       clearMessage(loginMessage);
-      loginButton.disabled = true;
+      loginButton.disabled = true; // Desativa o botão para evitar cliques duplos
 
+      // Dados a enviar ao servidor
       const body = {
-        id: Number(document.getElementById('login-id').value),
+        id: Number(document.getElementById('login-id').value), // Converte o ID para número
         password: loginForm.password.value
       };
 
       try {
+        // Envia o pedido de login para a API do servidor
         const response = await fetch(`${API_BASE}/api/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+          body: JSON.stringify(body) // Converte os dados para texto JSON
         });
+        // Tenta ler a resposta como JSON; se falhar, usa objeto vazio
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
+          // O servidor devolveu erro (ID ou password incorretos)
           showMessage(loginMessage, 'error', data.erro || 'Login inválido.');
           return;
         }
 
-        localStorage.setItem('carat_token', data.token);
-        localStorage.setItem('carat_user', JSON.stringify(data.user));
+        // Login bem-sucedido! Guarda o token e dados do utilizador no browser
+        // localStorage: área de armazenamento do browser que persiste entre sessões
+        localStorage.setItem('carat_token', data.token);           // Token JWT para autenticação
+        localStorage.setItem('carat_user', JSON.stringify(data.user)); // Dados básicos do utilizador
         localStorage.setItem('carat_storage_version', CARAT_STORAGE_VERSION);
+
+        // Redireciona para a página principal da aplicação
         window.location.href = APP_URL;
       } catch {
+        // Erro de rede — servidor inacessível
         showMessage(loginMessage, 'error', 'Não foi possível contactar o servidor.');
       } finally {
-        loginButton.disabled = false;
+        loginButton.disabled = false; // Reativa o botão independentemente do resultado
       }
     });
   </script>

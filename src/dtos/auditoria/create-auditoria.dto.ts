@@ -1,3 +1,10 @@
+/*
+ * CreateAuditoriaDto — Dados para criar um registo de auditoria
+ *
+ * Este DTO é usado internamente pelo AuditoriaService — não é enviado
+ * diretamente pelos clientes da API. É preenchido automaticamente
+ * sempre que se cria, altera ou elimina um registo importante.
+ */
 import { OperacaoAuditoria } from '../../enums/OperacaoAuditoria.enum.js';
 
 type JsonValue =

@@ -1,3 +1,20 @@
+/*
+ * ============================================================
+ * data-source.ts — Configuração da ligação à base de dados
+ * ============================================================
+ *
+ * Este ficheiro define como a aplicação se liga à base de dados SQLite.
+ * SQLite é uma base de dados simples que guarda tudo num único ficheiro
+ * ("database.db") — é ideal para desenvolvimento e projetos de pequena escala.
+ *
+ * O TypeORM é a ferramenta que faz a "ponte" entre o código TypeScript e a
+ * base de dados: permite fazer consultas sem escrever SQL manualmente.
+ *
+ * A lista de "entities" (entidades) diz ao TypeORM quais são as tabelas
+ * da base de dados — cada entidade corresponde a uma tabela.
+ */
+
+// DataSource: representa a ligação à base de dados
 import { DataSource } from 'typeorm';
 import { Administrador } from '../models/administrador.entity.js';
 import { Alergia } from '../models/alergia.entity.js';

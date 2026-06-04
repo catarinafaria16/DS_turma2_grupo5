@@ -1,3 +1,22 @@
+/*
+ * ============================================================
+ * medicacao.service.ts — Serviço de gestão de medicamentos prescritos
+ * ============================================================
+ *
+ * Este service gere os medicamentos associados a prescrições médicas.
+ * Contém validação clínica de doses — o sistema tem um catálogo de
+ * medicamentos comuns em alergologia/pneumologia e valida se as doses
+ * prescritas estão dentro de intervalos clinicamente razoáveis.
+ *
+ * Funcionalidades especiais:
+ *   - Catálogo de medicamentos: inclui corticosteroides inalados, broncodilatadores,
+ *     anti-histamínicos, biológicos e outros usados em rinite/asma
+ *   - Validação de dose: formato "500 mg", "1 g", "200 mcg"
+ *   - Sincronização automática: quando um medicamento é prescrito, é automaticamente
+ *     adicionado à medicação habitual do utente
+ *
+ * Regras de acesso seguem as da prescrição associada.
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Medicacao } from '../models/medicacao.entity.js';
 import { MedicacaoHabitual } from '../models/medicacaoHabitual.entity.js';
@@ -14,6 +33,17 @@ import { obterMedicoIdAutenticado } from './perfilAcesso.helper.js';
 
 export class MedicacaoService {
     private auditoriaService: AuditoriaService;
+    /*
+     * catalogoMedicamentos — Catálogo de medicamentos com intervalos de dose clinicamente seguros
+     *
+     * Para cada medicamento define-se:
+     *   - minMg: dose mínima em miligramas (abaixo disto é provavelmente um erro de escrita)
+     *   - maxMg: dose máxima em miligramas (acima disto é clinicamente implausível)
+     *   - unidades: unidades de dose aceites (mg, g, mcg)
+     *
+     * Se um medicamento não estiver no catálogo, não há validação de dose (aceita qualquer valor).
+     * Esta é uma medida de segurança clínica, não uma lista exaustiva.
+     */
     private static readonly catalogoMedicamentos: Record<string, { minMg: number; maxMg: number; unidades: string[] }> = {
         // Analgésicos / Anti-inflamatórios
         paracetamol: { minMg: 125, maxMg: 1000, unidades: ['mg', 'g'] },
@@ -147,6 +177,17 @@ export class MedicacaoService {
         return valor;
     }
 
+    /*
+     * sincronizarMedicacaoHabitual — Atualiza automaticamente a medicação habitual do utente
+     *
+     * Quando um médico prescreve um medicamento, este método verifica se o mesmo
+     * medicamento já está na medicação habitual do utente:
+     *   - Se já existe: atualiza dose, duração e periodicidade
+     *   - Se não existe: cria um novo registo na medicação habitual
+     *
+     * Isto garante que a medicação habitual está sempre sincronizada com as prescrições.
+     * A comparação de nomes ignora maiúsculas/minúsculas e acentuação.
+     */
     private async sincronizarMedicacaoHabitual(
         medicacao: Medicacao,
         prescricao: Prescricao

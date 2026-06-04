@@ -1,7 +1,27 @@
+/*
+ * ============================================================
+ * fhir-types.dto.ts — Tipos partilhados do padrão HL7 FHIR R4
+ * ============================================================
+ *
+ * Este ficheiro define as interfaces TypeScript para os tipos
+ * de dados partilhados pelo padrão HL7 FHIR R4.
+ *
+ * O FHIR define tipos standard para representar dados clínicos.
+ * Estes tipos são usados em todos os recursos FHIR (Patient, AllergyIntolerance, etc.)
+ *
+ * Tipos principais:
+ *   - FhirCoding: um código de uma terminologia médica (ex: código SNOMED)
+ *   - FhirCodeableConcept: um conceito médico com código(s) e texto
+ *   - FhirIdentifier: um identificador (ex: número de utente SNS)
+ *   - FhirReference: referência a outro recurso FHIR (ex: "Patient/123")
+ *   - FhirBundle: conjunto de recursos FHIR numa só resposta
+ */
+
+// Código de uma terminologia médica standard (SNOMED, LOINC, etc.)
 export interface FhirCoding {
-  system?: string;
-  code?: string;
-  display?: string;
+  system?: string;   // URL da terminologia (ex: "http://snomed.info/sct")
+  code?: string;     // Código específico na terminologia
+  display?: string;  // Texto legível do código
 }
 
 export interface FhirCodeableConcept {

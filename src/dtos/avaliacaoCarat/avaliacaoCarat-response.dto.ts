@@ -1,4 +1,9 @@
-
+/*
+ * AvaliacaoCaratResponseDto — Dados do modelo do questionário CARAT devolvidos pela API
+ *
+ * Estrutura do questionário nas respostas GET /api/avaliacoes-carat.
+ * Inclui o ID e a data de criação, além das perguntas e opções de resposta.
+ */
 type JsonValue =
     | string
     | number
@@ -10,7 +15,7 @@ type JsonValue =
 export type JsonObject = { [key: string]: JsonValue };
 
 export interface AvaliacaoCaratResponseDto {
-    id: number;
+    id: number;   // ID único desta versão do questionário
     data_criacao: Date;
     q1: string;
     q2: string;

@@ -1,3 +1,23 @@
+/*
+ * ============================================================
+ * medico.routes.ts — Rotas da API para médicos
+ * ============================================================
+ *
+ * URL base: /api/medicos
+ *
+ * Nota sobre permissões:
+ *   - Criar/apagar médico: apenas administradores
+ *   - Listar/consultar/atualizar: admins e médicos
+ *   - Utentes não têm acesso a dados de médicos
+ *
+ * Rotas disponíveis:
+ *   GET    /api/medicos                             — listar médicos
+ *   GET    /api/medicos/especialidade/:esp          — filtrar por especialidade
+ *   POST   /api/medicos                             — criar médico (admin)
+ *   GET    /api/medicos/:id                         — obter dados de um médico
+ *   PUT    /api/medicos/:id                         — atualizar médico
+ *   DELETE /api/medicos/:id                         — apagar médico (admin)
+ */
 import { Router } from 'express';
 import { MedicoController } from '../controller/medico.controller.js';
 import { autenticar, requirePerfil } from '../middleware/auth.middleware.js';
@@ -6,6 +26,7 @@ import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 const routes = Router();
 const controller = new MedicoController();
 
+// Todas as rotas requerem autenticação
 routes.use(autenticar);
 
 // RNF001: Administrador pode listar todos os medicos. Medico ve apenas o proprio perfil.

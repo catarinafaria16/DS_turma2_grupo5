@@ -1,3 +1,20 @@
+/*
+ * ============================================================
+ * seed.ts — Script independente de inicialização da base de dados
+ * ============================================================
+ *
+ * Este ficheiro é um script alternativo de seed (inicialização de dados)
+ * que pode ser executado de forma independente do servidor.
+ *
+ * Na versão atual do sistema, o seed é feito automaticamente dentro do
+ * app.ts (função seedTestData) quando o servidor arranca.
+ * Este ficheiro pode ser usado para inicializar a base de dados manualmente
+ * sem precisar de arrancar o servidor.
+ *
+ * Dados inseridos: utilizadores, médicos, utentes, prescrições, exames,
+ * sintomas, anamneses, alergias, comorbidades, medicação habitual,
+ * alertas, planos de acompanhamento, respostas CARAT e auditoria.
+ */
 import 'reflect-metadata';
 import { AppDataSource } from './data-source.js';
 import { Utilizador } from '../models/utilizador.entity.js';
@@ -14,6 +31,7 @@ import { Alergia } from '../models/alergia.entity.js';
 import { Comorbidade } from '../models/comorbidade.entity.js';
 import { MedicacaoHabitual } from '../models/medicacaoHabitual.entity.js';
 import { Alerta } from '../models/alerta.entity.js';
+import { RegraAlerta } from '../models/regraAlerta.entity.js';
 import { PlanoAcompanhamento } from '../models/planoAcompanhamento.entity.js';
 import { RespostaCarat } from '../models/respostaCarat.entity.js';
 import { Auditoria } from '../models/auditoria.entity.js';
@@ -21,7 +39,7 @@ import {
     testeUtilizadores, testeAdministradores, testeMedicos, testeUtentes,
     testePrescricoes, testeMedicacoes, testeExames, testeSintomas,
     testeAnamneses, testeAlergias, testeComorbidades, testeMedicacoesHabituais,
-    testeAlertas, testePlanosAcompanhamento, testeRespostasCarat, testeAuditorias,
+    testeRegrasAlerta, testeAlertas, testePlanosAcompanhamento, testeRespostasCarat, testeAuditorias,
 } from '../data/dadosTeste.js';
 
 const OPTS_1_9 = { 0: 'Nunca', 1: 'Até 2 dias por semana', 2: 'Mais de 2 dias por semana', 3: 'Quase todos os dias' };
@@ -78,6 +96,7 @@ async function seed() {
     const alergiaRepo           = AppDataSource.getRepository(Alergia);
     const comorbidadeRepo       = AppDataSource.getRepository(Comorbidade);
     const medicacaoHabitualRepo = AppDataSource.getRepository(MedicacaoHabitual);
+    const regraAlertaRepo       = AppDataSource.getRepository(RegraAlerta);
     const alertaRepo            = AppDataSource.getRepository(Alerta);
     const planoRepo             = AppDataSource.getRepository(PlanoAcompanhamento);
     const respostaCaratRepo     = AppDataSource.getRepository(RespostaCarat);
@@ -106,6 +125,7 @@ async function seed() {
     await seedTable(comorbidadeRepo,       testeComorbidades,         'Comorbidades');
     await seedTable(medicacaoHabitualRepo, testeMedicacoesHabituais,  'Medicações Habituais');
     await seedTable(sintomaRepo,           testeSintomas,             'Sintomas');
+    await seedTable(regraAlertaRepo,       testeRegrasAlerta,         'Regras de Alerta');
     await seedTable(alertaRepo,            testeAlertas,              'Alertas');
     await seedTable(planoRepo,             testePlanosAcompanhamento, 'Planos de Acompanhamento');
     await seedTable(respostaCaratRepo,     testeRespostasCarat,       'Respostas CARAT');

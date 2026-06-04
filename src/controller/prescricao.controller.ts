@@ -1,3 +1,18 @@
+/*
+ * ============================================================
+ * prescricao.controller.ts — Controller de prescrições médicas
+ * ============================================================
+ *
+ * Este controller gere as prescrições médicas — documentos emitidos pelo médico
+ * que autorizam medicamentos ou exames.
+ *
+ * Funcionalidades:
+ *   - Criar prescrição (só médicos e admins)
+ *   - Listar prescrições (utentes veem as suas, médicos veem as suas, admins veem todas)
+ *   - Obter prescrição específica
+ *   - Listar prescrições por utente ou por médico
+ *   - Atualizar prescrição (só médicos e admins)
+ */
 import type { Request, Response } from 'express';
 import { PrescricaoService } from '../services/prescricao.service.js';
 import type { CreatePrescricaoDto } from '../dtos/prescricao/create-prescricao.dto.js';

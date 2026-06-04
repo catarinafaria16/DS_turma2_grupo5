@@ -1,3 +1,21 @@
+/*
+ * ============================================================
+ * alerta.controller.ts — Controller de alertas clínicos
+ * ============================================================
+ *
+ * Este controller gere os alertas clínicos gerados automaticamente
+ * (quando um score CARAT é preocupante) ou manualmente pelo médico.
+ *
+ * Funcionalidades:
+ *   - Criar alertas manualmente
+ *   - Listar e filtrar alertas (por utente, médico, estado)
+ *   - Marcar alertas como "visto" (VISTO) ou "resolvido" (FECHADO)
+ *   - Adicionar notas clínicas a um alerta
+ *   - Obter resumo estatístico dos alertas
+ *
+ * O ciclo de vida de um alerta:
+ *   NOVO → VISTO → FECHADO (resolvido)
+ */
 import type { Request, Response } from 'express';
 import { AlertaService } from '../services/alerta.service.js';
 import type { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto.js';

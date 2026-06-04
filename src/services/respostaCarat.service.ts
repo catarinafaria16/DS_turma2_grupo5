@@ -1,3 +1,23 @@
+/*
+ * ============================================================
+ * respostaCarat.service.ts — Serviço de respostas ao questionário CARAT
+ * ============================================================
+ *
+ * Este é um dos services mais importantes do sistema. Gere o preenchimento
+ * e consulta de questionários CARAT, incluindo:
+ *   - Validação de que todas as 10 perguntas foram respondidas
+ *   - Cálculo automático do score total (0-30)
+ *   - Interpretação clínica do score (bem/parcialmente/mal controlado)
+ *   - Geração de recomendação automática para o utente
+ *   - Criação de alertas automáticos quando a doença está mal controlada
+ *   - Verificação de regras de alerta personalizadas definidas pelo médico
+ *
+ * Sistema de pontuação CARAT:
+ *   Perguntas 1-9: 0=Nunca(3pts), 1=≤2dias(2pts), 2=>2dias(1pt), 3=Quase sempre(0pts)
+ *   Pergunta 10: 0=Não toma(3pts), 1=Nunca(3pts), 2=<7dias(2pts), 3=≥7dias(0pts)
+ *   Score total máximo: 30 pontos
+ *   ≥21 = bem controlado | 16-20 = parcialmente controlado | <16 = mal controlado
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { RespostaCarat } from '../models/respostaCarat.entity.js';
 import { Utente } from '../models/utente.entity.js';
@@ -61,8 +81,15 @@ export class RespostaCaratService {
             .every((campo) => r[campo] !== undefined && r[campo] !== null);
     }
 
+    /*
+     * calcularScore — Calcula o score total do questionário CARAT
+     *
+     * As respostas têm valores de 0 a 3, mas a pontuação é invertida:
+     * Quem responde "Nunca" (melhor situação) recebe a pontuação mais alta.
+     * Isto significa que score alto = doença controlada, score baixo = doença mal controlada.
+     */
     private calcularScore(data: CreateRespostaCaratDto): number {
-        // Q1-9: 0=Nunca(3pts), 1=Ate2dias(2pts), 2=Mais2dias(1pt), 3=QuaseTodos(0pts)
+        // Tabela de pontuação para perguntas 1-9: 0=Nunca(3pts), 1=Até2dias(2pts), 2=Mais2dias(1pt), 3=QuaseTodos(0pts)
         // Q10:  0=NaoToma(3pts), 1=Nunca(3pts), 2=Menos7dias(2pts), 3=7ouMais(0pts)
         const s19: Record<number, number> = { 0: 3, 1: 2, 2: 1, 3: 0 };
         const s10: Record<number, number> = { 0: 3, 1: 3, 2: 2, 3: 0 };
@@ -77,6 +104,18 @@ export class RespostaCaratService {
         return 'Doenca mal controlada';
     }
 
+    /*
+     * verificarECriarAlertas — Cria alertas automáticos com base no score CARAT
+     *
+     * Chamada automaticamente após cada preenchimento do questionário.
+     * Verifica duas coisas:
+     *   1. Alertas automáticos do sistema:
+     *      - Score < 16: alerta de SCORE_BAIXO com prioridade MUITO_ALTA
+     *      - Score 16-20: alerta de DETERIORACAO com prioridade ALTA
+     *   2. Regras personalizadas do médico (por limiar de score):
+     *      - Verifica todas as regras do médico responsável pelo utente
+     *      - Para cada regra, verifica se o score é inferior ao limiar definido
+     */
     private async verificarECriarAlertas(utenteId: number, scoreTotal: number, respostaId: number): Promise<void> {
         const utente = await this.utenteRepo.findOne({ where: { id: utenteId } });
         if (!utente) return;

@@ -1,3 +1,21 @@
+/*
+ * ============================================================
+ * regraAlerta.service.ts — Serviço de gestão de regras de alertas
+ * ============================================================
+ *
+ * Este service gere as regras automáticas que o sistema usa para gerar alertas
+ * quando o estado clínico de um utente deteriora.
+ *
+ * Tipos de regras:
+ *   - LIMIAR_SCORE: gera alerta quando score CARAT ≤ limiar_score
+ *     (ex: "alertar se score < 16 — doença mal controlada")
+ *   - DETERIORACAO: gera alerta quando score piora mais de N pontos
+ *     (ex: "alertar se score baixar 5+ pontos entre avaliações")
+ *
+ * Regras de acesso:
+ *   - ADMINISTRADOR: vê e gere todas as regras do sistema
+ *   - MÉDICO: só gere regras associadas a si próprio
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { RegraAlerta } from '../models/regraAlerta.entity.js';
 import type { CreateRegraAlertaDto } from '../dtos/regraAlerta/create-regraAlerta.dto.js';

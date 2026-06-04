@@ -1,3 +1,14 @@
+/*
+ * ============================================================
+ * medicacaoHabitual.controller.ts — Controller de medicação habitual
+ * ============================================================
+ *
+ * Gere os medicamentos que o utente toma de forma crónica/habitual.
+ * É diferente da medicação prescrita pontualmente (medicacao.controller.ts).
+ *
+ * Apenas médicos e administradores têm acesso direto.
+ * (A medicação habitual é também atualizada automaticamente quando se prescrevem medicamentos.)
+ */
 import type { Request, Response } from 'express';
 import { MedicacaoHabitualService } from '../services/medicacaoHabitual.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';

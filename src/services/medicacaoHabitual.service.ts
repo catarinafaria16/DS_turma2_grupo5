@@ -1,3 +1,21 @@
+/*
+ * ============================================================
+ * medicacaoHabitual.service.ts — Serviço de medicação habitual do utente
+ * ============================================================
+ *
+ * Este service gere os medicamentos que o utente toma de forma crónica/habitual.
+ * Estes são diferentes das medicações prescritas pontualmente (que estão em medicacao.service).
+ *
+ * A medicação habitual é automaticamente atualizada quando um médico prescreve
+ * um medicamento (ver medicacao.service.ts — função sincronizarMedicacaoHabitual).
+ *
+ * Está ligada à anamnese do utente. Um utente pode ter vários medicamentos habituais.
+ *
+ * Regras de acesso:
+ *   - ADMINISTRADOR: acesso a toda a medicação habitual
+ *   - MÉDICO: só vê medicação habitual dos seus utentes
+ *   - UTENTE: sem acesso direto
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { MedicacaoHabitual } from '../models/medicacaoHabitual.entity.js';
 import { Anamnese } from '../models/anamnese.entity.js';

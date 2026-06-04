@@ -1,3 +1,18 @@
+/*
+ * ============================================================
+ * avaliacaoCarat.service.ts — Serviço do modelo do questionário CARAT
+ * ============================================================
+ *
+ * Este service gere os modelos (templates) do questionário CARAT.
+ * Normalmente existe apenas uma versão ativa do questionário (versão 1),
+ * que é criada automaticamente quando o servidor arranca pela primeira vez.
+ *
+ * A distinção entre AvaliacaoCarat (modelo) e RespostaCarat (resposta):
+ *   - AvaliacaoCarat: o formulário em branco — as perguntas e opções
+ *   - RespostaCarat: um preenchimento do formulário por um utente
+ *
+ * Este service é acessível por qualquer utilizador autenticado (médicos e utentes).
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { AvaliacaoCarat } from '../models/avaliacaoCarat.entity.js';
 import type { CreateAvaliacaoCaratDto } from '../dtos/avaliacaoCarat/create-avaliacaoCarat.dto.js';

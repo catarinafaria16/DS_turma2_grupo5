@@ -1,3 +1,19 @@
+/*
+ * ============================================================
+ * utente.service.ts — Serviço de gestão de utentes (pacientes)
+ * ============================================================
+ *
+ * Este service contém toda a lógica de negócio relacionada com utentes.
+ * Trata de operações como criar, listar, atualizar e apagar utentes,
+ * sempre com verificação das permissões de acesso.
+ *
+ * Regras de acesso:
+ *   - ADMINISTRADOR: acesso a todos os utentes
+ *   - MÉDICO: só vê e edita os seus próprios utentes
+ *   - UTENTE: só vê e edita os seus próprios dados (e apenas morada/contacto)
+ *
+ * Após cada operação importante, regista na auditoria quem fez o quê.
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Utente } from '../models/utente.entity.js';
 import { Medico } from '../models/medico.entity.js';
@@ -21,6 +37,15 @@ export class UtenteService {
     private get medicoRepo() { return AppDataSource.getRepository(Medico); }
     private get utilizadorRepo() { return AppDataSource.getRepository(Utilizador); }
 
+    /*
+     * validarAcesso — Verifica se o utilizador tem permissão para aceder a um utente
+     *
+     * Regras:
+     *   - ADMINISTRADOR: pode aceder a qualquer utente
+     *   - MÉDICO: só pode aceder a utentes que são seus
+     *   - UTENTE: só pode aceder aos seus próprios dados
+     * Se não tiver permissão, lança um erro que o controller converte em resposta 403.
+     */
     private async validarAcesso(utenteId: number, utilizador: UtilizadorAutenticado): Promise<Utente> {
         const utente = await this.repo.findOne({ where: { id: utenteId } });
 
@@ -49,10 +74,13 @@ export class UtenteService {
         throw new Error('Perfil nao reconhecido');
     }
 
+    // Valida se o número de contacto é um número de telefone português válido
+    // Aceita números com ou sem prefixo +351, começados por 2, 3 ou 9
     private validarContacto(contacto: string): boolean {
         return /^(\+351)?[239]\d{8}$/.test(contacto.replace(/\s/g, ''));
     }
 
+    // Valida se a data de nascimento é válida e não é no futuro
     private validarDataNascimento(dataNascimento: Date): void {
         const nascimento = new Date(dataNascimento);
         if (Number.isNaN(nascimento.getTime())) {
@@ -68,6 +96,17 @@ export class UtenteService {
         }
     }
 
+    /*
+     * criar — Cria um novo utente na base de dados
+     *
+     * Validações realizadas:
+     *   - IDs de utilizador e médico devem ser válidos
+     *   - Morada e contacto são obrigatórios
+     *   - Número de utente deve ser único no sistema
+     *   - O utilizador associado deve ter perfil UTENTE
+     *   - Um médico só pode criar utentes para si próprio
+     * Após criação, regista na auditoria.
+     */
     async criar(utenteData: CreateUtenteDto, utilizador: UtilizadorAutenticado): Promise<UtenteResponseDto> {
         try {
             // RNF004: valida campos obrigatorios e associacoes antes da criacao.
@@ -134,6 +173,8 @@ export class UtenteService {
         }
     }
 
+    // listar — Devolve a lista de utentes visíveis para o utilizador autenticado
+    // (todos para admin, só os seus para médico, só o próprio para utente)
     async listar(utilizador: UtilizadorAutenticado): Promise<UtenteResponseDto[]> {
         try {
             if (utilizador.perfil === PerfilUtilizador.ADMINISTRADOR) {
@@ -288,9 +329,17 @@ export class UtenteService {
         }
     }
 
+    /*
+     * apagar — Apaga "logicamente" um utente (soft delete)
+     *
+     * O registo NÃO é removido da base de dados — apenas o campo deleted_at
+     * é preenchido com a data atual. Isto mantém o histórico e permite recuperação.
+     * Após a operação, o utente deixa de aparecer nas listagens normais.
+     */
     async apagar(utenteId: number, utilizador: UtilizadorAutenticado): Promise<void> {
         try {
             await this.validarAcesso(utenteId, utilizador);
+            // softDelete: não apaga o registo, apenas preenche o campo deleted_at
             await this.repo.softDelete(utenteId);
 
             const anterior = await this.repo.findOne({ where: { id: utenteId }, withDeleted: true });

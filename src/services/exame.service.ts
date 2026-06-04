@@ -1,3 +1,17 @@
+/*
+ * ============================================================
+ * exame.service.ts — Serviço de gestão de exames clínicos
+ * ============================================================
+ *
+ * Este service gere os exames clínicos associados a prescrições médicas.
+ * Um exame só pode ser realizado após o consentimento informado do utente.
+ *
+ * Exemplos de exames: espirometria, análises ao sangue, teste cutâneo de alergias,
+ * peak-flow, radiografia torácica, TAC dos seios perinasais.
+ *
+ * Estados possíveis: PENDENTE → REALIZADO (ou CANCELADO)
+ * Regras de acesso seguem as da prescrição associada.
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Exame } from '../models/exame.entity.js';
 import { Prescricao } from '../models/prescricao.entity.js';

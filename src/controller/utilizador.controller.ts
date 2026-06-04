@@ -1,3 +1,18 @@
+/*
+ * ============================================================
+ * utilizador.controller.ts — Controller de utilizadores do sistema
+ * ============================================================
+ *
+ * Gere as contas de acesso ao sistema (utilizadores).
+ * Cada utilizador tem nome, email, password e perfil (ADMIN/MEDICO/UTENTE).
+ *
+ * Funcionalidades:
+ *   - Criar utilizador (só admins podem criar pela API; registo público está em app.ts)
+ *   - Listar todos os utilizadores (só admins)
+ *   - Obter dados de um utilizador (admin vê todos; outros só veem a si próprios)
+ *   - Atualizar (admin atualiza qualquer campo; outros só atualizam email/password)
+ *   - Apagar (soft delete, só admins)
+ */
 import type { Request, Response } from 'express';
 import { UtilizadorService } from '../services/utilizador.service.js';
 import type { CreateUtilizadorDto } from '../dtos/utilizador/create-utilizador.dto.js';

@@ -1,3 +1,22 @@
+/*
+ * ============================================================
+ * planoAcompanhamento.service.ts — Serviço de planos de acompanhamento
+ * ============================================================
+ *
+ * Este service gere os planos de acompanhamento clínico definidos pelo médico.
+ * Um plano estabelece a frequência das consultas, a duração do acompanhamento
+ * e as recomendações clínicas para o utente.
+ *
+ * Funcionalidades:
+ *   - Criar/atualizar planos de acompanhamento
+ *   - Alterar o estado de um plano (ATIVO → CONCLUIDO ou SUSPENSO)
+ *   - Listar planos por utente ou por médico
+ *
+ * Regras de acesso:
+ *   - ADMINISTRADOR: acesso a todos os planos
+ *   - MÉDICO: só gere planos dos seus utentes
+ *   - UTENTE: só consulta os seus próprios planos
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { PlanoAcompanhamento } from '../models/planoAcompanhamento.entity.js';
 import { Utente } from '../models/utente.entity.js';

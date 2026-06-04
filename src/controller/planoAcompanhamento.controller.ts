@@ -1,3 +1,17 @@
+/*
+ * ============================================================
+ * planoAcompanhamento.controller.ts — Controller de planos de acompanhamento
+ * ============================================================
+ *
+ * Gere os planos de acompanhamento clínico definidos pelo médico.
+ * Um plano define a frequência das consultas, a duração e as recomendações clínicas.
+ *
+ * Funcionalidade especial: atualizarEstado permite mudar o estado do plano
+ * (ATIVO → CONCLUIDO ou SUSPENSO) sem ter de reenviar todos os dados.
+ *
+ * Médicos e admins criam e gerem planos.
+ * Utentes podem consultar os seus planos.
+ */
 import type { Request, Response } from 'express';
 import { PlanoAcompanhamentoService } from '../services/planoAcompanhamento.service.js';
 import type { CreatePlanoAcompanhamentoDto } from '../dtos/planoAcompanhamento/create-planoAcompanhamento.dto.js';

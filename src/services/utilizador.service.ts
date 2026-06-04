@@ -1,3 +1,21 @@
+/*
+ * ============================================================
+ * utilizador.service.ts — Serviço de gestão de utilizadores
+ * ============================================================
+ *
+ * Este service gere a criação, consulta, atualização e eliminação de utilizadores.
+ * Um utilizador é a conta de acesso ao sistema (tem nome, email, password e perfil).
+ *
+ * Validações importantes:
+ *   - Email deve ser único e ter formato válido
+ *   - Password deve ter pelo menos 6 caracteres
+ *   - Perfil deve ser um valor válido (ADMIN, MEDICO, UTENTE)
+ *
+ * Regras de acesso:
+ *   - ADMINISTRADOR: pode criar, ver e editar qualquer utilizador
+ *   - Outros perfis: só podem ver e editar os seus próprios dados
+ *     (e apenas email e password — não podem mudar o perfil)
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Utilizador } from '../models/utilizador.entity.js';
 import type { CreateUtilizadorDto } from '../dtos/utilizador/create-utilizador.dto.js';

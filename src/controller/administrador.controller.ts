@@ -1,3 +1,16 @@
+/*
+ * ============================================================
+ * administrador.controller.ts — Controller de administradores
+ * ============================================================
+ *
+ * Este controller é exclusivo para administradores e gere:
+ *   - Operações CRUD sobre contas de administrador
+ *   - Configuração dos limiares CARAT (valores que definem os níveis de controlo)
+ *   - Gestão de perfis e permissões de utilizadores
+ *   - Operações de manutenção de dados do sistema
+ *
+ * Todas as rotas deste controller estão protegidas: só administradores têm acesso.
+ */
 import type { Request, Response } from 'express';
 import { AdministradorService } from '../services/administrador.service.js';
 import type { CreateAdministradorDto } from '../dtos/administrador/create-administrador.dto.js';
@@ -76,6 +89,8 @@ export class AdministradorController {
         }
     }
 
+    // PUT /api/administradores/config/limiares-carat — Configurar limiares de pontuação CARAT
+    // Os limiares definem as fronteiras entre "bem controlado", "parcialmente controlado" e "mal controlado"
     async configurarLimiaresCarat(req: Request, res: Response) {
         try {
             const { limiarBaixo, limiarIntermedio, limiarAlto } = req.body;

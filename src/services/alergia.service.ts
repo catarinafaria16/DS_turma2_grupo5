@@ -1,3 +1,18 @@
+/*
+ * ============================================================
+ * alergia.service.ts — Serviço de gestão de alergias do utente
+ * ============================================================
+ *
+ * Este service gere o registo e consulta de alergias conhecidas dos utentes.
+ * As alergias estão ligadas à anamnese do utente (história clínica).
+ *
+ * Regras de acesso:
+ *   - ADMINISTRADOR: acesso a todas as alergias
+ *   - MÉDICO: só vê alergias dos seus utentes
+ *   - UTENTE: sem acesso direto a alergias (apenas via anamnese)
+ *
+ * Cada alergia tem descrição, frequência das crises e intensidade (LIGEIRA/MODERADA/GRAVE).
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Alergia } from '../models/alergia.entity.js';
 import { Anamnese } from '../models/anamnese.entity.js';

@@ -1,3 +1,15 @@
+/*
+ * ============================================================
+ * avaliacaoCarat.controller.ts — Controller do modelo do questionário CARAT
+ * ============================================================
+ *
+ * Gere os modelos (templates) do questionário CARAT.
+ * Normalmente existe apenas a versão 1, criada automaticamente quando o servidor arranca.
+ *
+ * Distinção importante:
+ *   - AvaliacaoController: gere as PERGUNTAS do questionário (o formulário em branco)
+ *   - RespostaCaratController: gere as RESPOSTAS dos utentes ao questionário
+ */
 import type { Request, Response } from 'express';
 import { AvaliacaoCaratService } from '../services/avaliacaoCarat.service.js';
 import type { CreateAvaliacaoCaratDto } from '../dtos/avaliacaoCarat/create-avaliacaoCarat.dto.js';

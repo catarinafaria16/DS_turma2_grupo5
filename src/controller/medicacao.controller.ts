@@ -1,3 +1,17 @@
+/*
+ * ============================================================
+ * medicacao.controller.ts — Controller de medicamentos prescritos
+ * ============================================================
+ *
+ * Gere os medicamentos associados a prescrições médicas.
+ * Inclui validação de doses clinicamente razoáveis.
+ *
+ * Médicos e admins prescrevem medicamentos.
+ * Utentes podem consultar os seus medicamentos.
+ *
+ * Ao criar um medicamento, este é automaticamente sincronizado
+ * com a medicação habitual do utente.
+ */
 import type { Request, Response } from 'express';
 import { MedicacaoService } from '../services/medicacao.service.js';
 import type { CreateMedicacaoDto } from '../dtos/medicacao/create-medicacao.dto.js';

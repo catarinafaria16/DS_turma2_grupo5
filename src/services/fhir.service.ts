@@ -1,3 +1,24 @@
+/*
+ * ============================================================
+ * fhir.service.ts — Serviço de conversão de dados para formato FHIR
+ * ============================================================
+ *
+ * Este service converte os dados internos do sistema para o formato padrão
+ * internacional HL7 FHIR R4, necessário para interoperabilidade com outros
+ * sistemas de saúde (hospitais, laboratórios, apps de saúde).
+ *
+ * FHIR (Fast Healthcare Interoperability Resources) define "recursos" standard:
+ *   - Patient: informação do doente (nome, data de nascimento, contacto, morada)
+ *   - AllergyIntolerance: alergias conhecidas do doente
+ *   - MedicationRequest: prescrições de medicamentos
+ *   - Observation: observações clínicas (inclui scores CARAT)
+ *
+ * Os dados são agrupados em "Bundle" (conjunto) — o formato standard para
+ * devolver múltiplos recursos FHIR numa só resposta.
+ *
+ * Este service não acede à base de dados diretamente para a transformação —
+ * usa os mappers (patient.mapper, allergyIntolerance.mapper, etc.) para converter.
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Utente } from '../models/utente.entity.js';
 import { Utilizador } from '../models/utilizador.entity.js';
@@ -16,12 +37,27 @@ import type { FhirMedicationRequestDto } from '../dtos/fhir/medicationRequest/me
 import type { FhirObservationDto } from '../dtos/fhir/observation/observationDTO.js';
 import type { FhirBundle } from '../dtos/fhir/shared/fhir-types.dto.js';
 
+/*
+ * toBundle — Agrupa uma lista de recursos FHIR num Bundle FHIR
+ *
+ * O Bundle é o "envelope" standard para devolver múltiplos recursos FHIR.
+ * Inclui o tipo ("searchset" = resultado de pesquisa), o total de resultados,
+ * e a lista de recursos dentro de "entry".
+ *
+ * Exemplo de Bundle FHIR:
+ * {
+ *   "resourceType": "Bundle",
+ *   "type": "searchset",
+ *   "total": 2,
+ *   "entry": [{ "resource": { ... } }, { "resource": { ... } }]
+ * }
+ */
 function toBundle<T>(resources: T[]): FhirBundle<T> {
     return {
         resourceType: 'Bundle',
-        type: 'searchset',
-        total: resources.length,
-        entry: resources.map(r => ({ resource: r })),
+        type: 'searchset',        // Tipo de bundle: resultado de pesquisa
+        total: resources.length,  // Número total de recursos devolvidos
+        entry: resources.map(r => ({ resource: r })), // Cada recurso dentro de "entry"
     };
 }
 

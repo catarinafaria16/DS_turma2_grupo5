@@ -1,3 +1,19 @@
+/*
+ * ============================================================
+ * comorbidade.service.ts — Serviço de gestão de comorbilidades
+ * ============================================================
+ *
+ * Este service gere o registo e consulta de comorbilidades dos utentes
+ * (outras doenças coexistentes com a rinite/asma).
+ *
+ * As comorbilidades estão ligadas à anamnese do utente. Um utente pode
+ * ter várias comorbilidades registadas.
+ *
+ * Regras de acesso:
+ *   - ADMINISTRADOR: acesso a todas as comorbilidades
+ *   - MÉDICO: só vê comorbilidades dos seus utentes
+ *   - UTENTE: sem acesso direto
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Comorbidade } from '../models/comorbidade.entity.js';
 import { Anamnese } from '../models/anamnese.entity.js';

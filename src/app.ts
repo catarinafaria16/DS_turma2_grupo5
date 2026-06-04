@@ -1,9 +1,29 @@
-import express from 'express';
-import jwt from 'jsonwebtoken';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import 'reflect-metadata';
-import { AppDataSource } from './database/data-source.js';
+/*
+ * ============================================================
+ * app.ts — Ficheiro principal do servidor (ponto de entrada)
+ * ============================================================
+ *
+ * Este é o ficheiro mais importante do backend. É aqui que o servidor
+ * é criado, configurado e iniciado. Pensa nisto como o "motor" da
+ * aplicação — é o primeiro ficheiro a ser executado quando o sistema arranca.
+ *
+ * O que acontece aqui, por ordem:
+ *   1. São importadas todas as ferramentas e módulos necessários
+ *   2. O servidor Express é criado e configurado
+ *   3. São definidos os endpoints de login e registo (públicos, sem autenticação)
+ *   4. São registadas todas as rotas da API (cada grupo tem o seu prefixo)
+ *   5. A base de dados é ligada
+ *   6. São inseridos dados de teste (se ainda não existirem)
+ *   7. O servidor começa a ouvir pedidos na porta configurada
+ */
+
+// Importação das ferramentas principais do servidor
+import express from 'express';   // Express: framework que facilita criar servidores web em Node.js
+import jwt from 'jsonwebtoken';   // JWT: usado para criar tokens de autenticação (como um "crachá digital")
+import { fileURLToPath } from 'url';  // Utilitário para obter o caminho do ficheiro atual
+import { dirname, join } from 'path'; // Utilitários para trabalhar com caminhos de ficheiros
+import 'reflect-metadata';            // Necessário para o TypeORM funcionar com decoradores TypeScript
+import { AppDataSource } from './database/data-source.js'; // Configuração da ligação à base de dados
 
 import utilizadorRoutes from './routes/utilizador.routes.js';
 import utenteRoutes from './routes/utente.routes.js';
@@ -45,8 +65,22 @@ import { Auditoria } from './models/auditoria.entity.js';
 import { PerfilUtilizador } from './enums/PerfilUtilizador.enum.js';
 import { testeUtilizadores, testeAdministradores, testeMedicos, testeUtentes, testePrescricoes, testeMedicacoes, testeExames, testeSintomas, testeAnamneses, testeAlergias, testeComorbidades, testeMedicacoesHabituais, testeAlertas, testePlanosAcompanhamento, testeRespostasCarat, testeAuditorias } from './data/dadosTeste.js';
 
+// Opções de resposta para as perguntas 1 a 9 do questionário CARAT
+// (frequência dos sintomas durante a semana anterior)
 const OPTS_1_9 = { 0: 'Nunca', 1: 'Até 2 dias por semana', 2: 'Mais de 2 dias por semana', 3: 'Quase todos os dias' };
+
+// Opções de resposta para a pergunta 10 do questionário CARAT
+// (frequência de utilização de medicamentos de resgate)
 const OPTS_10  = { 0: 'Não estou a tomar medicamentos', 1: 'Nunca', 2: 'Menos de 7 dias', 3: '7 ou mais dias' };
+
+/*
+ * Questionário CARAT versão 1
+ * O CARAT (Control of Allergic Rhinitis and Asthma Test) é um questionário
+ * validado clinicamente que avalia o controlo de rinite alérgica e asma.
+ * Tem 10 perguntas: as 4 primeiras sobre sintomas nasais, as seguintes sobre
+ * sintomas de asma, e a última sobre uso de medicamentos de resgate.
+ * A pontuação total indica o nível de controlo da doença.
+ */
 const AVALIACAO_CARAT_V1 = {
     versao: 1,
     q1: 'Nariz entupido?', q2: 'Espirros?', q3: 'Comichão no nariz?', q4: 'Corrimento/pingo do nariz?',
@@ -58,17 +92,34 @@ const AVALIACAO_CARAT_V1 = {
     r6: OPTS_1_9, r7: OPTS_1_9, r8: OPTS_1_9, r9: OPTS_1_9, r10: OPTS_10,
 };
 
+// Obtém o caminho absoluto da pasta onde este ficheiro está (necessário para servir ficheiros estáticos)
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// Cria a aplicação Express (o servidor HTTP)
 const app = express();
+// Porta onde o servidor vai ouvir — usa a variável de ambiente PORT, ou 3000 por defeito
 const PORT = process.env['PORT'] ?? 3000;
+// Chave secreta para assinar tokens JWT — deve estar definida no ficheiro .env
 const JWT_SECRET = process.env['JWT_SECRET'] ?? 'carat-dev-secret-change-me';
 
+// Serve os ficheiros estáticos da pasta "public" (HTML, CSS, imagens do frontend)
 app.use(express.static(join(__dirname, '..', 'public')));
+// Permite que o servidor receba dados em formato JSON nos pedidos POST/PUT
 app.use(express.json());
+// Permite receber dados de formulários HTML tradicionais
 app.use(express.urlencoded({ extended: true }));
 
+/*
+ * ENDPOINT DE LOGIN — POST /api/login
+ *
+ * Este é o ponto de entrada do sistema. O utilizador envia o seu ID e password,
+ * e o servidor verifica se são válidos. Se sim, devolve um token JWT que o
+ * utilizador deve incluir em todos os pedidos seguintes para provar a sua identidade.
+ *
+ * Nota especial: os médicos fazem login com o número de cédula médica (não o ID interno).
+ */
 app.post('/api/login', async (req, res) => {
+    // Extrai o ID e a password do corpo do pedido
     const { id, password } = req.body;
     const utilizadorId = Number(id);
 
@@ -97,16 +148,27 @@ app.post('/api/login', async (req, res) => {
         email: utilizador.email,
         perfil: utilizador.perfil
     };
+    // Cria o token JWT com os dados do utilizador (ID e perfil)
+    // Este token é válido por 8 horas — depois o utilizador terá de fazer login novamente
     const token = jwt.sign(
         { id: utilizador.id, perfil: utilizador.perfil },
         JWT_SECRET,
         { expiresIn: '8h' }
     );
 
+    // Devolve o token e os dados básicos do utilizador para o frontend guardar
     return res.status(200).json({ token, user });
 });
 
+/*
+ * ENDPOINT DE REGISTO PÚBLICO — POST /api/registar
+ *
+ * Permite criar uma nova conta de utilizador sem necessitar de autenticação.
+ * Por segurança, só é possível criar contas com perfil "UTENTE" (paciente).
+ * A criação de médicos e administradores é feita por um administrador autenticado.
+ */
 app.post('/api/registar', async (req, res) => {
+    // Extrai os dados do novo utilizador do corpo do pedido
     const { nome, email, password, perfil, genero } = req.body;
 
     if (!nome || !email || !password || !perfil || !genero) {
@@ -147,8 +209,18 @@ app.post('/api/registar', async (req, res) => {
     });
 });
 
-app.use('/api/utilizadores', utilizadorRoutes);
-app.use('/api/utentes', utenteRoutes);
+/*
+ * REGISTO DE ROTAS DA API
+ *
+ * Aqui são registadas todas as "estradas" da API. Cada linha associa
+ * um prefixo de URL a um conjunto de rotas específicas.
+ * Por exemplo: qualquer pedido a "/api/utentes/..." é encaminhado
+ * para o ficheiro de rotas de utentes.
+ *
+ * Todas estas rotas estão protegidas por autenticação (exceto /api/login e /api/registar).
+ */
+app.use('/api/utilizadores', utilizadorRoutes);   // Gestão de utilizadores (admins, médicos, utentes)
+app.use('/api/utentes', utenteRoutes);             // Gestão de pacientes (utentes)
 app.use('/api/medicos', medicoRoutes);
 app.use('/api/administradores', administradorRoutes);
 app.use('/api/alertas', alertaRoutes);
@@ -168,15 +240,34 @@ app.use('/api/auditoria', auditoriaRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/fhir', fhirRoutes);
 
+// Rota de verificação de saúde do servidor — útil para monitorização
+// Qualquer sistema externo pode chamar GET /health para saber se o servidor está operacional
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', version: 'v2-typeorm', timestamp: new Date().toISOString() });
 });
 
+// Rota de fallback para URLs não reconhecidos — devolve erro 404 (Não encontrado)
+// Esta é a última rota registada, por isso só é ativada se nenhuma anterior corresponder
 app.use((_req, res) => {
     res.status(404).json({ erro: 'Rota não encontrada' });
 });
 
+/*
+ * seedTestData — Função de inicialização de dados de teste
+ *
+ * Esta função verifica se já existem dados na base de dados e, caso não existam,
+ * insere dados de exemplo (utilizadores, médicos, utentes, prescrições, etc.).
+ *
+ * É chamada uma única vez, quando o servidor arranca pela primeira vez.
+ * A verificação "se já existe, não insere de novo" evita duplicados em
+ * cada reinício do servidor.
+ *
+ * "Seed" é um termo técnico para "semear" a base de dados com dados iniciais,
+ * tal como se semeia um campo antes de começar a colheita.
+ */
 async function seedTestData() {
+    // Cria referências ("repositórios") para cada tabela da base de dados
+    // Um repositório é como um "gestor" que sabe como ler e escrever numa tabela específica
     const utilizadorRepo = AppDataSource.getRepository(Utilizador);
     const administradorRepo = AppDataSource.getRepository(Administrador);
     const medicoRepo = AppDataSource.getRepository(Medico);
@@ -314,17 +405,29 @@ async function seedTestData() {
     }
 }
 
+/*
+ * ARRANQUE DO SERVIDOR
+ *
+ * Aqui começa tudo:
+ *   1. Inicializa a ligação à base de dados (AppDataSource.initialize)
+ *   2. Se bem-sucedido, insere dados de teste (seedTestData)
+ *   3. Inicia o servidor HTTP na porta configurada
+ *   4. Se falhar (ex: base de dados corrompida), escreve o erro e encerra o processo
+ */
 AppDataSource.initialize()
     .then(async () => {
         console.log('Database connected successfully');
+        // Insere dados de teste na base de dados (apenas se ainda não existirem)
         await seedTestData();
+        // Começa a ouvir pedidos HTTP na porta definida
         app.listen(PORT, () => {
             console.log(`Servidor a correr na porta ${PORT}`);
         });
     })
     .catch((error) => {
+        // Se ocorrer um erro ao ligar à base de dados, escreve o erro e encerra o processo
         console.error('Error during database initialization:', error);
-        process.exit(1);
+        process.exit(1); // Código 1 indica saída com erro
     });
 
 export default app;

@@ -1,3 +1,22 @@
+/*
+ * ============================================================
+ * regraAlerta.controller.ts — Controller de regras de alertas automáticos
+ * ============================================================
+ *
+ * Este controller gere as regras que o sistema usa para gerar alertas
+ * automáticos quando o estado clínico de um utente se deteriora.
+ *
+ * Os médicos podem criar regras personalizadas para os seus utentes.
+ * Os administradores podem gerir regras globais do sistema.
+ *
+ * Funcionalidades:
+ *   - Criar regra de alerta (médico/admin)
+ *   - Listar regras (cada um vê as suas)
+ *   - Obter regra específica
+ *   - Listar regras por médico
+ *   - Atualizar regra
+ *   - Apagar regra (soft delete)
+ */
 import type { Request, Response } from 'express';
 import { RegraAlertaService } from '../services/regraAlerta.service.js';
 import type { CreateRegraAlertaDto } from '../dtos/regraAlerta/create-regraAlerta.dto.js';

@@ -1,3 +1,14 @@
+/*
+ * ============================================================
+ * exame.controller.ts — Controller de exames clínicos
+ * ============================================================
+ *
+ * Gere os exames clínicos prescritos (ex: espirometria, análises ao sangue).
+ * Os exames estão sempre associados a uma prescrição.
+ *
+ * Médicos e admins prescrevem e atualizam exames.
+ * Utentes podem consultar os seus próprios exames.
+ */
 import type { Request, Response } from 'express';
 import { ExameService } from '../services/exame.service.js';
 import type { CreateExameDto } from '../dtos/exame/create-exame.dto.js';

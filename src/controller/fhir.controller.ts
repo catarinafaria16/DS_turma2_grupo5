@@ -1,8 +1,31 @@
+/*
+ * ============================================================
+ * fhir.controller.ts — Controller HL7 FHIR
+ * ============================================================
+ *
+ * Este controller expõe os dados do sistema no formato padrão HL7 FHIR R4,
+ * permitindo interoperabilidade com outros sistemas de saúde.
+ *
+ * O que é o FHIR?
+ * HL7 FHIR (Fast Healthcare Interoperability Resources) é um padrão
+ * internacional que define como os dados de saúde devem ser estruturados
+ * e partilhados entre sistemas. É como uma "língua comum" para sistemas médicos.
+ *
+ * Recursos FHIR disponíveis:
+ *   - Patient: dados do utente
+ *   - AllergyIntolerance: alergias do utente
+ *   - MedicationRequest: prescrições de medicamentos
+ *   - Observation: observações clínicas (scores CARAT)
+ *
+ * As respostas de erro seguem o formato OperationOutcome do FHIR.
+ */
 import type { Request, Response } from 'express';
 import { FhirService } from '../services/fhir.service.js';
 
+// Função auxiliar para criar respostas de erro no formato FHIR OperationOutcome
+// Em vez de { erro: "..." }, o FHIR usa este formato estruturado para erros
 const operationOutcomeError = (diagnostics: string) => ({
-    resourceType: 'OperationOutcome',
+    resourceType: 'OperationOutcome', // Tipo FHIR para respostas de erro
     issue: [{ severity: 'error', code: 'exception', diagnostics }],
 });
 

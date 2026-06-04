@@ -1,3 +1,23 @@
+/*
+ * ============================================================
+ * administrador.routes.ts — Rotas da API para administradores
+ * ============================================================
+ *
+ * ACESSO RESTRITO: apenas administradores podem aceder a estas rotas.
+ *
+ * URL base: /api/administradores
+ *
+ * Rotas disponíveis:
+ *   GET  /api/administradores/config/limiares-carat   — ver limiares CARAT configurados
+ *   PUT  /api/administradores/config/limiares-carat   — configurar limiares CARAT
+ *   POST /api/administradores/dados                   — operações de manutenção de dados
+ *   GET  /api/administradores                         — listar administradores
+ *   POST /api/administradores                         — criar administrador
+ *   GET  /api/administradores/:id                     — obter administrador específico
+ *   PUT  /api/administradores/:id                     — atualizar administrador
+ *   DELETE /api/administradores/:id                   — apagar administrador
+ *   PUT  /api/administradores/:id/perfis-permissoes   — gerir permissões de um utilizador
+ */
 import { Router } from 'express';
 import { AdministradorController } from '../controller/administrador.controller.js';
 import { autenticar, requirePerfil } from '../middleware/auth.middleware.js';
@@ -6,7 +26,9 @@ import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 const routes = Router();
 const controller = new AdministradorController();
 
+// Requer autenticação JWT
 routes.use(autenticar);
+// APENAS administradores têm acesso a estas rotas
 routes.use(requirePerfil(PerfilUtilizador.ADMINISTRADOR));
 
 routes.get('/config/limiares-carat', controller.obterConfigLimiaresCarat.bind(controller));

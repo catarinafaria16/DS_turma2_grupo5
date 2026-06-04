@@ -1,3 +1,14 @@
+/*
+ * ============================================================
+ * anamnese.controller.ts — Controller da história clínica (anamnese)
+ * ============================================================
+ *
+ * Gere a anamnese dos utentes — o registo da sua história clínica de fundo.
+ * Contém historial familiar, situação tabágica e sexo biológico.
+ *
+ * Apenas médicos e administradores têm acesso.
+ * A anamnese é o "pai" de alergias, comorbilidades e medicação habitual.
+ */
 import type { Request, Response } from 'express';
 import { AnamneseService } from '../services/anamnese.service.js';
 import type { CreateAnamneseDto } from '../dtos/anamnese/create-anamnese.dto.js';

@@ -1,3 +1,13 @@
+/*
+ * ============================================================
+ * alergia.controller.ts — Controller de alergias dos utentes
+ * ============================================================
+ *
+ * Gere o registo e consulta de alergias conhecidas dos utentes.
+ * Apenas médicos e administradores têm acesso (não o próprio utente).
+ *
+ * As alergias estão sempre associadas a uma anamnese de um utente.
+ */
 import type { Request, Response } from 'express';
 import { AlergiaService } from '../services/alergia.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';

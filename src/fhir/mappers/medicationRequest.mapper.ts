@@ -1,3 +1,20 @@
+/*
+ * ============================================================
+ * medicationRequest.mapper.ts — Conversor de Prescrição/Medicação para FHIR MedicationRequest
+ * ============================================================
+ *
+ * Converte uma Prescricao + Medicacao para o recurso FHIR MedicationRequest (R4).
+ * São necessários ambos porque o FHIR MedicationRequest representa um medicamento específico
+ * dentro de uma prescrição.
+ *
+ * Mapeamento de estados:
+ *   ATIVA → "active" (prescrição em vigor)
+ *   DISPENSADA → "completed" (medicamento levantado)
+ *   CANCELADA → "cancelled"
+ *
+ * A instrução de dosagem (dosageInstruction) combina dose, periodicidade e duração
+ * num único texto descritivo.
+ */
 import { Prescricao } from '../../models/prescricao.entity.js';
 import { Medicacao } from '../../models/medicacao.entity.js';
 import { EstadoPrescricao } from '../../enums/EstadoPrescricao.enum.js';

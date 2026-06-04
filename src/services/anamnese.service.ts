@@ -1,3 +1,19 @@
+/*
+ * ============================================================
+ * anamnese.service.ts — Serviço de gestão da anamnese (história clínica)
+ * ============================================================
+ *
+ * Este service gere a anamnese de cada utente — o registo da sua história
+ * clínica de fundo: historial familiar, tabagismo e sexo biológico.
+ *
+ * Normalmente cada utente tem apenas uma anamnese. A anamnese serve como
+ * "pai" para alergias, comorbidades e medicação habitual.
+ *
+ * Regras de acesso:
+ *   - ADMINISTRADOR: acesso a todas as anamneses
+ *   - MÉDICO: só vê anamneses dos seus utentes
+ *   - UTENTE: sem acesso direto (ver dados através de outros endpoints)
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Anamnese } from '../models/anamnese.entity.js';
 import { Utente } from '../models/utente.entity.js';

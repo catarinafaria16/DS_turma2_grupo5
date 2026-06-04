@@ -1,3 +1,19 @@
+/*
+ * ============================================================
+ * sintoma.service.ts — Serviço de gestão de sintomas
+ * ============================================================
+ *
+ * Este service gere o registo e consulta de sintomas reportados pelos utentes.
+ * Os sintomas são importantes para o acompanhamento clínico e ajudam o médico
+ * a avaliar a evolução da doença entre consultas.
+ *
+ * Regras de acesso:
+ *   - ADMINISTRADOR: acesso a todos os sintomas
+ *   - MÉDICO: só vê sintomas dos seus utentes
+ *   - UTENTE: só vê e regista os seus próprios sintomas
+ *
+ * Os sintomas são listados por ordem cronológica inversa (mais recentes primeiro).
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Sintoma } from '../models/sintoma.entity.js';
 import { Utente } from '../models/utente.entity.js';

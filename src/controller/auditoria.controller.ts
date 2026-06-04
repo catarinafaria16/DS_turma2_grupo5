@@ -1,3 +1,21 @@
+/*
+ * ============================================================
+ * auditoria.controller.ts — Controller do log de auditoria
+ * ============================================================
+ *
+ * Este controller expõe o histórico de auditoria do sistema.
+ * A auditoria regista quem fez o quê e quando — essencial para
+ * conformidade legal e segurança em sistemas clínicos.
+ *
+ * ATENÇÃO: apenas administradores têm acesso à auditoria.
+ *
+ * Funcionalidades:
+ *   - Listar todas as entradas de auditoria (com paginação)
+ *   - Obter histórico de auditoria de um utilizador específico
+ *   - Obter histórico de um registo específico (ex: todas as alterações a uma prescrição)
+ *   - Ver as diferenças entre antes e depois de uma alteração
+ *   - Apagar uma entrada de auditoria (para manutenção)
+ */
 import type { Request, Response } from 'express';
 import { AuditoriaService } from '../services/auditoria.service.js';
 

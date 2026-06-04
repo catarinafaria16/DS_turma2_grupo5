@@ -1,3 +1,14 @@
+/*
+ * ============================================================
+ * comorbidade.controller.ts — Controller de comorbilidades
+ * ============================================================
+ *
+ * Gere as comorbilidades dos utentes — outras doenças coexistentes
+ * com a rinite/asma (ex: dermatite atópica, apneia do sono).
+ *
+ * Apenas médicos e administradores têm acesso.
+ * As comorbilidades estão sempre associadas a uma anamnese.
+ */
 import type { Request, Response } from 'express';
 import { ComorbidadeService } from '../services/comorbidade.service.js';
 import type { UtilizadorAutenticado } from '../middleware/auth.middleware.js';

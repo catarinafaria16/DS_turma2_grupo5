@@ -1,3 +1,18 @@
+/*
+ * ============================================================
+ * respostaCarat.controller.ts — Controller de respostas ao questionário CARAT
+ * ============================================================
+ *
+ * Este controller gere o preenchimento e consulta de questionários CARAT.
+ * É um dos mais importantes do sistema, pois é através dele que se regista
+ * a avaliação clínica do controlo da rinite/asma.
+ *
+ * Quando uma nova resposta é submetida (POST), o sistema automaticamente:
+ *   1. Calcula o score total (0-30)
+ *   2. Interpreta o resultado clinicamente
+ *   3. Gera recomendação para o utente
+ *   4. Cria alertas se necessário (score baixo ou deterioração)
+ */
 import type { Request, Response } from 'express';
 import { RespostaCaratService } from '../services/respostaCarat.service.js';
 import type { CreateRespostaCaratDto } from '../dtos/respostaCarat/create-respostaCarat.dto.js';

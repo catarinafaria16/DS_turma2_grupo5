@@ -12,6 +12,7 @@ import { IntensidadeCriseAlergia } from '../enums/IntensidadeCriseAlergia.enum.j
 import { TipoAlerta } from '../enums/TipoAlerta.enum.js';
 import { EstadoAlerta } from '../enums/EstadoAlerta.enum.js';
 import { PrioridadeRegraAlerta } from '../enums/PrioridadeRegraAlerta.enum.js';
+import { CategoriaRegraAlerta } from '../enums/CategoriaRegraAlerta.enum.js';
 import { EstadoPlanoAcompanhamento } from '../enums/EstadoPlanoAcompanhamento.enum.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 import { EspecialidadeMedico } from '../enums/EspecialidadeMedico.enum.js';
@@ -27,11 +28,11 @@ export const testeUtilizadores = [
     { id: 20261003, nome: 'Carla Mendes',     email: 'carla.mendes@administrador.pt',   password: 'pass20261003', perfil: PerfilUtilizador.ADMINISTRADOR, genero: GeneroUtilizador.FEMININO },
     { id: 20261004, nome: 'Diogo Pereira',    email: 'diogo.pereira@administrador.pt',  password: 'pass20261004', perfil: PerfilUtilizador.ADMINISTRADOR, genero: GeneroUtilizador.MASCULINO },
     { id: 20261005, nome: 'Eva Rodrigues',    email: 'eva.rodrigues@administrador.pt',  password: 'pass20261005', perfil: PerfilUtilizador.ADMINISTRADOR, genero: GeneroUtilizador.FEMININO, deleted_at: new Date('2026-05-01') },
-    { id: 2001, nome: 'Marta Silva',      email: 'marta.silva@medico.pt',     password: 'pass2001', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.FEMININO },
-    { id: 2002, nome: 'Pedro Costa',      email: 'pedro.costa@medico.pt',     password: 'pass2002', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.MASCULINO },
-    { id: 2003, nome: 'Ines Almeida',     email: 'ines.almeida@medico.pt',    password: 'pass2003', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.FEMININO },
-    { id: 2004, nome: 'Tiago Ferreira',   email: 'tiago.ferreira@medico.pt',  password: 'pass2004', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.MASCULINO },
-    { id: 2005, nome: 'Sofia Ribeiro',    email: 'sofia.ribeiro@medico.pt',   password: 'pass2005', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.FEMININO },
+    { id: 2001, nome: 'Marta Silva',      email: 'marta.silva@medico.pt',     password: 'pass20262001', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.FEMININO },
+    { id: 2002, nome: 'Pedro Costa',      email: 'pedro.costa@medico.pt',     password: 'pass20262002', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.MASCULINO },
+    { id: 2003, nome: 'Ines Almeida',     email: 'ines.almeida@medico.pt',    password: 'pass20262003', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.FEMININO },
+    { id: 2004, nome: 'Tiago Ferreira',   email: 'tiago.ferreira@medico.pt',  password: 'pass20262004', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.MASCULINO },
+    { id: 2005, nome: 'Sofia Ribeiro',    email: 'sofia.ribeiro@medico.pt',   password: 'pass20262005', perfil: PerfilUtilizador.MEDICO, genero: GeneroUtilizador.FEMININO },
     { id: 20263001, nome: 'Ana Ferreira',     email: 'ana.ferreira@utente.pt',    password: 'pass20263001', perfil: PerfilUtilizador.UTENTE, genero: GeneroUtilizador.FEMININO },
     { id: 20263002, nome: 'Bruno Costa',      email: 'bruno.costa@utente.pt',     password: 'pass20263002', perfil: PerfilUtilizador.UTENTE, genero: GeneroUtilizador.MASCULINO },
     { id: 20263003, nome: 'Carla Dias',       email: 'carla.dias@utente.pt',      password: 'pass20263003', perfil: PerfilUtilizador.UTENTE, genero: GeneroUtilizador.FEMININO },
@@ -285,17 +286,42 @@ export const testeMedicacoesHabituais = [
     { id: 9812, anamnese_id: 9025, nome: 'Salbutamol',       dose: '100 mcg', duracao: 'SOS',          periodicidade: 'em SOS' },
 ];
 
+// ─── REGRAS DE ALERTA ─── IDs 4001–4017 | cobre ambas as categorias, todas as prioridades, regras globais/por-médico/por-utente, e soft-delete
+export const testeRegrasAlerta = [
+    // Regras globais definidas pelo administrador (sem utente nem médico específico)
+    { id: 4001, administrador_id: 1001, categoria: CategoriaRegraAlerta.LIMIAR_SCORE,  limiar_score: 15,          prioridade: PrioridadeRegraAlerta.MUITO_ALTA },
+    { id: 4002, administrador_id: 1001, categoria: CategoriaRegraAlerta.DETERIORACAO,  valor_deterioracao: 7,     prioridade: PrioridadeRegraAlerta.ALTA       },
+    { id: 4003, administrador_id: 1002, categoria: CategoriaRegraAlerta.DETERIORACAO,  valor_deterioracao: 10,    prioridade: PrioridadeRegraAlerta.MUITO_ALTA },
+    // Regras por médico — aplicam a todos os utentes do médico
+    { id: 4004, medico_id: 2001, categoria: CategoriaRegraAlerta.LIMIAR_SCORE,         limiar_score: 10,          prioridade: PrioridadeRegraAlerta.MUITO_ALTA },
+    { id: 4005, medico_id: 2001, categoria: CategoriaRegraAlerta.DETERIORACAO,         valor_deterioracao: 5,     prioridade: PrioridadeRegraAlerta.ALTA       },
+    { id: 4006, medico_id: 2001, categoria: CategoriaRegraAlerta.DETERIORACAO,         valor_deterioracao: 3,     prioridade: PrioridadeRegraAlerta.MEDIA      },
+    { id: 4007, medico_id: 2002, categoria: CategoriaRegraAlerta.LIMIAR_SCORE,         limiar_score: 16,          prioridade: PrioridadeRegraAlerta.ALTA       },
+    { id: 4008, medico_id: 2002, categoria: CategoriaRegraAlerta.DETERIORACAO,         valor_deterioracao: 5,     prioridade: PrioridadeRegraAlerta.ALTA       },
+    { id: 4009, medico_id: 2003, categoria: CategoriaRegraAlerta.LIMIAR_SCORE,         limiar_score: 14,          prioridade: PrioridadeRegraAlerta.ALTA       },
+    { id: 4010, medico_id: 2003, categoria: CategoriaRegraAlerta.DETERIORACAO,         valor_deterioracao: 6,     prioridade: PrioridadeRegraAlerta.MEDIA      },
+    { id: 4011, medico_id: 2004, categoria: CategoriaRegraAlerta.LIMIAR_SCORE,         limiar_score: 16,          prioridade: PrioridadeRegraAlerta.MEDIA      },
+    { id: 4012, medico_id: 2004, categoria: CategoriaRegraAlerta.DETERIORACAO,         valor_deterioracao: 4,     prioridade: PrioridadeRegraAlerta.BAIXA      },
+    { id: 4013, medico_id: 2005, categoria: CategoriaRegraAlerta.DETERIORACAO,         valor_deterioracao: 5,     prioridade: PrioridadeRegraAlerta.MUITO_ALTA },
+    { id: 4014, medico_id: 2005, categoria: CategoriaRegraAlerta.LIMIAR_SCORE,         limiar_score: 12,          prioridade: PrioridadeRegraAlerta.MEDIA      },
+    // Regra específica para um utente (médico 2002, utente 3007 — limiar mais apertado)
+    { id: 4015, medico_id: 2002, utente_id: 3007, categoria: CategoriaRegraAlerta.LIMIAR_SCORE, limiar_score: 12, prioridade: PrioridadeRegraAlerta.MUITO_ALTA },
+    // Regras eliminadas (soft-delete) — desativadas por serem demasiado sensíveis
+    { id: 4016, administrador_id: 1002, categoria: CategoriaRegraAlerta.LIMIAR_SCORE,  limiar_score: 20,          prioridade: PrioridadeRegraAlerta.BAIXA,     deleted_at: new Date('2026-03-15') },
+    { id: 4017, medico_id: 2003,        categoria: CategoriaRegraAlerta.DETERIORACAO,  valor_deterioracao: 2,     prioridade: PrioridadeRegraAlerta.BAIXA,     deleted_at: new Date('2026-04-01') },
+];
+
 // ─── ALERTAS ─── cobre todos os tipos, estados e prioridades
 export const testeAlertas = [
-    { id: 9901, utente_id: 3001, medico_id: 2001, tipo: TipoAlerta.SCORE_BAIXO,      estado: EstadoAlerta.NOVO,          prioridade: PrioridadeRegraAlerta.MUITO_ALTA, notas: 'Score CARAT abaixo de 10 pela segunda vez consecutiva.',          data_atualizacao_estado: new Date('2026-05-20T09:00:00') },
-    { id: 9902, utente_id: 3007, medico_id: 2002, tipo: TipoAlerta.SCORE_BAIXO,      estado: EstadoAlerta.EM_SEGUIMENTO, prioridade: PrioridadeRegraAlerta.ALTA,      notas: 'Score mantido abaixo de 16. A aguardar reavaliacao.',             data_atualizacao_estado: new Date('2026-05-22T10:30:00') },
+    { id: 9901, utente_id: 3001, medico_id: 2001, regra_id: 4004, tipo: TipoAlerta.SCORE_BAIXO,      estado: EstadoAlerta.NOVO,          prioridade: PrioridadeRegraAlerta.MUITO_ALTA, notas: 'Score CARAT abaixo de 10 pela segunda vez consecutiva.',          data_atualizacao_estado: new Date('2026-05-20T09:00:00') },
+    { id: 9902, utente_id: 3007, medico_id: 2002, regra_id: 4007, tipo: TipoAlerta.SCORE_BAIXO,      estado: EstadoAlerta.EM_SEGUIMENTO, prioridade: PrioridadeRegraAlerta.ALTA,      notas: 'Score mantido abaixo de 16. A aguardar reavaliacao.',             data_atualizacao_estado: new Date('2026-05-22T10:30:00') },
     { id: 9903, utente_id: 3013, medico_id: 2003, tipo: TipoAlerta.SCORE_BAIXO,      estado: EstadoAlerta.VISTO,         prioridade: PrioridadeRegraAlerta.ALTA,      notas: 'Score 13. Doenca mal controlada. Consulta agendada.',             data_atualizacao_estado: new Date('2026-05-18T14:00:00') },
     { id: 9904, utente_id: 3019, medico_id: 2004, tipo: TipoAlerta.SCORE_BAIXO,      estado: EstadoAlerta.FECHADO,       prioridade: PrioridadeRegraAlerta.MEDIA,     notas: 'Situacao resolvida apos ajuste terapeutico.',                     data_atualizacao_estado: new Date('2026-05-10T11:00:00') },
-    { id: 9905, utente_id: 3002, medico_id: 2001, tipo: TipoAlerta.DETERIORACAO,     estado: EstadoAlerta.NOVO,          prioridade: PrioridadeRegraAlerta.ALTA,      notas: 'Queda de 7 pontos no score face a avaliacao anterior.',           data_atualizacao_estado: new Date('2026-05-23T08:45:00') },
+    { id: 9905, utente_id: 3002, medico_id: 2001, regra_id: 4005, tipo: TipoAlerta.DETERIORACAO,     estado: EstadoAlerta.NOVO,          prioridade: PrioridadeRegraAlerta.ALTA,      notas: 'Queda de 7 pontos no score face a avaliacao anterior.',           data_atualizacao_estado: new Date('2026-05-23T08:45:00') },
     { id: 9906, utente_id: 3008, medico_id: 2002, tipo: TipoAlerta.DETERIORACAO,     estado: EstadoAlerta.EM_SEGUIMENTO, prioridade: PrioridadeRegraAlerta.ALTA,      notas: 'Agravamento progressivo dos sintomas respiratorios.',             data_atualizacao_estado: new Date('2026-05-24T09:15:00') },
     { id: 9907, utente_id: 3014, medico_id: 2003, tipo: TipoAlerta.DETERIORACAO,     estado: EstadoAlerta.VISTO,         prioridade: PrioridadeRegraAlerta.MEDIA,     notas: 'Pieira noturna mais frequente. Rever medicacao.',                 data_atualizacao_estado: new Date('2026-05-19T16:20:00') },
     { id: 9908, utente_id: 3020, medico_id: 2004, tipo: TipoAlerta.DETERIORACAO,     estado: EstadoAlerta.FECHADO,       prioridade: PrioridadeRegraAlerta.BAIXA,     notas: 'Situacao estabilizada apos internamento breve.',                  data_atualizacao_estado: new Date('2026-05-05T10:00:00') },
-    { id: 9909, utente_id: 3025, medico_id: 2005, tipo: TipoAlerta.DETERIORACAO,     estado: EstadoAlerta.NOVO,          prioridade: PrioridadeRegraAlerta.MUITO_ALTA, notas: 'Crianca com score 9. Exige consulta urgente.',                   data_atualizacao_estado: new Date('2026-05-26T17:00:00') },
+    { id: 9909, utente_id: 3025, medico_id: 2005, regra_id: 4013, tipo: TipoAlerta.DETERIORACAO,     estado: EstadoAlerta.NOVO,          prioridade: PrioridadeRegraAlerta.MUITO_ALTA, notas: 'Crianca com score 9. Exige consulta urgente.',                   data_atualizacao_estado: new Date('2026-05-26T17:00:00') },
     { id: 9910, utente_id: 3003, medico_id: 2001, tipo: TipoAlerta.DETERIORACAO, estado: EstadoAlerta.NOVO,          prioridade: PrioridadeRegraAlerta.MEDIA,     notas: 'Agravamento dos sintomas. Espirometria de controlo necessaria.',   data_atualizacao_estado: new Date('2026-05-25T09:55:00') },
     { id: 9911, utente_id: 3009, medico_id: 2002, tipo: TipoAlerta.DETERIORACAO, estado: EstadoAlerta.EM_SEGUIMENTO, prioridade: PrioridadeRegraAlerta.MEDIA,     notas: 'Deterioracao confirmada. IgE especifica pedida.',                 data_atualizacao_estado: new Date('2026-05-21T13:00:00') },
     { id: 9912, utente_id: 3015, medico_id: 2003, tipo: TipoAlerta.SCORE_BAIXO,  estado: EstadoAlerta.VISTO,         prioridade: PrioridadeRegraAlerta.BAIXA,     notas: 'Score baixo. Oximetria nocturna agendada.',                       data_atualizacao_estado: new Date('2026-05-17T11:30:00') },

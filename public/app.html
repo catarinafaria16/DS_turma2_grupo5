@@ -1,12 +1,54 @@
-﻿<!DOCTYPE html>
+﻿<!--
+  ============================================================
+  app.html — Página principal da aplicação CARAT (Single Page Application)
+  ============================================================
+
+  Este é o ficheiro principal do frontend (interface gráfica) da aplicação.
+  É uma SPA (Single Page Application) — uma única página HTML que muda
+  dinamicamente consoante as ações do utilizador, sem recarregar a página.
+
+  TECNOLOGIAS USADAS:
+  - React 18: biblioteca JavaScript para construir interfaces de utilizador.
+    O React organiza a interface em "componentes" reutilizáveis (como peças de Lego).
+  - ReactDOM: renderiza os componentes React na página HTML.
+  - Babel: converte código JSX (mistura de HTML e JavaScript) em JavaScript puro
+    que o browser consegue interpretar.
+  - Chart.js: biblioteca para criar gráficos (usada no dashboard CARAT).
+
+  ESTRUTURA DA APLICAÇÃO:
+  1. CSS (estilos visuais) — variáveis de cores, layout, formulários, tabelas
+  2. Componentes React:
+     - SecaoUtilizadorAutenticado: perfil do utilizador atual (alterar password)
+     - SecaoUtilizadores: gestão de contas de utilizador (admins)
+     - SecaoAdministradores: gestão de administradores
+     - SecaoMedicos: gestão de médicos
+     - SecaoUtentes: gestão de utentes (pacientes)
+     - SecaoPrescricoes: prescrições médicas (medicamentos e exames)
+     - SecaoAnamneses: histórias clínicas dos utentes
+     - E muitos outros...
+  3. Componente App: raiz da aplicação — gere autenticação e navegação
+  4. ReactDOM.createRoot: ponto de arranque — "liga" o React à página HTML
+
+  COMO FUNCIONA O FLUXO:
+  1. O utilizador faz login em index.html → token guardado no localStorage
+  2. app.html carrega → verifica se o token existe
+  3. Se sim: carrega a interface completa com sidebar e conteúdo
+  4. Se não: redireciona para index.html (login)
+  5. O utilizador navega pelos menus → o componente correspondente é mostrado
+-->
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistema de avaliação CARAT</title>
+  <!-- React 18: biblioteca para construir interfaces de utilizador reativas -->
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <!-- ReactDOM: renderiza componentes React no browser -->
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel: permite escrever JSX (HTML dentro de JavaScript) no browser -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Chart.js: biblioteca de gráficos (usada no dashboard CARAT) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
     /* ── variáveis ── */
@@ -54,7 +96,7 @@
     .sidebar-item.active { background: var(--bg-info); color: var(--color-info); font-weight: 500; border-color: var(--border-primary); border-left: 3px solid var(--color-info); }
 
     /* ── conteúdo principal ── */
-    .main-content { flex: 1; background: var(--bg-tertiary); overflow-y: auto; padding: 16px; }
+    .main-content { flex: 1; background: var(--bg-tertiary); overflow-y: auto; padding: 16px; padding-bottom: 52px; }
 
     /* ── cards ── */
     .card { background: var(--bg-primary); border: 0.5px solid var(--border-tertiary); border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(91,141,217,0.12), 0 1px 3px rgba(91,141,217,0.08); }
@@ -183,7 +225,7 @@
     .audit-after  { color: var(--color-success); }
 
     /* ── footer ── */
-    footer { text-align: center; padding: 14px; font-size: 13px; color: var(--color-tertiary); border-top: 0.5px solid var(--border-tertiary); background: var(--bg-primary); margin-top: 8px; border-radius: 8px; }
+    footer { text-align: center; padding: 14px; font-size: 13px; color: var(--color-tertiary); border-top: 0.5px solid var(--border-tertiary); background: var(--bg-primary); position: fixed; bottom: 0; left: var(--sidebar-width); right: 0; z-index: 10; }
 
     /* ── login (componente embutido) ── */
     .login-container { max-width: 420px; margin: 60px auto; padding: 0 16px; }
@@ -213,34 +255,77 @@
   </style>
 </head>
 <body>
+  <!-- Ponto de ligação do React: o componente App será renderizado aqui -->
   <div id="root"></div>
+
+  <!--
+    Script principal da aplicação.
+    type="text/babel" indica que o Babel deve processar este código antes de
+    o browser o executar — isso permite usar JSX (HTML dentro de JavaScript).
+  -->
   <script type="text/babel">
+    // Ferramentas do React que vamos usar:
+    // useState: guarda dados que podem mudar (ex: lista de utentes, formulários)
+    // useEffect: executa código quando algo muda (ex: carregar dados da API)
+    // useCallback: memoriza funções para evitar re-criações desnecessárias
+    // useRef: referência direta a elementos HTML (ex: para manipular um gráfico)
     const { useState, useEffect, useCallback, useRef } = React;
+
+    // URL base da API (vazio = mesmo servidor que serve a página)
     const API_BASE = '';
+    // Versão dos dados guardados — muda quando o formato da sessão muda
     const CARAT_STORAGE_VERSION = 'login-medico-cedula-2026';
 
+    /*
+     * limparSessaoDesatualizada — Remove dados de sessão desatualizados
+     *
+     * Se os dados guardados no localStorage forem de uma versão antiga
+     * (ex: antes de uma atualização do sistema), remove-os para forçar
+     * novo login. Evita bugs causados por dados incompatíveis.
+     */
     function limparSessaoDesatualizada() {
       const temSessao = localStorage.getItem('carat_token') || localStorage.getItem('carat_user');
       const versao = localStorage.getItem('carat_storage_version');
 
       if (temSessao && versao !== CARAT_STORAGE_VERSION) {
+        // Sessão desatualizada — limpa tudo para forçar novo login
         localStorage.removeItem('carat_token');
         localStorage.removeItem('carat_user');
       }
 
+      // Marca a versão atual da sessão
       localStorage.setItem('carat_storage_version', CARAT_STORAGE_VERSION);
     }
 
+    // Executa imediatamente ao carregar a página
     limparSessaoDesatualizada();
 
+    /*
+     * listaDados — Garante que um valor é sempre uma lista (array)
+     *
+     * A API pode devolver um objeto único ou uma lista dependendo do endpoint.
+     * Esta função normaliza a resposta para ser sempre uma lista.
+     */
     function listaDados(dados) {
       if (Array.isArray(dados)) return dados;
       return dados ? [dados] : [];
     }
 
-    /* ----- Helpers de API (com token) ----- */
+    /*
+     * useApi — Hook React de gestão de autenticação e pedidos à API
+     *
+     * "Hook" é um conceito do React — uma função especial que guarda estado
+     * entre renderizações do componente.
+     *
+     * Este hook centraliza toda a comunicação com a API:
+     *   - Guarda o token JWT e os dados do utilizador
+     *   - Providencia a função apiFetch para fazer pedidos autenticados
+     *   - Gere o logout (limpar token e redirecionar para login)
+     */
     function useApi() {
+      // token: o "crachá digital" do utilizador — lido do localStorage ao arrancar
       const [token, setTokenState] = useState(() => localStorage.getItem('carat_token') || '');
+      // user: dados básicos do utilizador (nome, email, perfil) — lidos do localStorage
       const [user, setUserState] = useState(() => {
         const saved = localStorage.getItem('carat_user');
         return saved ? JSON.parse(saved) : null;
@@ -767,6 +852,20 @@
     }
 
     /* ----- Utentes ----- */
+    /*
+     * SecaoUtentes — Secção de gestão de utentes (pacientes)
+     *
+     * Este componente apresenta a lista de utentes e permite:
+     *   - Ver todos os utentes (admins/médicos) ou apenas o próprio (utente)
+     *   - Criar novo utente (admins/médicos)
+     *   - Editar dados inline na tabela
+     *   - Alterar password
+     *   - Aceder ao histórico clínico do utente
+     *   - Filtrar utentes por texto
+     *
+     * "useState" guarda dados que podem mudar (ex: lista de utentes, formulário de criação)
+     * "useEffect" executa código quando o componente carrega (ex: buscar utentes da API)
+     */
     function SecaoUtentes({ apiFetch, user }) {
       const [utentes, setUtentes] = useState([]);
       const [utilizadores, setUtilizadores] = useState([]);
@@ -1119,6 +1218,19 @@
     }
 
     /* ----- Prescrições ----- */
+    /*
+     * SecaoPrescricoes — Secção de gestão de prescrições médicas
+     *
+     * Este componente gere as prescrições de medicamentos e exames.
+     * Uma prescrição pode conter vários medicamentos OU vários exames.
+     *
+     * Funcionalidades:
+     *   - Criar prescrição com medicamentos (inclui validação de dose clínica)
+     *   - Criar prescrição com exames
+     *   - Listar prescrições com os seus itens (medicamentos/exames)
+     *   - Filtrar por utente
+     *   - Validação clínica de doses: formato "500 mg", "1 g", "200 mcg"
+     */
     function SecaoPrescricoes({ apiFetch, user }) {
       const [prescricoes, setPrescricoes] = useState([]);
       const [medicos, setMedicos] = useState([]);
@@ -2330,6 +2442,20 @@
     }
 
     /* ----- Alertas ----- */
+    /*
+     * SecaoAlertas — Secção de gestão de alertas clínicos
+     *
+     * Este componente apresenta os alertas gerados pelo sistema (automaticamente
+     * quando um score CARAT é preocupante) ou criados manualmente pelo médico.
+     *
+     * Funcionalidades:
+     *   - Listar alertas (filtrado por perfil)
+     *   - Filtrar por estado (NOVO, VISTO, EM_SEGUIMENTO, FECHADO)
+     *   - Marcar alertas como vistos ou resolvidos
+     *   - Adicionar notas clínicas a alertas
+     *   - Criar alertas manualmente
+     *   - Criar regras de alerta automático
+     */
     function SecaoAlertas({ apiFetch, user }) {
       const [alertas, setAlertas] = useState([]);
       const [utentes, setUtentes] = useState([]);
@@ -3397,6 +3523,20 @@
       );
     }
 
+    /*
+     * SecaoFhir — Secção de dados no formato HL7 FHIR
+     *
+     * Esta secção apresenta os dados do sistema no formato padrão internacional
+     * HL7 FHIR R4, que permite integração com outros sistemas de saúde.
+     *
+     * Recursos disponíveis (separadores):
+     *   - Patient: dados dos utentes em formato FHIR
+     *   - AllergyIntolerance: alergias em formato FHIR
+     *   - MedicationRequest: prescrições de medicamentos em formato FHIR
+     *   - Observation: observações clínicas (scores CARAT) em formato FHIR
+     *
+     * Apenas acessível por médicos e administradores.
+     */
     function SecaoFhir({ apiFetch }) {
       const [subtab, setSubtab] = useState('Patient');
       const [utentes, setUtentes] = useState([]);
@@ -3507,6 +3647,20 @@
       );
     }
 
+    /*
+     * SecaoDashboard — Painel de controlo clínico do utente
+     *
+     * Este componente apresenta uma visão consolidada do estado clínico de um utente:
+     *   - Estado atual da doença (baseado no último score CARAT)
+     *   - Gráfico de evolução dos scores CARAT ao longo do tempo
+     *   - Alertas ativos (não fechados)
+     *   - Recomendação automática baseada no último score
+     *   - Lista de sintomas registados
+     *
+     * Usa Chart.js para desenhar o gráfico de evolução dos scores.
+     * O limiar de controlo (linha horizontal no gráfico) é 21 pontos.
+     * Médicos selecionam um utente; o próprio utente vê automaticamente o seu dashboard.
+     */
     function SecaoDashboard({ apiFetch, user }) {
       const [utentes, setUtentes] = useState([]);
       const [utenteId, setUtenteId] = useState('');
@@ -3801,6 +3955,22 @@
     /* --------------------------------------------------------------------------
        AUDITORIA (só ADMINISTRADOR)
        ---------------------------------------------------------------------- */
+    /*
+     * SecaoAuditoria — Secção do log de auditoria
+     *
+     * Este componente é exclusivo para administradores e apresenta o historial
+     * completo de todas as operações realizadas no sistema.
+     *
+     * Funcionalidades:
+     *   - Listar entradas de auditoria com filtros (por tabela, operação, utilizador, datas)
+     *   - Ver detalhes de uma entrada (o que mudou antes e depois)
+     *   - Exportar relatório de auditoria em formato legível
+     *
+     * Cada linha mostra: quem fez a operação, em que tabela, que tipo de operação,
+     * quando aconteceu, e os dados antes e depois da alteração.
+     *
+     * Apenas acessível por administradores.
+     */
     function SecaoAuditoria({ apiFetch }) {
       const [logs, setLogs] = useState([]);
       const [loading, setLoading] = useState(false);
@@ -4056,19 +4226,38 @@
       ],
     };
 
+    /*
+     * App — Componente raiz da aplicação
+     *
+     * Este é o componente principal que organiza toda a interface.
+     * Constrói o layout da aplicação: barra superior (topbar), menu lateral (sidebar)
+     * e área de conteúdo principal.
+     *
+     * Funciona assim:
+     *   1. Verifica se o utilizador está autenticado (tem token) — se não, redireciona para login
+     *   2. Determina quais os menus disponíveis consoante o perfil do utilizador
+     *   3. Renderiza a barra superior com o nome e botão de sair
+     *   4. Renderiza o menu lateral com as secções disponíveis
+     *   5. Renderiza a secção ativa (a que o utilizador selecionou no menu)
+     */
     function App() {
+      // Obtém os dados de autenticação e a função para fazer pedidos à API
       const { token, user, login, registar, logout, apiFetch } = useApi();
+      // tabs: lista de separadores (menus) disponíveis para este perfil
       const tabs = TABS_POR_PERFIL[user?.perfil] ?? TODAS_TABS;
+      // Separador padrão por perfil — o que aparece ao entrar na aplicação
       const DEFAULT_TAB_BY_PROFILE = {
-        ADMINISTRADOR: 'Auditoria',
-        MEDICO:        'Aval. CARAT',
-        UTENTE:        'Dashboard',
+        ADMINISTRADOR: 'Auditoria',   // Admins começam no log de auditoria
+        MEDICO:        'Aval. CARAT', // Médicos começam nas avaliações CARAT
+        UTENTE:        'Dashboard',   // Utentes começam no seu dashboard pessoal
       };
+      // Estado do separador ativo (qual menu está selecionado)
       const [tab, setTab] = useState(() => DEFAULT_TAB_BY_PROFILE[user?.perfil] ?? tabs[0] ?? 'Utentes');
 
+      // Verificação de segurança: se não há token ou utilizador, redireciona para login
       if (!token || !user) {
         window.location.href = '/index.html';
-        return null;
+        return null; // Não renderiza nada enquanto redireciona
       }
 
       const perfilBadge = { UTENTE: 'badge-pink', MEDICO: 'badge-blue', ADMINISTRADOR: 'badge-brown' };
@@ -4133,6 +4322,15 @@
       );
     }
 
+    /*
+     * ARRANQUE DA APLICAÇÃO
+     *
+     * ReactDOM.createRoot: cria o ponto de entrada do React no elemento HTML com id="root"
+     * .render(<App />): renderiza o componente App (a raiz de toda a interface)
+     *
+     * A partir daqui, o React controla o elemento <div id="root"> e
+     * renderiza/atualiza a interface conforme o estado da aplicação muda.
+     */
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>

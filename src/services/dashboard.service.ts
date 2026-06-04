@@ -1,3 +1,20 @@
+/*
+ * ============================================================
+ * dashboard.service.ts — Serviço do painel de controlo clínico
+ * ============================================================
+ *
+ * Este service agrega informação de várias fontes para compor o
+ * "dashboard" (painel de controlo) de um utente.
+ *
+ * O dashboard apresenta de forma consolidada:
+ *   - Estado atual da doença (interpretação do último score CARAT)
+ *   - Evolução histórica dos scores CARAT ao longo do tempo
+ *   - Alertas ativos (não fechados) do utente
+ *   - Recomendações automáticas baseadas no último score
+ *   - Sintomas registados pelo utente
+ *
+ * O limiar de controlo é 21 pontos — acima disto a doença está bem controlada.
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Utente } from '../models/utente.entity.js';
 import { RespostaCarat } from '../models/respostaCarat.entity.js';

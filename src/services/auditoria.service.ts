@@ -1,11 +1,40 @@
+/*
+ * ============================================================
+ * auditoria.service.ts — Serviço de registo de auditoria
+ * ============================================================
+ *
+ * Este service é responsável por registar e consultar o histórico de
+ * operações realizadas no sistema. É chamado por outros services sempre
+ * que algo importante acontece (criação, alteração ou eliminação de registos).
+ *
+ * Funções principais:
+ *   - registarAuditoria: grava uma nova entrada no log de auditoria
+ *   - listar: lista todas as entradas com paginação
+ *   - obterHistoricoAuditoria: histórico de um registo específico
+ *   - obterDiferencas: mostra o que mudou entre dois estados de um registo
+ *   - validarIntegridade: verifica se um registo tem histórico de auditoria
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Auditoria } from '../models/auditoria.entity.js';
 import type { AuditoriaResponseDto } from '../dtos/auditoria/auditoria-response.dto.js';
 import { OperacaoAuditoria } from '../enums/OperacaoAuditoria.enum.js';
 
 export class AuditoriaService {
+    // Acesso ao repositório (tabela) de auditoria na base de dados
     private get repo() { return AppDataSource.getRepository(Auditoria); }
 
+    /*
+     * registarAuditoria — Grava uma nova entrada no log de auditoria
+     *
+     * É chamada por outros services após cada operação importante.
+     * Parâmetros:
+     *   - utilizadorId: quem fez a operação
+     *   - tabela: em que tabela foi feita a operação (ex: "prescricao")
+     *   - tabelaId: ID do registo afetado
+     *   - operacao: CRIACAO, ALTERACAO ou ELIMINACAO
+     *   - valorAntigo: dados antes da alteração (null se for uma criação)
+     *   - valorNovo: dados depois da alteração (null se for uma eliminação)
+     */
     async registarAuditoria(
         utilizadorId: number,
         tabela: string,
@@ -107,6 +136,16 @@ export class AuditoriaService {
         }
     }
 
+    /*
+     * listar — Lista todas as entradas de auditoria com paginação
+     *
+     * Paginação: em vez de devolver todos os registos de uma vez (pode ser
+     * muito lento com muitos dados), devolve uma "página" de cada vez.
+     * Parâmetros:
+     *   - pagina: número da página (começa em 1)
+     *   - limite: quantos registos por página (máximo 100)
+     *   - ordenacao: 'DESC' mostra os mais recentes primeiro
+     */
     async listar(pagina: number = 1, limite: number = 20, ordenacao: 'ASC' | 'DESC' = 'DESC'): Promise<{ total: number; pagina: number; limite: number; auditorias: AuditoriaResponseDto[]; }> {
         try {
             if (pagina < 1) throw new Error('Número de página deve ser maior que 0');
@@ -123,6 +162,13 @@ export class AuditoriaService {
         }
     }
 
+    /*
+     * obterDiferencas — Compara o estado antes e depois de uma alteração
+     *
+     * Útil para mostrar ao utilizador "o que mudou" numa determinada operação.
+     * Por exemplo: "o campo 'estado' mudou de 'ATIVO' para 'EXPIRADO'".
+     * Devolve uma lista de campos que foram alterados, com os valores antes e depois.
+     */
     async obterDiferencas(auditoriaId: number): Promise<any> {
         try {
             const auditoria = await this.obter(auditoriaId);

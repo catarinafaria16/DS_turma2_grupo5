@@ -1,3 +1,19 @@
+/*
+ * ============================================================
+ * medico.controller.ts — Controller de médicos
+ * ============================================================
+ *
+ * Este controller recebe os pedidos HTTP relacionados com médicos e
+ * delega o processamento ao MedicoService.
+ *
+ * Funcionalidades:
+ *   - Criar um novo médico (apenas admins)
+ *   - Listar médicos (admins veem todos, médicos só veem a si próprios)
+ *   - Obter dados de um médico específico
+ *   - Atualizar dados (médico só pode alterar o seu contacto)
+ *   - Apagar um médico (soft delete, apenas admins)
+ *   - Filtrar médicos por especialidade
+ */
 import type { Request, Response } from 'express';
 import { MedicoService } from '../services/medico.service.js';
 import type { CreateMedicoDto } from '../dtos/medico/create-medico.dto.js';

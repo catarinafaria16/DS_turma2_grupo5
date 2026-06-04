@@ -1,3 +1,19 @@
+/*
+ * ============================================================
+ * administrador.service.ts — Serviço de gestão de administradores
+ * ============================================================
+ *
+ * Este service gere as operações relacionadas com administradores do sistema.
+ * Os administradores têm acesso total a todos os dados e funcionalidades.
+ *
+ * Funcionalidades especiais de administrador:
+ *   - Configurar limiares globais do CARAT (limiarBaixo/Intermedio/Alto)
+ *   - Gerir perfis e permissões de utilizadores
+ *   - Acesso a todas as operações de leitura/escrita
+ *
+ * Nota: os limiares CARAT estão guardados em memória (não na base de dados),
+ * por isso são reposto para os valores padrão quando o servidor reinicia.
+ */
 import { AppDataSource } from '../database/data-source.js';
 import { Administrador } from '../models/administrador.entity.js';
 import type { CreateAdministradorDto } from '../dtos/administrador/create-administrador.dto.js';
