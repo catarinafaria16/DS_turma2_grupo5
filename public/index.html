@@ -220,7 +220,7 @@
           </div>
         </div>
         <button id="login-button" class="btn-primary" type="submit">Entrar</button>
-        <p class="hint">Utilizadores de teste: IDs 1001–1005 administrador, 2001–2005 medico ou 3001–3030 utente. Exemplo: ID <strong>3001</strong> com password <strong>pass3001</strong>.</p>
+        <p class="hint">Utilizadores de teste: IDs 20261001-20261005 administrador, 20262001-20262005 medico ou 20263001-20263030 utente. Exemplo: ID <strong>20262001</strong> com password <strong>pass2001</strong>.</p>
         <div id="login-message"></div>
       </form>
     </div>
@@ -229,6 +229,7 @@
   <script>
     const API_BASE = '';
     const APP_URL = '/app.html';
+    const CARAT_STORAGE_VERSION = 'login-medico-cedula-2026';
     const loginForm = document.getElementById('login-form');
     const loginButton = document.getElementById('login-button');
     const loginMessage = document.getElementById('login-message');
@@ -278,6 +279,7 @@
 
         localStorage.setItem('carat_token', data.token);
         localStorage.setItem('carat_user', JSON.stringify(data.user));
+        localStorage.setItem('carat_storage_version', CARAT_STORAGE_VERSION);
         window.location.href = APP_URL;
       } catch {
         showMessage(loginMessage, 'error', 'Não foi possível contactar o servidor.');

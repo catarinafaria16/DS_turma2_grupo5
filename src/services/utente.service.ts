@@ -53,6 +53,21 @@ export class UtenteService {
         return /^(\+351)?[239]\d{8}$/.test(contacto.replace(/\s/g, ''));
     }
 
+    private validarDataNascimento(dataNascimento: Date): void {
+        const nascimento = new Date(dataNascimento);
+        if (Number.isNaN(nascimento.getTime())) {
+            throw new Error('Data de nascimento invalida');
+        }
+
+        const hoje = new Date();
+        nascimento.setHours(0, 0, 0, 0);
+        hoje.setHours(0, 0, 0, 0);
+
+        if (nascimento > hoje) {
+            throw new Error('Data de nascimento nao pode ser posterior ao dia atual');
+        }
+    }
+
     async criar(utenteData: CreateUtenteDto, utilizador: UtilizadorAutenticado): Promise<UtenteResponseDto> {
         try {
             // RNF004: valida campos obrigatorios e associacoes antes da criacao.
@@ -71,6 +86,7 @@ export class UtenteService {
             if (!this.validarContacto(utenteData.contacto)) {
                 throw new Error('Contacto invalido');
             }
+            this.validarDataNascimento(utenteData.data_nascimento);
 
             if (utilizador.perfil === PerfilUtilizador.MEDICO && utenteData.medico_id !== await obterMedicoIdAutenticado(utilizador)) {
                 throw new Error('Acesso negado: medico so pode criar utentes para si');
@@ -172,8 +188,19 @@ export class UtenteService {
                     dadosEditaveis.contacto = utenteData.contacto;
                 }
 
-                await this.repo.update(utenteId, dadosEditaveis);
-                return this.obter(utenteId, utilizador);
+                const atualizado = await this.repo.save({ ...anterior, ...dadosEditaveis, id: utenteId });
+                if (JSON.stringify(anterior) === JSON.stringify(atualizado)) {
+                    return atualizado;
+                }
+                await this.auditoriaService.registarAuditoria(
+                    utilizador.id,
+                    'utente',
+                    utenteId,
+                    OperacaoAuditoria.ALTERACAO,
+                    JSON.stringify(anterior),
+                    JSON.stringify(atualizado)
+                );
+                return atualizado;
             }
 
             if (utilizador.perfil === PerfilUtilizador.MEDICO) {
@@ -201,8 +228,19 @@ export class UtenteService {
                 }
             }
 
-            await this.repo.save({ ...anterior, ...utenteData, id: utenteId });
-            return this.obter(utenteId, utilizador);
+            const atualizado = await this.repo.save({ ...anterior, ...utenteData, id: utenteId });
+            if (JSON.stringify(anterior) === JSON.stringify(atualizado)) {
+                return atualizado;
+            }
+            await this.auditoriaService.registarAuditoria(
+                utilizador.id,
+                'utente',
+                utenteId,
+                OperacaoAuditoria.ALTERACAO,
+                JSON.stringify(anterior),
+                JSON.stringify(atualizado)
+            );
+            return atualizado;
         } catch (error) {
             console.error('Erro ao atualizar utente:', error);
             throw error;

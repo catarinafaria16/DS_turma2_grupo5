@@ -77,7 +77,15 @@ app.post('/api/login', async (req, res) => {
     }
 
     const utilizadorRepo = AppDataSource.getRepository(Utilizador);
-    const utilizador = await utilizadorRepo.findOne({ where: { id: utilizadorId } });
+    const medicoRepo = AppDataSource.getRepository(Medico);
+    const medico = await medicoRepo.findOne({ where: { numero_cedula_medica: utilizadorId } });
+    let utilizador = medico
+        ? await utilizadorRepo.findOne({ where: { id: medico.utilizador_id } })
+        : await utilizadorRepo.findOne({ where: { id: utilizadorId } });
+
+    if (utilizador?.perfil === PerfilUtilizador.MEDICO && !medico) {
+        return res.status(401).json({ erro: 'ID ou password invalidos' });
+    }
 
     if (!utilizador || utilizador.password !== password) {
         return res.status(401).json({ erro: 'ID ou password invalidos' });

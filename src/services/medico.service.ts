@@ -66,6 +66,21 @@ export class MedicoService {
             if (medicoData.utilizador_id <= 0) {
                 throw new Error('ID do utilizador deve ser valido');
             }
+            if (medicoData.id !== undefined) {
+                if (medicoData.id <= 0) {
+                    throw new Error('ID do medico deve ser valido');
+                }
+                if (medicoData.id !== medicoData.utilizador_id) {
+                    throw new Error('ID do medico deve coincidir com o ID do utilizador');
+                }
+                const medicoComMesmoId = await this.repo.findOne({ where: { id: medicoData.id } });
+                if (medicoComMesmoId) {
+                    throw new Error('ID ja esta atribuido a outro medico');
+                }
+            }
+            if (!medicoData.numero_cedula_medica || medicoData.numero_cedula_medica <= 0) {
+                throw new Error('Numero de cedula medica deve ser valido');
+            }
             if (!medicoData.contacto || medicoData.contacto.trim().length === 0) {
                 throw new Error('Contacto e obrigatorio');
             }
@@ -153,6 +168,9 @@ export class MedicoService {
                 }
                 if (medicoData.utilizador_id !== undefined) {
                     await this.validarUtilizadorAssociado(medicoData.utilizador_id, medicoId);
+                }
+                if (medicoData.numero_cedula_medica !== undefined && medicoData.numero_cedula_medica !== anterior.numero_cedula_medica) {
+                    throw new Error('Numero de cedula medica nao pode ser alterado');
                 }
                 if (medicoData.especialidade !== undefined) {
                     validarEnum(EspecialidadeMedico, medicoData.especialidade, 'especialidade');
