@@ -10,6 +10,9 @@ export class Medico {
     @Column('int')
     utilizador_id!: number;
 
+    @Column('int')
+    numero_cedula_medica!: number;
+
     @Column({ type: 'simple-enum', enum: EspecialidadeMedico })
     especialidade!: EspecialidadeMedico;
 

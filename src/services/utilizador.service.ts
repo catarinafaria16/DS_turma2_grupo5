@@ -37,6 +37,16 @@ export class UtilizadorService {
             }
             validarEnum(GeneroUtilizador, utilizadorData.genero, 'genero');
 
+            if (utilizadorData.id !== undefined) {
+                if (utilizadorData.id <= 0) {
+                    throw new Error('ID do utilizador deve ser valido');
+                }
+                const idExistente = await this.repo.findOne({ where: { id: utilizadorData.id } });
+                if (idExistente) {
+                    throw new Error('ID ja esta atribuido a outro utilizador');
+                }
+            }
+
             const emailExistente = await this.repo.findOne({ where: { email: utilizadorData.email } });
             if (emailExistente) {
                 throw new Error('Email ja esta atribuido a outro utilizador');

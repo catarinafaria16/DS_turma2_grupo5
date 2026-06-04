@@ -100,14 +100,12 @@
       min-width: 0;
     }
     .utentes-table .badge { font-size: 11px; padding: 2px 7px; }
-    .utentes-table .col-utente-id { width: 96px; }
-    .utentes-table .col-utilizador-id { width: 92px; }
-    .utentes-table .col-nr-utente { width: 88px; }
-    .utentes-table .col-morada { width: 160px; }
-    .utentes-table .col-contacto { width: 128px; }
-    .utentes-table .col-data { width: 90px; }
+    .utentes-table .col-nr-utente { width: 130px; }
+    .utentes-table .col-morada { width: 280px; }
+    .utentes-table .col-contacto { width: 180px; }
+    .utentes-table .col-data { width: 130px; }
     .utentes-table .col-medico-id { width: 110px; }
-    .utentes-table .col-acoes { width: 82px; }
+    .utentes-table .col-acoes { width: 92px; }
     .utentes-table .utente-address-input,
     .utentes-table .utente-contact-input {
       width: 100% !important;
@@ -123,6 +121,7 @@
     .badge-orange { background: #FFF4E6; color: #8A4A20; border-color: #F0B87A; }
     .badge-red    { background: #FFF0F0; color: #9A3B3B; border-color: #F0A8A8; }
     .badge-pink   { background: #FCF0FF; color: #7A3A8A; border-color: #DDA8F0; }
+    .badge-purple { background: #E9D8FD; color: #553C9A; border-color: #B794F4; }
     .badge-brown  { background: #FFF4EC; color: #7A4A28; border-color: #D4B08A; }
 
     /* ── filtros ── */
@@ -218,6 +217,22 @@
   <script type="text/babel">
     const { useState, useEffect, useCallback, useRef } = React;
     const API_BASE = '';
+    const CARAT_STORAGE_VERSION = 'login-medico-cedula-2026';
+
+    function limparSessaoDesatualizada() {
+      const temSessao = localStorage.getItem('carat_token') || localStorage.getItem('carat_user');
+      const versao = localStorage.getItem('carat_storage_version');
+
+      if (temSessao && versao !== CARAT_STORAGE_VERSION) {
+        localStorage.removeItem('carat_token');
+        localStorage.removeItem('carat_user');
+      }
+
+      localStorage.setItem('carat_storage_version', CARAT_STORAGE_VERSION);
+    }
+
+    limparSessaoDesatualizada();
+
     function listaDados(dados) {
       if (Array.isArray(dados)) return dados;
       return dados ? [dados] : [];
@@ -495,12 +510,11 @@
             <h2>Administradores Registados</h2>
             {administradores.length === 0 ? <p className="vazio">Nenhum administrador registado.</p> : (
               <table>
-                <thead><tr><th>Administrador ID</th><th>Utilizador ID</th><th>Nome</th><th>Email</th></tr></thead>
+                <thead><tr><th>Nº Administrador</th><th>Nome</th><th>Email</th></tr></thead>
                 <tbody>{administradores.map(a => {
                   const utilizador = utilizadorDoAdmin(a);
                   return (
                     <tr key={a.id}>
-                      <td>{a.id}</td>
                       <td><span className="badge badge-brown">{a.utilizador_id}</span></td>
                       <td>{utilizador?.nome || '—'}</td>
                       <td>{utilizador?.email || '—'}</td>
@@ -517,7 +531,7 @@
     function SecaoMedicos({ apiFetch, user }) {
       const [medicos, setMedicos] = useState([]);
       const [utilizadores, setUtilizadores] = useState([]);
-      const [form, setForm] = useState({ nome: '', email: '', password: '', genero: '', especialidade: 'PNEUMOLOGIA', contacto: '' });
+      const [form, setForm] = useState({ id: '', nome: '', email: '', password: '', genero: '', numero_cedula_medica: '', especialidade: 'PNEUMOLOGIA', contacto: '' });
       const [erro, setErro] = useState('');
       const [sucesso, setSucesso] = useState('');
       const [contactoEditavel, setContactoEditavel] = useState('');
@@ -542,7 +556,7 @@
           if (r.ok) {
             const dados = listaDados(r.data.dados);
             setMedicos(dados);
-            setEdicoesMedicos(Object.fromEntries(dados.map(m => [m.id, { especialidade: m.especialidade || 'PNEUMOLOGIA', contacto: m.contacto || '' }])));
+            setEdicoesMedicos(Object.fromEntries(dados.map(m => [m.id, { numero_cedula_medica: m.numero_cedula_medica || '', especialidade: m.especialidade || 'PNEUMOLOGIA', contacto: m.contacto || '' }])));
           }
         } catch {}
       }
@@ -559,13 +573,14 @@
       }
       async function handleSubmit(e) {
         e.preventDefault(); setErro(''); setSucesso('');
-        const ru = await apiFetch('/api/utilizadores', { method: 'POST', body: { nome: form.nome, email: form.email, password: form.password, perfil: 'MEDICO', genero: form.genero } });
+        const medicoId = Number(form.id);
+        const ru = await apiFetch('/api/utilizadores', { method: 'POST', body: { id: medicoId, nome: form.nome, email: form.email, password: form.password, perfil: 'MEDICO', genero: form.genero } });
         if (!ru.ok) {
           setErro(ru.data.erro || 'Erro ao criar utilizador medico.');
           return;
         }
-        const r = await apiFetch('/api/medicos', { method: 'POST', body: { utilizador_id: Number(ru.data.dados?.id), especialidade: form.especialidade, contacto: form.contacto } });
-        if (r.ok) { setForm({ nome: '', email: '', password: '', genero: '', especialidade: 'PNEUMOLOGIA', contacto: '' }); setSucesso('Medico registado com sucesso.'); buscar(); buscarUtilizadores(); }
+        const r = await apiFetch('/api/medicos', { method: 'POST', body: { id: medicoId, utilizador_id: medicoId, numero_cedula_medica: Number(form.numero_cedula_medica), especialidade: form.especialidade, contacto: form.contacto } });
+        if (r.ok) { setForm({ id: '', nome: '', email: '', password: '', genero: '', numero_cedula_medica: '', especialidade: 'PNEUMOLOGIA', contacto: '' }); setSucesso('Medico registado com sucesso.'); buscar(); buscarUtilizadores(); }
         else setErro(r.data.erro || 'Erro ao registar médico.');
       }
       async function guardarEdicaoMedico(medico) {
@@ -645,6 +660,7 @@
                 <table>
                   <tbody>
                     <tr><td><strong>ID</strong></td><td>{medicoAutenticado.id}</td></tr>
+                    <tr><td><strong>Nº Cédula Médica</strong></td><td>{medicoAutenticado.numero_cedula_medica || '—'}</td></tr>
                     <tr><td><strong>Password</strong></td><td>********</td></tr>
                     <tr><td><strong>Nome</strong></td><td>{user.nome || '—'}</td></tr>
                     <tr><td><strong>E-mail</strong></td><td>{user.email || '—'}</td></tr>
@@ -694,6 +710,7 @@
           <div className="card">
             <h2>Novo Médico</h2>
             <form onSubmit={handleSubmit}>
+              <input type="number" min="1" value={form.id} onChange={set('id')} placeholder="ID médico/utilizador" required />
               <input value={form.nome} onChange={set('nome')} placeholder="Nome completo" required />
               <input value={form.email} onChange={set('email')} placeholder="Email" type="email" required />
               <input value={form.password} onChange={set('password')} placeholder="Password (min. 6 caracteres)" type="password" required />
@@ -712,6 +729,7 @@
                 <option value="OTORRINOLARINGOLOGIA">Otorrinolaringologia</option>
                 <option value="PEDIATRIA">Pediatria</option>
               </select>
+              <input type="number" min="1" value={form.numero_cedula_medica} onChange={set('numero_cedula_medica')} placeholder="Nº cédula médica" required />
               <input value={form.contacto} onChange={set('contacto')} placeholder="Contacto" required />
               <button type="submit">Registar médico</button>
               {erro && <p className="erro">{erro}</p>}
@@ -722,10 +740,10 @@
             <h2>Médicos Registados</h2>
             {medicos.length === 0 ? <p className="vazio">Nenhum médico registado.</p> : (
               <table>
-                <thead><tr><th>Médico ID</th><th>Utilizador ID</th><th>Especialidade</th><th>Contacto</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Nº Cédula Médica</th><th>Especialidade</th><th>Contacto</th><th>Ações</th></tr></thead>
                 <tbody>{medicos.map(m => (
-                  <tr key={m.id}><td>{m.id}</td>
-                    <td><span className="badge badge-blue">{m.utilizador_id}</span></td>
+                  <tr key={m.id}>
+                    <td><span className="badge badge-blue">{m.numero_cedula_medica}</span></td>
                     <td>
                       <select value={edicoesMedicos[m.id]?.especialidade || m.especialidade} onChange={setEdicaoMedico(m.id, 'especialidade')}>
                         <option value="PNEUMOLOGIA">Pneumologia</option>
@@ -759,6 +777,8 @@
       const [dadosEditaveis, setDadosEditaveis] = useState({ email: '', morada: '', contacto: '' });
       const [passwordForm, setPasswordForm] = useState({ password: '', confirmar: '' });
       const [edicoesUtentes, setEdicoesUtentes] = useState({});
+      const [utentesAGuardar, setUtentesAGuardar] = useState({});
+      const hojeIso = new Date().toISOString().split('T')[0];
       function normalizarContacto(contacto) {
         return (contacto || '').replace(/\s+/g, '');
       }
@@ -925,6 +945,7 @@
         setTimeout(() => window.location.reload(), 500);
       }
       async function guardarEdicaoUtente(utente) {
+        if (utentesAGuardar[utente.id]) return;
         setErro('');
         setSucesso('');
         const edicao = edicoesUtentes[utente.id] || {};
@@ -932,18 +953,29 @@
           setErro('NÃºmero de telefone invÃ¡lido. Use 9 dÃ­gitos vÃ¡lidos, com ou sem +351.');
           return;
         }
-        const r = await apiFetch(`/api/utentes/${utente.id}`, {
-          method: 'PUT',
-          body: {
-            morada: edicao.morada,
-            contacto: normalizarContacto(edicao.contacto)
+        const contactoNormalizado = normalizarContacto(edicao.contacto);
+        if ((edicao.morada || '') === (utente.morada || '') && contactoNormalizado === normalizarContacto(utente.contacto)) {
+          setSucesso('Nao houve alteracoes para guardar.');
+          return;
+        }
+
+        setUtentesAGuardar(p => ({ ...p, [utente.id]: true }));
+        try {
+          const r = await apiFetch(`/api/utentes/${utente.id}`, {
+            method: 'PUT',
+            body: {
+              morada: edicao.morada,
+              contacto: contactoNormalizado
+            }
+          });
+          if (r.ok) {
+            setSucesso(`Utente #${utente.id} atualizado com sucesso.`);
+            buscar();
+          } else {
+            setErro(r.data.erro || 'Erro ao atualizar utente.');
           }
-        });
-        if (r.ok) {
-          setSucesso(`Utente #${utente.id} atualizado com sucesso.`);
-          buscar();
-        } else {
-          setErro(r.data.erro || 'Erro ao atualizar utente.');
+        } finally {
+          setUtentesAGuardar(p => ({ ...p, [utente.id]: false }));
         }
       }
 
@@ -1008,9 +1040,9 @@
               <h2>Utentes Registados</h2>
               {utentes.length === 0 ? <p className="vazio">Nenhum utente associado a este medico.</p> : (
                 <table>
-                  <thead><tr><th>Utente ID</th><th>Utilizador ID</th><th>Nº Utente</th><th>Data Nasc.</th><th>Médico ID</th></tr></thead>
+                  <thead><tr><th>Nº Utente</th><th>Data Nasc.</th><th>Médico ID</th></tr></thead>
                   <tbody>{utentes.map(u => (
-                    <tr key={u.id}><td>{u.id}</td><td><span className="badge badge-brown">{u.utilizador_id}</span></td><td>{u.nr_utente}</td>
+                    <tr key={u.id}><td><span className="badge badge-purple">{u.nr_utente}</span></td>
                       <td>{u.data_nascimento ? `${new Date(u.data_nascimento).toLocaleDateString('pt-PT')} (${calcularIdade(u.data_nascimento)} anos)` : '—'}</td>
                       <td><span className="badge badge-blue">{u.medico_id}</span></td>
                     </tr>
@@ -1047,7 +1079,7 @@
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:4}}>
                 <span style={{fontSize:'0.82rem',color:'var(--color-secondary)',fontWeight:500}}>Data de nascimento</span>
-                <input type="date" value={form.data_nascimento} onChange={set('data_nascimento')} required />
+                <input type="date" max={hojeIso} value={form.data_nascimento} onChange={set('data_nascimento')} required />
               </div>
               <input value={form.morada} onChange={set('morada')} placeholder="Morada" required />
               <input value={form.contacto} onChange={set('contacto')} placeholder="Contacto" required />
@@ -1062,8 +1094,6 @@
             {utentes.length === 0 ? <p className="vazio">Nenhum utente registado.</p> : (
               <table className="utentes-table">
                 <colgroup>
-                  <col className="col-utente-id" />
-                  <col className="col-utilizador-id" />
                   <col className="col-nr-utente" />
                   <col className="col-morada" />
                   <col className="col-contacto" />
@@ -1071,14 +1101,14 @@
                   <col className="col-medico-id" />
                   <col className="col-acoes" />
                 </colgroup>
-                <thead><tr><th>Utente ID</th><th>Utilizador ID</th><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Médico ID</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Nº Utente</th><th>Morada</th><th>Contacto</th><th>Data Nasc.</th><th>Médico ID</th><th>Ações</th></tr></thead>
                 <tbody>{utentes.map(u => (
-                  <tr key={u.id}><td>{u.id}</td><td><span className="badge badge-brown">{u.utilizador_id}</span></td><td>{u.nr_utente}</td>
+                  <tr key={u.id}><td><span className="badge badge-purple">{u.nr_utente}</span></td>
                     <td><input className="utente-address-input" value={edicoesUtentes[u.id]?.morada || ''} onChange={setEdicaoUtente(u.id, 'morada')} /></td>
                     <td><input className="utente-contact-input" value={edicoesUtentes[u.id]?.contacto || ''} onChange={setEdicaoUtente(u.id, 'contacto')} /></td>
                     <td>{u.data_nascimento ? new Date(u.data_nascimento).toLocaleDateString('pt-PT') : '—'}</td>
                     <td><span className="badge badge-blue">{u.medico_id}</span></td>
-                    <td><button type="button" onClick={() => guardarEdicaoUtente(u)}>Guardar</button></td>
+                    <td><button type="button" disabled={!!utentesAGuardar[u.id]} onClick={() => guardarEdicaoUtente(u)}>{utentesAGuardar[u.id] ? 'A guardar...' : 'Guardar'}</button></td>
                   </tr>
                 ))}</tbody>
               </table>
