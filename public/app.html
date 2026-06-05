@@ -9,7 +9,7 @@
 
   TECNOLOGIAS USADAS:
   - React 18: biblioteca JavaScript para construir interfaces de utilizador.
-    O React organiza a interface em "componentes" reutilizáveis (como peças de Lego).
+    O React organiza a interface em "componentes" reutilizáveis.
   - ReactDOM: renderiza os componentes React na página HTML.
   - Babel: converte código JSX (mistura de HTML e JavaScript) em JavaScript puro
     que o browser consegue interpretar.
@@ -348,18 +348,36 @@
         setUser(null);
       }, [setToken, setUser]);
 
-      // Função fetch com token automático
+      /*
+       * apiFetch — Função central para fazer pedidos à API com autenticação automática
+       *
+       * Todos os componentes usam esta função para comunicar com o backend.
+       * Faz tudo automaticamente:
+       *   1. Adiciona o token JWT ao cabeçalho "Authorization: Bearer <token>"
+       *   2. Se o body for um objeto, converte para JSON e define o Content-Type
+       *   3. Faz o pedido HTTP com fetch()
+       *   4. Tenta ler a resposta como JSON; se falhar, devolve {}
+       *   5. Devolve { ok, status, data } — fácil de usar nos componentes
+       *
+       * Exemplo de uso num componente:
+       *   const { ok, data } = await apiFetch('/api/utentes');
+       *   if (ok) setUtentes(data.dados);
+       */
       const apiFetch = useCallback(async (url, options = {}) => {
         const headers = { ...options.headers };
         if (token) {
+          // Adiciona o token JWT ao cabeçalho de autenticação
           headers['Authorization'] = `Bearer ${token}`;
         }
         if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
+          // Converte o body para JSON se for um objeto JavaScript
           headers['Content-Type'] = 'application/json';
           options.body = JSON.stringify(options.body);
         }
+        // Constrói a URL completa (adiciona o prefixo API_BASE se a URL não começa com http)
         const apiUrl = url.startsWith('http') ? url : `${API_BASE}${url}`;
         const r = await fetch(apiUrl, { ...options, headers });
+        // Tenta converter a resposta para JSON; se falhar (ex: resposta vazia), usa {}
         const d = await r.json().catch(() => ({}));
         return { ok: r.ok, status: r.status, data: d };
       }, [token]);
@@ -422,6 +440,12 @@
        ---------------------------------------------------------------------- */
 
     /* ----- Utilizadores ----- */
+    /*
+     * SecaoUtilizadorAutenticado — Secção do perfil do utilizador atual
+     *
+     * Permite ao utilizador autenticado alterar a sua própria password.
+     * Acessível a todos os perfis (admin, médico, utente).
+     */
     function SecaoUtilizadorAutenticado({ apiFetch, user }) {
       const [passwordForm, setPasswordForm] = useState({ password: '', confirmar: '' });
       const [erro, setErro] = useState('');
@@ -475,6 +499,12 @@
       );
     }
 
+    /*
+     * SecaoUtilizadores — Secção de gestão de contas de utilizador
+     *
+     * Exclusiva para administradores. Permite criar, listar e apagar
+     * contas de utilizador de qualquer perfil (admin, médico, utente).
+     */
     function SecaoUtilizadores({ apiFetch }) {
       const [utilizadores, setUtilizadores] = useState([]);
       const [form, setForm] = useState({ nome: '', email: '', password: '', perfil: 'UTENTE', genero: '' });
@@ -537,6 +567,12 @@
     }
 
     /* ----- Médicos ----- */
+    /*
+     * SecaoAdministradores — Secção de gestão de administradores
+     *
+     * Exclusiva para administradores. Permite gerir os administradores do sistema,
+     * incluindo configurar os limiares do questionário CARAT.
+     */
     function SecaoAdministradores({ apiFetch }) {
       const [administradores, setAdministradores] = useState([]);
       const [utilizadores, setUtilizadores] = useState([]);
@@ -613,6 +649,13 @@
       );
     }
 
+    /*
+     * SecaoMedicos — Secção de gestão de médicos
+     *
+     * Admins podem criar e gerir todos os médicos.
+     * Médicos só veem o seu próprio perfil e podem atualizar o seu contacto.
+     * Utentes não têm acesso a esta secção.
+     */
     function SecaoMedicos({ apiFetch, user }) {
       const [medicos, setMedicos] = useState([]);
       const [utilizadores, setUtilizadores] = useState([]);
@@ -1377,7 +1420,7 @@
       }
       async function handleConfirmar() {
         setConfirmLoading(true); setConfirmErro('');
-        const r = await apiFetch('/api/login', { method: 'POST', body: { id: user.id, password: confirmPass } });
+        const r = await apiFetch('/api/verificar-password', { method: 'POST', body: { password: confirmPass } });
         setConfirmLoading(false);
         if (!r.ok) { setConfirmErro('Password incorreta. Tente novamente.'); return; }
         setShowConfirm(false);
@@ -1627,6 +1670,13 @@
     }
 
     /* ----- Anamneses ----- */
+    /*
+     * SecaoAnamneses — Secção de gestão de anamneses (histórias clínicas)
+     *
+     * Permite criar e editar a história clínica de base dos utentes.
+     * Contém historial familiar, situação tabágica e sexo biológico.
+     * Apenas médicos e administradores têm acesso.
+     */
     function SecaoAnamneses({ apiFetch, user }) {
       const [anamneses, setAnamneses] = useState([]);
       const [utentes, setUtentes] = useState([]);
@@ -1933,6 +1983,13 @@
     }
 
     /* ----- Alergias ----- */
+    /*
+     * SecaoAlergias — Secção de gestão de alergias dos utentes
+     *
+     * Permite registar e editar alergias conhecidas dos utentes.
+     * As alergias estão associadas à anamnese de cada utente.
+     * Apenas médicos e administradores têm acesso.
+     */
     function SecaoAlergias({ apiFetch, user }) {
       const [alergias, setAlergias] = useState([]);
       const [anamneses, setAnamneses] = useState([]);
@@ -2044,6 +2101,13 @@
     }
 
     /* ----- Comorbidades ----- */
+    /*
+     * SecaoComorbidades — Secção de gestão de comorbilidades
+     *
+     * Permite registar outras doenças coexistentes com a rinite/asma
+     * (ex: dermatite atópica, apneia do sono).
+     * Associadas à anamnese. Apenas médicos e admins têm acesso.
+     */
     function SecaoComorbidades({ apiFetch, user }) {
       const [comorbidades, setComorbidades] = useState([]);
       const [anamneses, setAnamneses] = useState([]);
@@ -2144,6 +2208,13 @@
     }
 
     /* ----- Sintomas ----- */
+    /*
+     * SecaoSintomas — Secção de registo e consulta de sintomas
+     *
+     * Utentes podem registar os seus próprios sintomas.
+     * Médicos podem ver e registar sintomas dos seus utentes.
+     * Os sintomas são úteis para acompanhar a evolução da doença entre consultas.
+     */
     function SecaoSintomas({ apiFetch, user }) {
       const [sintomas, setSintomas] = useState([]);
       const [utentes, setUtentes] = useState([]);
@@ -2325,6 +2396,13 @@
 
 
     /* ----- Medicações Habituais ----- */
+    /*
+     * SecaoMedicacoesHabituais — Secção de medicação habitual dos utentes
+     *
+     * Apresenta os medicamentos que os utentes tomam regularmente.
+     * É atualizada automaticamente quando se prescrevem medicamentos.
+     * Apenas médicos e admins têm acesso direto.
+     */
     function SecaoMedicacoesHabituais({ apiFetch }) {
       const [medicacoes, setMedicacoes] = useState([]);
       const [anamneses, setAnamneses] = useState([]);
@@ -2370,6 +2448,13 @@
     }
 
     /* ----- Exames ----- */
+    /*
+     * SecaoExames — Secção de gestão de exames clínicos
+     *
+     * Apresenta os exames prescritos e o seu estado (PENDENTE, REALIZADO, etc.).
+     * Médicos e admins podem criar e atualizar exames.
+     * Utentes podem consultar os seus exames.
+     */
     function SecaoExames({ apiFetch }) {
       const [exames, setExames] = useState([]);
       const [filtro, setFiltro] = useState('');
@@ -2626,6 +2711,13 @@
     }
 
     /* ----- Regras de Alerta ----- */
+    /*
+     * SecaoRegrasAlerta — Secção de gestão de regras de alertas automáticos
+     *
+     * Médicos podem criar regras personalizadas (ex: "alertar se score < 16").
+     * Admins gerem limiares globais do sistema.
+     * As regras são verificadas automaticamente após cada preenchimento CARAT.
+     */
     function SecaoRegrasAlerta({ apiFetch, user }) {
       const [regras, setRegras] = useState([]);
       const [utentes, setUtentes] = useState([]);
@@ -2750,6 +2842,16 @@
     }
 
     /* ----- Avaliações CARAT ----- */
+    /*
+     * SecaoAvaliacoesCarat — Secção do modelo do questionário CARAT
+     *
+     * Apresenta as versões disponíveis do questionário CARAT (formulário base).
+     * Normalmente existe apenas a versão 1, criada automaticamente.
+     * Admins podem criar novas versões do questionário.
+     *
+     * NOTA: esta secção gere o MODELO (as perguntas), não as respostas dos utentes.
+     * Para as respostas, ver SecaoRespostasCarat.
+     */
     function SecaoAvaliacoesCarat({ apiFetch, user }) {
       const [avaliacoes, setAvaliacoes] = useState([]);
       const OPTS_1_9 = ["Nunca", "Até 2 dias por semana", "Mais de 2 dias por semana", "Quase todos os dias"];
@@ -2864,6 +2966,20 @@
     }
 
     /* ----- Respostas CARAT ----- */
+    /*
+     * SecaoRespostasCarat — Secção de preenchimento e consulta de questionários CARAT
+     *
+     * Esta é uma das secções mais importantes do sistema.
+     * Permite preencher o questionário CARAT com as 10 perguntas.
+     * Após submissão, o sistema calcula automaticamente:
+     *   - Score total (0-30)
+     *   - Interpretação clínica (bem/parcialmente/mal controlado)
+     *   - Recomendação para o utente
+     *   - Alertas automáticos se necessário
+     *
+     * Utentes preenchem o seu próprio questionário.
+     * Médicos podem preencher em nome dos seus utentes.
+     */
     function SecaoRespostasCarat({ apiFetch, user }) {
       const [respostas, setRespostas] = useState([]);
       const [utentes, setUtentes] = useState([]);
@@ -3094,6 +3210,14 @@
     }
 
     /* ----- Planos de Acompanhamento ----- */
+    /*
+     * SecaoPlanos — Secção de planos de acompanhamento clínico
+     *
+     * Médicos criam planos de acompanhamento para os seus utentes.
+     * Define a frequência das consultas, duração e recomendações clínicas.
+     * Utentes podem consultar os seus planos.
+     * O estado do plano pode ser atualizado (ATIVO → CONCLUIDO ou SUSPENSO).
+     */
     function SecaoPlanos({ apiFetch, user }) {
       const [planos, setPlanos] = useState([]);
       const [medicos, setMedicos] = useState([]);
@@ -4203,26 +4327,43 @@
     /* --------------------------------------------------------------------------
        APP PRINCIPAL
        ---------------------------------------------------------------------- */
+    // Lista de todos os separadores disponíveis no sistema (para referência)
     const TODAS_TABS = ['Dashboard','Administradores','Médicos','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos','FHIR'];
+
+    /*
+     * TABS_POR_PERFIL — Define quais separadores cada perfil pode aceder
+     *
+     * Controla a visibilidade dos menus consoante o tipo de utilizador:
+     *   - ADMINISTRADOR: gestão do sistema, médicos, utentes, auditoria
+     *   - MÉDICO: dashboard, utentes, prescrições, anamneses, alertas, CARAT
+     *   - UTENTE: dashboard pessoal, prescrições, questionário CARAT, planos
+     */
     const TABS_POR_PERFIL = {
       ADMINISTRADOR: ['Perfil','Administradores','Médicos','Utentes','Regras Alerta','Aval. CARAT','Auditoria'],
       MEDICO: ['Perfil','Dashboard','Utentes','Prescrições','Anamneses','Alertas','Regras Alerta','Aval. CARAT','Resp. CARAT','Planos'],
       UTENTE: ['Perfil','Dashboard','Prescrições','Aval. CARAT','Resp. CARAT','Planos'],
     };
+
+    /*
+     * SECOES_SIDEBAR — Organiza os menus laterais por grupos temáticos
+     *
+     * Cada perfil tem os seus menus agrupados por categorias para facilitar
+     * a navegação. Os títulos dos grupos aparecem em maiúsculas no menu.
+     */
     const SECOES_SIDEBAR = {
       ADMINISTRADOR: [
-        { titulo: 'GESTÃO',  tabs: ['Perfil','Administradores','Médicos','Utentes'] },
-        { titulo: 'SISTEMA', tabs: ['Regras Alerta','Aval. CARAT','Auditoria'] },
+        { titulo: 'GESTÃO',  tabs: ['Perfil','Administradores','Médicos','Utentes'] },    // Gestão de utilizadores
+        { titulo: 'SISTEMA', tabs: ['Regras Alerta','Aval. CARAT','Auditoria'] },         // Configuração e logs
       ],
       MEDICO: [
-        { titulo: 'PRINCIPAL',   tabs: ['Perfil','Dashboard','Utentes','Alertas'] },
-        { titulo: 'CLÍNICO',     tabs: ['Prescrições','Anamneses','Regras Alerta'] },
-        { titulo: 'AVALIAÇÕES',  tabs: ['Aval. CARAT','Resp. CARAT','Planos'] },
+        { titulo: 'PRINCIPAL',   tabs: ['Perfil','Dashboard','Utentes','Alertas'] },      // Visão geral
+        { titulo: 'CLÍNICO',     tabs: ['Prescrições','Anamneses','Regras Alerta'] },      // Registos clínicos
+        { titulo: 'AVALIAÇÕES',  tabs: ['Aval. CARAT','Resp. CARAT','Planos'] },           // Questionários e acompanhamento
       ],
       UTENTE: [
-        { titulo: 'O MEU ESPAÇO',  tabs: ['Dashboard','Aval. CARAT','Resp. CARAT'] },
-        { titulo: 'SAÚDE',         tabs: ['Prescrições','Planos'] },
-        { titulo: 'OS MEUS DADOS', tabs: ['Perfil'] },
+        { titulo: 'O MEU ESPAÇO',  tabs: ['Dashboard','Aval. CARAT','Resp. CARAT'] },     // Área pessoal
+        { titulo: 'SAÚDE',         tabs: ['Prescrições','Planos'] },                       // Documentos de saúde
+        { titulo: 'OS MEUS DADOS', tabs: ['Perfil'] },                                     // Perfil e password
       ],
     };
 

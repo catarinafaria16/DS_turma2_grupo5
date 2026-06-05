@@ -42,7 +42,9 @@ import {
     testeRegrasAlerta, testeAlertas, testePlanosAcompanhamento, testeRespostasCarat, testeAuditorias,
 } from '../data/dadosTeste.js';
 
+// Opções de resposta para as perguntas 1-9 do questionário CARAT
 const OPTS_1_9 = { 0: 'Nunca', 1: 'Até 2 dias por semana', 2: 'Mais de 2 dias por semana', 3: 'Quase todos os dias' };
+// Opções de resposta para a pergunta 10 (uso de medicamentos de resgate)
 const OPTS_10  = { 0: 'Não estou a tomar medicamentos', 1: 'Nunca', 2: 'Menos de 7 dias', 3: '7 ou mais dias' };
 
 const AVALIACAO_CARAT_V1 = {
@@ -62,6 +64,18 @@ const AVALIACAO_CARAT_V1 = {
     r9: OPTS_1_9, r10: OPTS_10,
 };
 
+/*
+ * seedTable — Função genérica para inserir dados de teste numa tabela
+ *
+ * Para cada item da lista, verifica se já existe (pelo campo idField).
+ * Se não existir, insere. Se já existir, ignora (não duplica).
+ *
+ * Parâmetros:
+ *   - repo: repositório TypeORM da tabela
+ *   - dados: lista de dados a inserir
+ *   - label: nome para mostrar no log (ex: "Utilizadores")
+ *   - idField: campo a usar para verificar existência (por defeito "id")
+ */
 async function seedTable<T extends Record<string, any>>(
     repo: any,
     dados: T[],
@@ -73,15 +87,23 @@ async function seedTable<T extends Record<string, any>>(
         const where = { [idField]: (item as any)[idField] };
         const existe = await repo.findOne({ where });
         if (!existe) {
-            await repo.save(item);
+            await repo.save(item); // Insere apenas se não existir
             count++;
         }
     }
-    console.log(`  ${label}: ${count} inseridos`);
+    console.log(`  ${label}: ${count} inseridos`); // Mostra quantos foram inseridos
 }
 
+/*
+ * seed — Função principal de inicialização da base de dados
+ *
+ * Liga à base de dados, cria todos os repositórios necessários,
+ * e chama seedTable para cada tipo de dados.
+ * A ordem de inserção é importante devido às dependências entre tabelas:
+ * (utilizadores → médicos/utentes → anamneses → alergias, etc.)
+ */
 async function seed() {
-    await AppDataSource.initialize();
+    await AppDataSource.initialize(); // Liga à base de dados
 
     const utilizadorRepo        = AppDataSource.getRepository(Utilizador);
     const administradorRepo     = AppDataSource.getRepository(Administrador);

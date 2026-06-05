@@ -35,12 +35,13 @@ import { Sintoma } from '../models/sintoma.entity.js';
 import { Utente } from '../models/utente.entity.js';
 import { Utilizador } from '../models/utilizador.entity.js';
 
+// AppDataSource: objeto de ligação à base de dados — usado em toda a aplicação
 export const AppDataSource = new DataSource({
-    type: 'sqlite',
-    database: 'database.db',
-    synchronize: true,
-    logging: true,
-    entities: [
+    type: 'sqlite',         // Tipo de base de dados: SQLite (ficheiro local)
+    database: 'database.db', // Nome do ficheiro onde os dados são guardados
+    synchronize: true,       // Auto-cria/altera tabelas baseado nas entidades (apenas para desenvolvimento!)
+    logging: true,           // Mostra as queries SQL no terminal (útil para depuração)
+    entities: [              // Lista de todas as tabelas (entidades) da base de dados
         Administrador,
         Alergia,
         Alerta,

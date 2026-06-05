@@ -34,7 +34,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\"id\": 1001, \"password\": \"pass1001\"}" },
+            "body": { "mode": "raw", "raw": "{\"id\": 20261001, \"password\": \"pass20261001\"}" },
             "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api", "login"] }
           }, "response": []
         },
@@ -49,7 +49,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\"id\": 2001, \"password\": \"pass2001\"}" },
+            "body": { "mode": "raw", "raw": "{\"id\": 20262001, \"password\": \"pass20262001\"}" },
             "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api", "login"] }
           }, "response": []
         },
@@ -64,7 +64,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\"id\": 3001, \"password\": \"pass3001\"}" },
+            "body": { "mode": "raw", "raw": "{\"id\": 20263001, \"password\": \"pass20263001\"}" },
             "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api", "login"] }
           }, "response": []
         },
@@ -77,7 +77,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\"id\": 1001, \"password\": \"senha_errada\"}" },
+            "body": { "mode": "raw", "raw": "{\"id\": 20261001, \"password\": \"senha_errada\"}" },
             "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api", "login"] }
           }, "response": []
         }
@@ -174,7 +174,7 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 201', () => pm.response.to.have.status(201));",
             "pm.test('JSON válido', () => pm.response.to.be.json);",
-            "pm.test('utente_id correto', () => pm.expect(pm.response.json().dados.utente_id).to.equal(20263000));",
+            "pm.test('utente_id correto', () => pm.expect(pm.response.json().dados.utente_id).to.equal(3001));",
             "pm.test('Score calculado presente', () => pm.expect(pm.response.json().dados.score_total).to.be.a('number'));",
             "pm.test('ID guardado', () => { var d = pm.response.json().dados; pm.expect(d.id).to.be.a('number'); pm.collectionVariables.set('respostaId', d.id); });"
           ]}}],
@@ -186,7 +186,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"avaliacao_id\": {{avaliacaoId}},\n  \"utente_id\": 20263000,\n  \"r1\": 1,\n  \"r2\": 2,\n  \"r3\": 1,\n  \"r4\": 2,\n  \"r5\": 1,\n  \"r6\": 0,\n  \"r7\": 1,\n  \"r8\": 2,\n  \"r9\": 1,\n  \"r10\": 0\n}"
+              "raw": "{\n  \"avaliacao_id\": {{avaliacaoId}},\n  \"utente_id\": 3001,\n  \"r1\": 1,\n  \"r2\": 2,\n  \"r3\": 1,\n  \"r4\": 2,\n  \"r5\": 1,\n  \"r6\": 0,\n  \"r7\": 1,\n  \"r8\": 2,\n  \"r9\": 1,\n  \"r10\": 0\n}"
             },
             "url": { "raw": "{{baseUrl}}/api/respostas-carat", "host": ["{{baseUrl}}"], "path": ["api", "respostas-carat"] }
           }, "response": []
@@ -210,12 +210,12 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
-            "pm.test('Contém respostas do utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+            "pm.test('Contém respostas do utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(3001); });"
           ]}}],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
-            "url": { "raw": "{{baseUrl}}/api/respostas-carat/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "respostas-carat", "utente", "20263000"] }
+            "url": { "raw": "{{baseUrl}}/api/respostas-carat/utente/3001", "host": ["{{baseUrl}}"], "path": ["api", "respostas-carat", "utente", "3001"] }
           }, "response": []
         },
         {
@@ -233,7 +233,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"avaliacao_id\": {{avaliacaoId}},\n  \"utente_id\": 20263000,\n  \"r1\": 2,\n  \"r2\": 3,\n  \"r3\": 2,\n  \"r4\": 3,\n  \"r5\": 3,\n  \"r6\": 2,\n  \"r7\": 2,\n  \"r8\": 3,\n  \"r9\": 2,\n  \"r10\": 1\n}"
+              "raw": "{\n  \"avaliacao_id\": {{avaliacaoId}},\n  \"utente_id\": 3001,\n  \"r1\": 2,\n  \"r2\": 3,\n  \"r3\": 2,\n  \"r4\": 3,\n  \"r5\": 3,\n  \"r6\": 2,\n  \"r7\": 2,\n  \"r8\": 3,\n  \"r9\": 2,\n  \"r10\": 1\n}"
             },
             "url": { "raw": "{{baseUrl}}/api/respostas-carat/{{respostaId}}", "host": ["{{baseUrl}}"], "path": ["api", "respostas-carat", "{{respostaId}}"] }
           }, "response": []
@@ -283,7 +283,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"utente_id\": 20263000,\n  \"medico_id\": 20262000,\n  \"tipo\": \"DETERIORACAO\",\n  \"estado\": \"NOVO\",\n  \"prioridade\": \"ALTA\",\n  \"notas\": \"Deterioração observada após última resposta CARAT.\"\n}"
+              "raw": "{\n  \"utente_id\": 3001,\n  \"medico_id\": 2001,\n  \"tipo\": \"DETERIORACAO\",\n  \"estado\": \"NOVO\",\n  \"prioridade\": \"ALTA\",\n  \"notas\": \"Deterioração observada após última resposta CARAT.\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/api/alertas", "host": ["{{baseUrl}}"], "path": ["api", "alertas"] }
           }, "response": []
@@ -293,7 +293,7 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('ID corresponde', () => { var id = parseInt(pm.collectionVariables.get('alertaId')); pm.expect(pm.response.json().dados.id).to.equal(id); });",
-            "pm.test('medico_id correto', () => pm.expect(pm.response.json().dados.medico_id).to.equal(20262000));"
+            "pm.test('medico_id correto', () => pm.expect(pm.response.json().dados.medico_id).to.equal(2001));"
           ]}}],
           "request": {
             "method": "GET",
@@ -306,12 +306,12 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
-            "pm.test('Pertence ao utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+            "pm.test('Pertence ao utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(3001); });"
           ]}}],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
-            "url": { "raw": "{{baseUrl}}/api/alertas/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "alertas", "utente", "20263000"] }
+            "url": { "raw": "{{baseUrl}}/api/alertas/utente/3001", "host": ["{{baseUrl}}"], "path": ["api", "alertas", "utente", "3001"] }
           }, "response": []
         },
         {
@@ -419,7 +419,7 @@
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
-            "url": { "raw": "{{baseUrl}}/api/auditoria/utilizador/1001", "host": ["{{baseUrl}}"], "path": ["api", "auditoria", "utilizador", "1001"] }
+            "url": { "raw": "{{baseUrl}}/api/auditoria/utilizador/20261001", "host": ["{{baseUrl}}"], "path": ["api", "auditoria", "utilizador", "20261001"] }
           }, "response": []
         },
         {
@@ -491,7 +491,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"utente_id\": 20263000,\n  \"descricao\": \"Tosse persistente com agravamento nocturno\",\n  \"intensidade\": \"MODERADA\",\n  \"duracao\": \"5 dias\",\n  \"data_registo\": \"2026-06-04T10:00:00.000Z\"\n}"
+              "raw": "{\n  \"utente_id\": 3001,\n  \"descricao\": \"Tosse persistente com agravamento nocturno\",\n  \"intensidade\": \"MODERADA\",\n  \"duracao\": \"5 dias\",\n  \"data_registo\": \"2026-06-04T10:00:00.000Z\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/api/sintomas", "host": ["{{baseUrl}}"], "path": ["api", "sintomas"] }
           }, "response": []
@@ -501,7 +501,7 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('ID corresponde', () => { var id = parseInt(pm.collectionVariables.get('sintomaId')); pm.expect(pm.response.json().dados.id).to.equal(id); });",
-            "pm.test('utente_id presente', () => pm.expect(pm.response.json().dados.utente_id).to.equal(20263000));"
+            "pm.test('utente_id presente', () => pm.expect(pm.response.json().dados.utente_id).to.equal(3001));"
           ]}}],
           "request": {
             "method": "GET",
@@ -514,12 +514,12 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
-            "pm.test('Contém sintomas do utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+            "pm.test('Contém sintomas do utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(3001); });"
           ]}}],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
-            "url": { "raw": "{{baseUrl}}/api/sintomas/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "sintomas", "utente", "20263000"] }
+            "url": { "raw": "{{baseUrl}}/api/sintomas/utente/3001", "host": ["{{baseUrl}}"], "path": ["api", "sintomas", "utente", "3001"] }
           }, "response": []
         },
         {
@@ -536,7 +536,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"utente_id\": 20263000,\n  \"descricao\": \"Tosse persistente com agravamento nocturno\",\n  \"intensidade\": \"GRAVE\",\n  \"duracao\": \"7 dias\",\n  \"data_registo\": \"2026-06-04T10:00:00.000Z\"\n}"
+              "raw": "{\n  \"utente_id\": 3001,\n  \"descricao\": \"Tosse persistente com agravamento nocturno\",\n  \"intensidade\": \"GRAVE\",\n  \"duracao\": \"7 dias\",\n  \"data_registo\": \"2026-06-04T10:00:00.000Z\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/api/sintomas/{{sintomaId}}", "host": ["{{baseUrl}}"], "path": ["api", "sintomas", "{{sintomaId}}"] }
           }, "response": []
@@ -586,7 +586,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medico_id\": 20262000,\n  \"utente_id\": 20263000,\n  \"tipo\": \"MEDICACAO\",\n  \"data_emissao\": \"2026-06-04\",\n  \"data_validade\": \"2026-09-04\",\n  \"estado\": \"ATIVA\"\n}"
+              "raw": "{\n  \"medico_id\": 2001,\n  \"utente_id\": 3001,\n  \"tipo\": \"MEDICACAO\",\n  \"data_emissao\": \"2026-06-04\",\n  \"data_validade\": \"2026-09-04\",\n  \"estado\": \"ATIVA\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/api/prescricoes", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes"] }
           }, "response": []
@@ -596,7 +596,7 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('ID corresponde', () => { var id = parseInt(pm.collectionVariables.get('prescricaoId')); pm.expect(pm.response.json().dados.id).to.equal(id); });",
-            "pm.test('medico_id correto', () => pm.expect(pm.response.json().dados.medico_id).to.equal(20262000));"
+            "pm.test('medico_id correto', () => pm.expect(pm.response.json().dados.medico_id).to.equal(2001));"
           ]}}],
           "request": {
             "method": "GET",
@@ -609,12 +609,12 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
-            "pm.test('Pertence ao utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+            "pm.test('Pertence ao utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(3001); });"
           ]}}],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
-            "url": { "raw": "{{baseUrl}}/api/prescricoes/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes", "utente", "20263000"] }
+            "url": { "raw": "{{baseUrl}}/api/prescricoes/utente/3001", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes", "utente", "3001"] }
           }, "response": []
         },
         {
@@ -622,12 +622,12 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
-            "pm.test('Pertence ao médico', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].medico_id).to.equal(20262000); });"
+            "pm.test('Pertence ao médico', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].medico_id).to.equal(2001); });"
           ]}}],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
-            "url": { "raw": "{{baseUrl}}/api/prescricoes/medico/20262000", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes", "medico", "20262000"] }
+            "url": { "raw": "{{baseUrl}}/api/prescricoes/medico/2001", "host": ["{{baseUrl}}"], "path": ["api", "prescricoes", "medico", "2001"] }
           }, "response": []
         },
         {
@@ -674,7 +674,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medico_id\": 20262000,\n  \"utente_id\": 20263001,\n  \"frequencia_avaliacao\": \"Quinzenal\",\n  \"data_inicio\": \"2026-06-04\",\n  \"data_fim\": \"2026-12-04\",\n  \"estado\": \"ATIVO\",\n  \"recomendacao_medica\": \"Monitorizar sintomas e reavaliar adesão à medicação de forma quinzenal.\"\n}"
+              "raw": "{\n  \"medico_id\": 2001,\n  \"utente_id\": 3001,\n  \"frequencia_avaliacao\": \"Quinzenal\",\n  \"data_inicio\": \"2026-06-04\",\n  \"data_fim\": \"2026-12-04\",\n  \"estado\": \"ATIVO\",\n  \"recomendacao_medica\": \"Monitorizar sintomas e reavaliar adesão à medicação de forma quinzenal.\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/api/planos-acompanhamento", "host": ["{{baseUrl}}"], "path": ["api", "planos-acompanhamento"] }
           }, "response": []
@@ -684,12 +684,12 @@
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('dados é array', () => pm.expect(pm.response.json().dados).to.be.an('array'));",
-            "pm.test('Pertence ao utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(20263000); });"
+            "pm.test('Pertence ao utente', () => { var j = pm.response.json(); pm.expect(j.dados.length).to.be.above(0); pm.expect(j.dados[0].utente_id).to.equal(3001); });"
           ]}}],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
-            "url": { "raw": "{{baseUrl}}/api/planos-acompanhamento/utente/20263000", "host": ["{{baseUrl}}"], "path": ["api", "planos-acompanhamento", "utente", "20263000"] }
+            "url": { "raw": "{{baseUrl}}/api/planos-acompanhamento/utente/3001", "host": ["{{baseUrl}}"], "path": ["api", "planos-acompanhamento", "utente", "3001"] }
           }, "response": []
         },
         {
@@ -743,12 +743,12 @@
             "pm.test('Status 200', () => pm.response.to.have.status(200));",
             "pm.test('JSON válido', () => pm.response.to.be.json);",
             "pm.test('resourceType Patient', () => pm.expect(pm.response.json().resourceType).to.equal('Patient'));",
-            "pm.test('ID correto', () => pm.expect(pm.response.json().id).to.equal('20263000'));"
+            "pm.test('ID correto', () => pm.expect(pm.response.json().id).to.equal('3001'));"
           ]}}],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
-            "url": { "raw": "{{baseUrl}}/fhir/Patient/20263000", "host": ["{{baseUrl}}"], "path": ["fhir", "Patient", "20263000"] }
+            "url": { "raw": "{{baseUrl}}/fhir/Patient/3001", "host": ["{{baseUrl}}"], "path": ["fhir", "Patient", "3001"] }
           }, "response": []
         },
         {
@@ -762,9 +762,9 @@
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
             "url": {
-              "raw": "{{baseUrl}}/fhir/AllergyIntolerance?patient=20263000",
+              "raw": "{{baseUrl}}/fhir/AllergyIntolerance?patient=3001",
               "host": ["{{baseUrl}}"], "path": ["fhir", "AllergyIntolerance"],
-              "query": [{ "key": "patient", "value": "20263000" }]
+              "query": [{ "key": "patient", "value": "3001" }]
             }
           }, "response": []
         },
@@ -779,9 +779,9 @@
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }],
             "url": {
-              "raw": "{{baseUrl}}/fhir/MedicationRequest?patient=20263000",
+              "raw": "{{baseUrl}}/fhir/MedicationRequest?patient=3001",
               "host": ["{{baseUrl}}"], "path": ["fhir", "MedicationRequest"],
-              "query": [{ "key": "patient", "value": "20263000" }]
+              "query": [{ "key": "patient", "value": "3001" }]
             }
           }, "response": []
         },

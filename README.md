@@ -40,18 +40,55 @@ Na primeira execução, a base de dados (`database.db`) é criada automaticament
 Abrir o browser em:
 
 ```
-http://localhost:3000/app.html
+http://localhost:3000
 ```
+
+A página de login abre automaticamente. Depois do login é redirecionado para `app.html`.
+
+---
 
 ### Credenciais de teste
 
-| Perfil | ID | Password |
-|--------|----|----------|
-| Administrador | 1001 | pass1001 |
-| Médico | 2001 | pass2001 |
-| Utente | 3001 | pass3001 |
+#### Administradores (5 contas — 1 apagada logicamente)
 
-> Todos os utilizadores de teste seguem o padrão `password = pass<id>`. Ver `src/data/dadosTeste.ts` para a lista completa.
+| Nome | ID de login | Password |
+|------|-------------|----------|
+| Luana Gaspar | 20261001 | pass20261001 |
+| Bruno Almeida | 20261002 | pass20261002 |
+| Carla Mendes | 20261003 | pass20261003 |
+| Diogo Pereira | 20261004 | pass20261004 |
+| ~~Eva Rodrigues~~ | ~~20261005~~ | *(apagada em 2026-05-01)* |
+
+#### Médicos (5 contas)
+
+Os médicos fazem login com o **número de cédula médica** (não o ID interno).
+
+| Nome | Nº Cédula (login) | Password | Especialidade |
+|------|-------------------|----------|---------------|
+| Marta Silva | 20262001 | pass20262001 | Pneumologia |
+| Pedro Costa | 20262002 | pass20262002 | Alergologia |
+| Inês Almeida | 20262003 | pass20262003 | Imunoalergologia |
+| Tiago Ferreira | 20262004 | pass20262004 | Medicina Interna |
+| Sofia Ribeiro | 20262005 | pass20262005 | Pediatria |
+
+#### Utentes (30 contas)
+
+Os utentes fazem login com o **número de utente SNS** (`nr_utente`).
+
+| Nº de utente (login) | Password | Médico responsável |
+|----------------------|----------|--------------------|
+| 20263001 – 20263006 | pass20263001 … pass20263006 | Marta Silva (Pneumologia) |
+| 20263007 – 20263012 | pass20263007 … pass20263012 | Pedro Costa (Alergologia) |
+| 20263013 – 20263018 | pass20263013 … pass20263018 | Inês Almeida (Imunoalergologia) |
+| 20263019 – 20263024 | pass20263019 … pass20263024 | Tiago Ferreira (Medicina Interna) |
+| 20263025 – 20263030 | pass20263025 … pass20263030 | Sofia Ribeiro (Pediatria) |
+
+> **Exemplos rápidos:**
+> - Admin: ID `20261001`, password `pass20261001`
+> - Médico: cédula `20262001`, password `pass20262001`
+> - Utente: nº utente `20263001`, password `pass20263001`
+>
+> Ver `src/data/dadosTeste.ts` para a lista completa com nomes e dados clínicos.
 
 ---
 

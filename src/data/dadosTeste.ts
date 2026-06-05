@@ -1,3 +1,35 @@
+/*
+ * ============================================================
+ * dadosTeste.ts — Dados de exemplo para inicializar a base de dados
+ * ============================================================
+ *
+ * Este ficheiro contém dados de teste que são inseridos automaticamente
+ * na base de dados quando o servidor arranca pela primeira vez (seed).
+ *
+ * Os dados estão organizados por tipo de registo e representam um cenário
+ * clínico realista com utentes com rinite alérgica e asma.
+ *
+ * UTILIZADORES DE TESTE:
+ *   Administradores: ID 20261001–20261005, password = pass<ID>
+ *     (ex: ID 20261001, password pass20261001)
+ *   Médicos: login com nº de cédula (2001–2005), password = pass<cédula>
+ *     (ex: cédula 20262001, password pass20262001)
+ *   Utentes: ID 20263001–20263030, password = pass<ID>
+ *     (ex: ID 20263001, password pass20263001)
+ *
+ * ESTRUTURA DOS DADOS:
+ *   - 5 administradores (1 apagado logicamente)
+ *   - 5 médicos (alergologistas e pneumologistas)
+ *   - 30 utentes com dados clínicos variados
+ *   - Anamneses, alergias, comorbilidades para cada utente
+ *   - Prescrições, medicações, exames
+ *   - Sintomas, alertas, planos de acompanhamento
+ *   - Respostas CARAT com scores variados (bem/parcialmente/mal controlado)
+ *   - Registo de auditoria de operações
+ *
+ * NOTA: Estes dados SÃO APENAS para fins de demonstração e teste.
+ * Numa aplicação real, estes dados seriam introduzidos pelos utilizadores.
+ */
 import { PerfilUtilizador } from '../enums/PerfilUtilizador.enum.js';
 import { GeneroUtilizador } from '../enums/GeneroUtilizador.enum.js';
 import { RespostaCarat1a9 as R } from '../enums/RespostaCarat1a9.enum.js';

@@ -116,7 +116,10 @@ app.use(express.urlencoded({ extended: true }));
  * e o servidor verifica se são válidos. Se sim, devolve um token JWT que o
  * utilizador deve incluir em todos os pedidos seguintes para provar a sua identidade.
  *
- * Nota especial: os médicos fazem login com o número de cédula médica (não o ID interno).
+ * Identificadores de login por perfil:
+ *   - Administrador: ID interno do utilizador (ex: 20261001)
+ *   - Médico:        número de cédula médica (ex: 20262001)
+ *   - Utente:        número de utente SNS (ex: 20263001)
  */
 app.post('/api/login', async (req, res) => {
     // Extrai o ID e a password do corpo do pedido
@@ -129,12 +132,30 @@ app.post('/api/login', async (req, res) => {
 
     const utilizadorRepo = AppDataSource.getRepository(Utilizador);
     const medicoRepo = AppDataSource.getRepository(Medico);
-    const medico = await medicoRepo.findOne({ where: { numero_cedula_medica: utilizadorId } });
-    let utilizador = medico
-        ? await utilizadorRepo.findOne({ where: { id: medico.utilizador_id } })
-        : await utilizadorRepo.findOne({ where: { id: utilizadorId } });
 
+    // Verifica se o número introduzido é uma cédula médica
+    const medico = await medicoRepo.findOne({ where: { numero_cedula_medica: utilizadorId } });
+    // Verifica se o número introduzido é um número de utente SNS
+    const utente = await AppDataSource.getRepository(Utente).findOne({ where: { nr_utente: utilizadorId } });
+
+    let utilizador;
+    if (medico) {
+        // Login de médico: usa o utilizador associado à cédula
+        utilizador = await utilizadorRepo.findOne({ where: { id: medico.utilizador_id } });
+    } else if (utente) {
+        // Login de utente: usa o utilizador associado ao número de utente SNS
+        utilizador = await utilizadorRepo.findOne({ where: { id: utente.utilizador_id } });
+    } else {
+        // Login de administrador: usa o ID diretamente
+        utilizador = await utilizadorRepo.findOne({ where: { id: utilizadorId } });
+    }
+
+    // Impede médicos de fazerem login sem cédula médica válida
     if (utilizador?.perfil === PerfilUtilizador.MEDICO && !medico) {
+        return res.status(401).json({ erro: 'ID ou password invalidos' });
+    }
+    // Impede utentes de fazerem login sem número de utente SNS válido
+    if (utilizador?.perfil === PerfilUtilizador.UTENTE && !utente) {
         return res.status(401).json({ erro: 'ID ou password invalidos' });
     }
 
@@ -158,6 +179,31 @@ app.post('/api/login', async (req, res) => {
 
     // Devolve o token e os dados básicos do utilizador para o frontend guardar
     return res.status(200).json({ token, user });
+});
+
+/*
+ * ENDPOINT DE VERIFICAÇÃO DE PASSWORD — POST /api/verificar-password
+ *
+ * Verifica se a password fornecida corresponde à do utilizador autenticado,
+ * sem necessitar do identificador de login (cédula, nr_utente ou ID).
+ * Usado para confirmações de ações sensíveis no frontend (ex: criar prescrição).
+ */
+app.post('/api/verificar-password', async (req, res) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ erro: 'Token em falta' });
+    }
+    try {
+        const payload = jwt.verify(authHeader.substring(7), JWT_SECRET) as { id: number; perfil: string };
+        const utilizadorRepo = AppDataSource.getRepository(Utilizador);
+        const utilizador = await utilizadorRepo.findOne({ where: { id: payload.id } });
+        if (!utilizador || utilizador.password !== req.body.password) {
+            return res.status(401).json({ erro: 'Password incorreta' });
+        }
+        return res.status(200).json({ ok: true });
+    } catch {
+        return res.status(401).json({ erro: 'Token invalido' });
+    }
 });
 
 /*
